@@ -1,0 +1,121 @@
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { GenerateOutput } from './GenerateOutput';
+import { DASHBOARD_PLATFORMS, PLATFORM_LABELS, type DashboardPlatform } from '@/lib/constants';
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
+
+async function callGenerate(prompt: string): Promise<string> {
+  const res = await fetchWithAuth('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || 'Generation failed');
+  }
+  const { text } = await res.json();
+  return text;
+}
+
+const PLATFORM_GUIDELINES: Record<DashboardPlatform, string> = {
+  linkedin:
+    'linkedin: longer, more reflective. Add professional context. First line hooks. Expand the lesson.',
+  twitter:
+    'twitter: thread format. Each tweet numbered. Under 280 chars each. Hook tweet earns the click.',
+};
+
+export function Repurpose() {
+  const [script, setScript] = useState('');
+  const [fromPlatform, setFromPlatform] = useState<DashboardPlatform>('linkedin');
+  const [toPlatform, setToPlatform] = useState<DashboardPlatform>('twitter');
+  const [output, setOutput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const generate = async () => {
+    if (loading) return; // guard against double-submit
+    if (!script.trim()) {
+      setError('Paste a script first');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    setOutput('');
+    const prompt = `Adapt this ${fromPlatform} script for ${toPlatform}.
+SCRIPT: ${script.trim()}
+
+${toPlatform} guidelines:
+- ${PLATFORM_GUIDELINES[toPlatform]}
+
+Match the voice, keep every specific detail, adapt only the format and length. No em dashes.`;
+    try {
+      const text = await callGenerate(prompt);
+      setOutput(text);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Generation failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <label className="block section-label mb-2">Paste script</label>
+        <textarea
+          value={script}
+          onChange={(e) => setScript(e.target.value)}
+          rows={6}
+          placeholder="Paste the script you want to repurpose..."
+          className="w-full bg-bg-tertiary border border-border rounded-md px-4 py-3 font-body text-[13px] text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-border-hover resize-none transition-colors duration-100"
+        />
+      </div>
+
+      <div className="flex gap-4 flex-wrap">
+        <div>
+          <label className="block section-label mb-1">From</label>
+          <select
+            value={fromPlatform}
+            onChange={(e) => setFromPlatform(e.target.value as DashboardPlatform)}
+            className="bg-bg-tertiary border border-border rounded-md px-3 py-2 font-body text-[13px] text-text-primary focus:outline-none focus:border-border-hover transition-colors duration-100"
+          >
+            {DASHBOARD_PLATFORMS.map((p) => (
+              <option key={p} value={p}>
+                {PLATFORM_LABELS[p]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block section-label mb-1">To</label>
+          <select
+            value={toPlatform}
+            onChange={(e) => setToPlatform(e.target.value as DashboardPlatform)}
+            className="bg-bg-tertiary border border-border rounded-md px-3 py-2 font-body text-[13px] text-text-primary focus:outline-none focus:border-border-hover transition-colors duration-100"
+          >
+            {DASHBOARD_PLATFORMS.map((p) => (
+              <option key={p} value={p}>
+                {PLATFORM_LABELS[p]}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <Button
+        onClick={generate}
+        loading={loading}
+        disabled={!script.trim()}
+      >
+        Repurpose
+      </Button>
+
+      {error && <p className="font-body text-[13px] text-accent-primary">{error}</p>}
+
+      <GenerateOutput text={output} loading={loading} />
+    </div>
+  );
+}

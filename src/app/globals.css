@@ -1,0 +1,354 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #fbfaf7;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f4f2ec;
+  --text-primary: #171717;
+  --text-secondary: #56544f;
+  --text-tertiary: #908d87;
+  --border-default: rgba(23, 23, 23, 0.1);
+  --border-hover: rgba(23, 23, 23, 0.16);
+  --accent: #2563eb;
+  --accent-light: rgba(37, 99, 235, 0.1);
+  --accent-dark: #1d4ed8;
+  --sage: #0f766e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--text-primary);
+}
+
+::selection {
+  background: #171717;
+  color: #fbfaf7;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+@layer components {
+  .page-shell {
+    @apply max-w-4xl mx-auto space-y-6 pt-1 pb-8;
+  }
+
+  .page-shell-wide {
+    @apply max-w-[1100px] mx-auto space-y-6 pt-1 pb-8;
+  }
+
+  /* Editorial page title — DM Sans semibold like landing section headlines. */
+  .page-title {
+    @apply text-[clamp(28px,3.5vw,36px)] font-semibold leading-[1.05] tracking-[-0.03em] text-ink;
+  }
+
+  .page-subtitle {
+    @apply mt-2 max-w-2xl text-[15px] leading-relaxed text-ink2;
+  }
+
+  /* Mono eyebrow above a page/section title (e.g. "02 / THE PROBLEM"). */
+  .page-eyebrow {
+    @apply font-mono text-[11.5px] uppercase tracking-[0.12em] text-ink3;
+  }
+
+  /* Hairline rule used to separate major sections on the editorial grid. */
+  .hairline {
+    @apply border-t border-hair;
+  }
+
+  .card-surface {
+    @apply rounded-xl border border-hair bg-white/90 p-4 shadow-[0_20px_50px_-30px_rgba(23,23,23,0.12)] backdrop-blur-sm;
+  }
+
+  /* Legacy dashboard panels — maps old class combos to landing-style surfaces. */
+  .shadow-card {
+    box-shadow: 0 20px 50px -30px rgba(23, 23, 23, 0.12);
+  }
+
+  .border-border.bg-bg-secondary,
+  .border-border.bg-bg-elevated,
+  .editorial .bg-bg-secondary,
+  .editorial .bg-bg-elevated {
+    @apply border-hair bg-white/90 backdrop-blur-sm;
+  }
+
+  .editorial .bg-bg-tertiary {
+    @apply bg-paper2/80;
+  }
+
+  .editorial .border-border {
+    @apply border-hair;
+  }
+
+  .editorial .rounded-lg.bg-bg-secondary,
+  .editorial .rounded-xl.bg-bg-secondary,
+  .editorial .rounded-lg.bg-bg-elevated,
+  .editorial .rounded-xl.bg-bg-elevated {
+    box-shadow: 0 20px 50px -30px rgba(23, 23, 23, 0.12);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] px-6 rounded-full text-[15px] font-medium text-paper bg-ink hover:bg-ink/90 transition-all hover:-translate-y-px shadow-[0_12px_40px_-12px_rgba(23,23,23,0.45)] disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-full text-[15px] font-medium text-ink bg-white/90 border border-hair2 backdrop-blur-sm hover:border-blue/25 hover:bg-white transition-all disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 min-h-[44px] px-4 rounded-full text-sm font-medium text-ink2 hover:text-ink hover:bg-paper2 transition-colors;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium text-ink mb-1.5;
+  }
+
+  .field-hint {
+    @apply text-xs text-ink3 mt-1;
+  }
+
+  .select-field {
+    @apply w-full min-h-[48px] appearance-none bg-white border border-hair rounded-lg px-3 py-2 text-[15px] text-ink cursor-pointer transition-colors;
+  }
+
+  .chip {
+    @apply inline-flex items-center px-3 py-1.5 rounded-badge text-xs font-medium min-h-[32px];
+  }
+
+  .section-label {
+    @apply font-mono text-[11px] uppercase tracking-[0.12em] text-ink3;
+  }
+
+  .empty-state {
+    @apply rounded-xl border border-dashed border-hair bg-white/60 p-5 text-sm text-ink2;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in-right 0.2s ease-out;
+}
+
+@keyframes pulse-skeleton {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.animate-skeleton {
+  animation: pulse-skeleton 1.5s ease-in-out infinite;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ───────────────────────── Content OS landing (scoped dark theme) ───────────────────────── */
+.os-landing {
+  --os-bg: #07080a;
+  --os-text: #f4f0e8;
+  --os-soft: #c9c0b3;
+  --os-muted: #7f776c;
+  background: var(--os-bg);
+  color: var(--os-soft);
+  font-family: var(--font-hanken), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+.os-landing h1,
+.os-landing h2,
+.os-landing h3 {
+  color: var(--os-text);
+}
+
+.os-landing ::selection {
+  background: rgba(255, 107, 74, 0.3);
+  color: #fff;
+}
+
+.os-serif {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+.os-mono {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+/* Film-grain texture overlay: adds cinematic depth without an image asset */
+.os-grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Gradient shimmer text: oil-slick coral→gold→cyan, animated sweep */
+.os-shimmer-text {
+  background: linear-gradient(
+    100deg,
+    #ff6b4a 0%,
+    #d7b56d 28%,
+    #f4f0e8 50%,
+    #5be7d8 72%,
+    #ff6b4a 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: os-shimmer 6s linear infinite;
+}
+
+@keyframes os-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.os-landing .os-glass {
+  background: rgba(20, 22, 27, 0.6);
+  border: 1px solid rgba(244, 240, 232, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-shimmer-text,
+  .os-landing [class*='animate-os-'] {
+    animation: none !important;
+  }
+}
+
+/* ───────────────────────── Editorial theme (Swiss-editorial light) ───────────────────────── */
+/* Scoped theme for the marketing landing and the editorial app reskin. Off-white
+   paper, ink type, hairline rules, Fraunces display. Mirrors the design handoff
+   tokens so the look stays consistent between landing and product surfaces. */
+.editorial {
+  background: #fbfaf7;
+  color: #171717;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.editorial ::selection {
+  background: #171717;
+  color: #fbfaf7;
+}
+
+.editorial [id] {
+  scroll-margin-top: 5.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial {
+    scroll-behavior: auto;
+  }
+  .editorial [class*='transition'] {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Fraunces display + JetBrains mono helpers (use alongside Tailwind font-serif/mono) */
+.ed-serif {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-optical-sizing: auto;
+}
+.ed-mono {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial [class*='animate-ed-'],
+  .editorial [class*='animate-land-'] {
+    animation: none !important;
+  }
+}
+
+/* Lenis smooth scroll (loaded dynamically on landing) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}

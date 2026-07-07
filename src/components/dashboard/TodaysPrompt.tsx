@@ -1,0 +1,114 @@
+'use client';
+
+import { useCallback, useEffect, useState } from 'react';
+import { RefreshCw } from 'lucide-react';
+
+const CACHE_KEY = 'content_os_todays_prompt';
+
+interface CachedPrompt {
+  date: string;
+  text: string;
+}
+
+function getTodayDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getCachedPrompt(): string | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const cached: CachedPrompt = JSON.parse(raw);
+    if (cached.date === getTodayDate() && cached.text) {
+      return cached.text;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedPrompt(text: string): void {
+  try {
+    const entry: CachedPrompt = { date: getTodayDate(), text };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(entry));
+  } catch {
+    // localStorage may be unavailable; silently ignore
+  }
+}
+
+interface TodaysPromptProps {
+  postsSummary: string;
+}
+
+export default function TodaysPrompt({ postsSummary }: TodaysPromptProps) {
+  const [suggestion, setSuggestion] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const fetchSuggestion = useCallback(async () => {
+    setLoading(true);
+    try {
+      const prompt = `Here is the creator's content schedule for this week: ${postsSummary}. What single content idea is most missing? Give one specific idea. Pillar name, then one sentence. No em dashes.`;
+      // This is a throwaway dashboard hint, not published content — skip the heavy
+      // voice pipeline (fast + no voice matching). One LLM call instead of the full
+      // 4-stage pipeline: far less latency and no timeout risk in production.
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, fast: true, useVoice: false }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.text ?? 'Could not generate a suggestion.';
+        setSuggestion(text);
+        setCachedPrompt(text);
+      } else {
+        setSuggestion('Could not generate a suggestion right now. Try again later.');
+      }
+    } catch {
+      setSuggestion('Could not generate a suggestion right now. Try again later.');
+    } finally {
+      setLoading(false);
+    }
+  }, [postsSummary]);
+
+  useEffect(() => {
+    const cached = getCachedPrompt();
+    if (cached) {
+      setSuggestion(cached);
+      setLoading(false);
+      return;
+    }
+    fetchSuggestion();
+  }, [fetchSuggestion]);
+
+  return (
+    <section className="card-surface p-4">
+      <div className="flex items-center justify-between mb-3">
+        <p className="section-label">
+          Idea for today
+        </p>
+        <button
+          type="button"
+          onClick={fetchSuggestion}
+          disabled={loading}
+          className="text-ink3 hover:text-blue transition-colors disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-paper2"
+          aria-label="Get another idea"
+        >
+          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+        </button>
+      </div>
+      {loading ? (
+        <div className="space-y-2">
+          <div className="h-3 w-full bg-paper2 rounded-full animate-pulse" />
+          <div className="h-3 w-3/4 bg-paper2 rounded-full animate-pulse" />
+          <div className="h-3 w-5/6 bg-paper2 rounded-full animate-pulse" />
+        </div>
+      ) : (
+        <p className="text-sm text-ink leading-relaxed">
+          {suggestion}
+        </p>
+      )}
+    </section>
+  );
+}
