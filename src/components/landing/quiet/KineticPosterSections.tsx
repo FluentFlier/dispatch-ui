@@ -102,7 +102,7 @@ function VoicePoster() {
       ref={ref}
       className="relative overflow-hidden border-b-[3px] border-ink bg-[radial-gradient(circle_at_72%_22%,#ff9a87_0%,#ff694e_42%,#f45840_100%)] text-ink"
     >
-      <div className="relative mx-auto grid min-h-[860px] max-w-[1400px] gap-12 px-5 py-24 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:px-12 lg:py-32">
+      <div className="relative mx-auto grid min-h-[740px] max-w-[1400px] gap-8 px-5 py-24 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:px-12 lg:py-32">
         <div className="relative z-10">
           <motion.h2
             initial={reduceMotion ? false : { opacity: 0, y: 46 }}
@@ -119,26 +119,13 @@ function VoicePoster() {
             Creator Brain learns from your posts, emails, and stories. Voice QA checks every draft
             before it reaches your queue.
           </p>
-          <div className="mt-8 flex flex-wrap gap-2">
-            {['Story Bank', 'Creator Brain', 'Voice QA'].map((item, index) => (
-              <motion.span
-                key={item}
-                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: 0.12 + index * 0.08, ease: EASE }}
-                className="rounded-full border-2 border-ink bg-paper px-3 py-1.5 text-xs font-bold"
-              >
-                {item}
-              </motion.span>
-            ))}
-          </div>
+      
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, x: -24 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.62, delay: 0.24, ease: EASE }}
-            className="mt-8 w-[330px] max-w-[72vw]"
+            className="mt-6 w-[240px] max-w-[60vw]"
           >
             <Image
               src="/images/illustrations/voice-character-clean.png"
@@ -152,7 +139,7 @@ function VoicePoster() {
 
         <motion.div
           style={{ y: composerY }}
-          className="relative z-10 flex min-h-[500px] items-center justify-center"
+          className="relative z-10 flex min-h-[440px] items-center justify-center"
         >
           <div className="relative z-10">
             <VoiceComposer />
