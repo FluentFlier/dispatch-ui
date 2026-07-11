@@ -49,7 +49,7 @@ function VoiceComposer() {
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <div className="mt-3 grid grid-cols-1 gap-2 min-[440px]:grid-cols-3">
         {[
           ['Brand voice', 'On-brand'],
           ['Audience', 'Founder-creators'],
@@ -102,14 +102,14 @@ function VoicePoster() {
       ref={ref}
       className="relative overflow-hidden border-b-[3px] border-ink bg-[radial-gradient(circle_at_72%_22%,#ff9a87_0%,#ff694e_42%,#f45840_100%)] text-ink"
     >
-      <div className="relative mx-auto grid min-h-[740px] max-w-[1400px] gap-8 px-5 py-24 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:px-12 lg:py-32">
+      <div className="relative mx-auto grid min-h-[740px] max-w-[1400px] gap-6 px-5 py-24 sm:gap-8 sm:px-8 md:grid-cols-[0.9fr_1.1fr] md:items-center md:gap-5 lg:grid-cols-[0.92fr_1.08fr] lg:gap-8 lg:px-12 lg:py-32">
         <div className="relative z-10">
           <motion.h2
             initial={reduceMotion ? false : { opacity: 0, y: 46 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 max-w-[8ch] text-[clamp(4.6rem,9vw,9.5rem)] font-black uppercase leading-[0.76] tracking-[-0.075em]"
+            className="m-0 mt-6 max-w-[8ch] text-[clamp(3.65rem,17vw,5.4rem)] font-black uppercase leading-[0.78] tracking-[-0.07em] sm:text-[clamp(4.6rem,9vw,9.5rem)] sm:leading-[0.76] sm:tracking-[-0.075em] md:text-[4.15rem] lg:text-[clamp(4.6rem,9vw,9.5rem)]"
           >
             <span className="block text-paper">Your voice</span>
             <span className="block">before</span>
@@ -125,7 +125,7 @@ function VoicePoster() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.62, delay: 0.24, ease: EASE }}
-            className="mt-6 w-[240px] max-w-[60vw]"
+            className="mt-6 w-[200px] max-w-[58vw] sm:w-[220px] sm:max-w-[60vw] md:w-[180px] lg:w-[240px]"
           >
             <Image
               src="/images/illustrations/voice-character-clean.png"
@@ -139,25 +139,25 @@ function VoicePoster() {
 
         <motion.div
           style={{ y: composerY }}
-          className="relative z-10 flex min-h-[440px] items-center justify-center"
+          className="relative z-10 flex min-h-[390px] items-center justify-center sm:min-h-[440px]"
         >
-          <div className="relative z-10">
+          <div className="relative z-10 w-full max-w-[520px]">
             <VoiceComposer />
           </div>
-          <div className="absolute -right-4 -top-10 z-20 hidden lg:block">
+          <div className="absolute -right-2 -top-8 z-20 hidden origin-top-right scale-75 md:block lg:-right-4 lg:-top-10 lg:scale-100">
             <VoiceGauge rotation={reduceMotion ? 8 : dialRotation} />
           </div>
           <motion.div
             aria-hidden
-            className="absolute -right-5 top-0 z-20 grid h-20 w-20 place-items-center rounded-full border-[3px] border-ink bg-lilac"
+            className="absolute right-1 top-0 z-20 grid h-16 w-16 place-items-center rounded-full border-[3px] border-ink bg-lilac sm:-right-5 sm:h-20 sm:w-20"
             animate={reduceMotion ? undefined : { rotate: [0, 8, 0], y: [0, -8, 0] }}
             transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <Sparkles className="h-8 w-8" strokeWidth={2.2} />
+            <Sparkles className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={2.2} />
           </motion.div>
         </motion.div>
 
-        <div className="lg:hidden">
+        <div className="mx-auto md:hidden">
           <VoiceGauge rotation={8} />
         </div>
       </div>
@@ -175,14 +175,14 @@ function DistributionPoster() {
 
   return (
     <section ref={ref} className="relative overflow-hidden border-b-[3px] border-ink bg-[#fbfbfb] text-ink">
-      <div className="mx-auto grid min-h-[900px] max-w-[1400px] gap-12 px-5 py-24 sm:px-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center lg:px-12 lg:py-32">
+      <div className="mx-auto grid min-h-[820px] max-w-[1400px] gap-8 px-5 py-24 sm:gap-12 sm:px-8 md:min-h-[780px] md:grid-cols-[0.82fr_1.18fr] md:items-center md:gap-6 lg:min-h-[900px] lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:px-12 lg:py-32">
         <div className="relative z-20">
           <motion.h2
             initial={reduceMotion ? false : { opacity: 0, x: -44 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 text-[clamp(5rem,9vw,9.2rem)] font-black uppercase leading-[0.78] tracking-[-0.075em]"
+            className="m-0 mt-6 text-[clamp(3.8rem,18vw,5.5rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] sm:text-[clamp(5rem,9vw,9.2rem)] sm:leading-[0.78] sm:tracking-[-0.075em] md:text-[3.35rem] lg:text-[clamp(5rem,9vw,9.2rem)]"
           >
             Repurpose
             <span className="block text-blue">once.</span>
@@ -196,7 +196,7 @@ function DistributionPoster() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.22, ease: EASE }}
-            className="mt-9 w-[270px] max-w-[68vw]"
+            className="mt-8 w-[220px] max-w-[64vw] sm:mt-9 sm:w-[230px] sm:max-w-[68vw] md:w-[170px] lg:w-[270px]"
           >
             <Image
               src="/images/illustrations/distribution-character.png"
@@ -210,7 +210,7 @@ function DistributionPoster() {
 
         <motion.div style={{ y: calendarY }} className="relative">
           <ArcherContainer
-            className="relative min-h-[580px] lg:min-h-[690px]"
+            className="relative min-h-[520px] sm:min-h-[580px] md:min-h-[560px] lg:min-h-[690px]"
             strokeColor="#171512"
             strokeWidth={5}
             strokeDasharray="12 11"
@@ -218,18 +218,18 @@ function DistributionPoster() {
             offset={8}
             svgContainerStyle={{ zIndex: 10 }}
           >
-            <div className="absolute inset-x-[-12%] top-[8%] rotate-[5deg] rounded-[24px] border-[3px] border-ink bg-blue p-4 shadow-[14px_18px_0_oklch(18%_0.012_55)] sm:p-6 lg:inset-x-[-4%]">
+            <div className="absolute inset-x-0 top-[8%] rotate-[2deg] rounded-[20px] border-[3px] border-ink bg-blue p-3 shadow-[10px_13px_0_oklch(18%_0.012_55)] sm:inset-x-[-12%] sm:rotate-[5deg] sm:rounded-[24px] sm:p-6 sm:shadow-[14px_18px_0_oklch(18%_0.012_55)] md:inset-x-[4%] md:rotate-[3deg] md:p-4 md:shadow-[10px_12px_0_oklch(18%_0.012_55)] lg:inset-x-[-4%] lg:rotate-[5deg] lg:p-6 lg:shadow-[14px_18px_0_oklch(18%_0.012_55)]">
               <div className="flex items-center justify-between text-paper">
-                <p className="m-0 text-3xl font-black uppercase tracking-[-0.05em] sm:text-5xl">May</p>
-                <span className="rounded-[8px] border border-paper/35 px-3 py-1 text-xs font-bold">Publishing calendar</span>
+                <p className="m-0 text-3xl font-black uppercase tracking-[-0.05em] sm:text-5xl md:text-4xl lg:text-5xl">May</p>
+                <span className="rounded-[8px] border border-paper/35 px-2 py-1 text-[9px] font-bold sm:px-3 sm:text-xs md:text-[10px] lg:text-xs">Publishing calendar</span>
               </div>
               <div className="mt-5 grid grid-cols-5 overflow-hidden rounded-[14px] border-2 border-ink bg-paper">
                 {DAYS.map((day, index) => (
-                  <div key={day} className="min-h-[280px] border-r border-ink/15 p-2 last:border-r-0 sm:p-3">
+                  <div key={day} className="min-h-[230px] border-r border-ink/15 p-1.5 last:border-r-0 sm:min-h-[280px] sm:p-3 md:min-h-[240px] md:p-2 lg:min-h-[280px] lg:p-3">
                     <p className="m-0 text-[9px] font-black tracking-[0.1em] text-ink3">{day}</p>
                     <p className="m-0 mt-1 text-lg font-black text-ink">{26 + index}</p>
                     {index === 2 && (
-                      <div className="mt-12 h-24 rounded-[10px] border-2 border-ink bg-flame p-2 text-[9px] font-bold text-ink shadow-[4px_5px_0_oklch(18%_0.012_55)]">
+                      <div className="mt-8 h-20 rounded-[8px] border-2 border-ink bg-flame p-1.5 text-[8px] font-bold text-ink shadow-[3px_4px_0_oklch(18%_0.012_55)] sm:mt-12 sm:h-24 sm:rounded-[10px] sm:p-2 sm:text-[9px] sm:shadow-[4px_5px_0_oklch(18%_0.012_55)] md:mt-9 md:h-20 lg:mt-12 lg:h-24">
                         Founder lesson
                       </div>
                     )}
@@ -255,7 +255,7 @@ function DistributionPoster() {
                 },
               ]}
             >
-              <div className="absolute left-[4%] top-[4%] z-20 w-44">
+              <div className="absolute left-[2%] top-[2%] z-20 w-36 sm:left-[4%] sm:top-[4%] sm:w-44">
                 <motion.div
                   initial={reduceMotion ? false : { opacity: 0, x: -28 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -270,7 +270,7 @@ function DistributionPoster() {
             </ArcherElement>
 
             <ArcherElement id="distribution-linkedin">
-              <div className="absolute bottom-[4%] left-[5%] z-20 w-[42%]">
+              <div className="absolute bottom-[3%] left-0 z-20 w-[47%] sm:bottom-[4%] sm:left-[5%] sm:w-[42%]">
                 <div className="-rotate-2 rounded-[16px] border-[3px] border-ink bg-surface p-3 shadow-[7px_8px_0_oklch(18%_0.012_55)] sm:p-4">
                   <div className="flex items-center gap-2">
                     <Image src="/images/brands/linkedin.png" alt="" width={24} height={24} className="h-6 w-6" />
@@ -282,7 +282,7 @@ function DistributionPoster() {
             </ArcherElement>
 
             <ArcherElement id="distribution-x">
-              <div className="absolute bottom-0 right-[2%] z-20 w-[42%]">
+              <div className="absolute bottom-0 right-0 z-20 w-[47%] sm:right-[2%] sm:w-[42%]">
                 <div className="rotate-2 rounded-[16px] border-[3px] border-ink bg-surface p-3 shadow-[7px_8px_0_oklch(18%_0.012_55)] sm:p-4">
                   <div className="flex items-center gap-2">
                     <Image src="/images/brands/x.png" alt="" width={22} height={22} className="h-[22px] w-[22px] rounded-[3px]" />
@@ -306,19 +306,41 @@ const SIGNALS = [
   { title: 'Warm reply', detail: 'Appreciate the reach. Let’s connect.', color: 'bg-lime', icon: MessageCircle },
 ] as const;
 
+type Signal = (typeof SIGNALS)[number];
+
+function SignalCardBody({ signal }: { signal: Signal }) {
+  const Icon = signal.icon;
+
+  return (
+    <>
+      <div className="flex items-center gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] border-2 border-ink bg-paper">
+          <Icon className="h-[18px] w-[18px]" strokeWidth={2.4} />
+        </span>
+        <p className="m-0 min-w-0 flex-1 text-[13px] font-black leading-[1.15] tracking-[-0.015em] sm:text-sm">
+          {signal.title}
+        </p>
+      </div>
+      <p className="m-0 mt-4 border-t border-ink/15 pt-3 text-[11px] font-semibold leading-[1.45] text-ink/70 sm:text-xs sm:leading-[1.5]">
+        {signal.detail}
+      </p>
+    </>
+  );
+}
+
 function LeadsPoster() {
   const reduceMotion = useReducedMotion();
 
   return (
     <section className="relative overflow-hidden border-b-[3px] border-ink bg-ink text-paper">
-      <div className="mx-auto grid min-h-[920px] max-w-[1400px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center lg:px-12 lg:py-32">
+      <div className="mx-auto grid min-h-[920px] max-w-[1400px] gap-10 px-5 py-24 sm:gap-16 sm:px-8 md:grid-cols-[0.82fr_1.18fr] md:items-center md:gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:gap-16 lg:px-12 lg:py-32">
         <div className="relative z-20">
           <motion.h2
             initial={reduceMotion ? false : { opacity: 0, y: 44 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 text-[clamp(4.6rem,8.5vw,8.7rem)] font-black uppercase leading-[0.78] tracking-[-0.075em]"
+            className="m-0 mt-6 text-[clamp(3.45rem,16.5vw,5.2rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] sm:text-[clamp(4.6rem,8.5vw,8.7rem)] sm:leading-[0.78] sm:tracking-[-0.075em] md:text-[3rem] lg:text-[clamp(4.6rem,8.5vw,8.7rem)]"
           >
             <span className="block text-paper">Attention</span>
             <span className="block text-lilac">into</span>
@@ -333,7 +355,7 @@ function LeadsPoster() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.62, delay: 0.2, ease: EASE }}
-            className="mt-8 w-[185px] max-w-[48vw]"
+            className="mt-8 w-[155px] max-w-[44vw] sm:w-[170px] sm:max-w-[48vw] md:w-[125px] lg:w-[185px]"
           >
             <Image
               src="/images/illustrations/signal-character-padded.png"
@@ -345,8 +367,29 @@ function LeadsPoster() {
           </motion.div>
         </div>
 
+        <div className="relative md:hidden">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute bottom-8 left-1/2 top-8 border-l-[3px] border-dashed border-lime/55"
+          />
+          {SIGNALS.map((signal, index) => (
+            <motion.div
+              key={signal.title}
+              initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-10%' }}
+              transition={{ duration: 0.5, delay: index * 0.08, ease: EASE }}
+              className={`relative z-10 mb-6 w-[86%] rounded-[18px] border-[3px] border-paper p-5 text-ink shadow-[8px_9px_0_oklch(99.2%_0.002_85)] ${
+                index % 2 === 0 ? 'mr-auto -rotate-1' : 'ml-auto rotate-1'
+              } ${signal.color}`}
+            >
+              <SignalCardBody signal={signal} />
+            </motion.div>
+          ))}
+        </div>
+
         <ArcherContainer
-          className="relative -ml-[10%] min-h-[700px] w-[120%]"
+          className="relative -ml-[10%] hidden min-h-[620px] w-[120%] md:block lg:min-h-[700px]"
           strokeColor="#c9ff49"
           strokeWidth={5}
           strokeDasharray="12 12"
@@ -354,7 +397,7 @@ function LeadsPoster() {
           offset={8}
           svgContainerStyle={{ zIndex: 5 }}
         >
-          {SIGNALS.map(({ title, detail, color, icon: Icon }, index) => {
+          {SIGNALS.map((signal, index) => {
             const positions = [
               'left-[8%] top-[0] rotate-[-2deg]',
               'right-[8%] top-[15%] rotate-[2deg]',
@@ -378,7 +421,7 @@ function LeadsPoster() {
                 : [];
             return (
               <ArcherElement
-                key={title}
+                key={signal.title}
                 id={`signal-${index}`}
                 relations={relations}
               >
@@ -389,19 +432,9 @@ function LeadsPoster() {
                     whileHover={reduceMotion ? undefined : { y: -7, rotate: 0 }}
                     viewport={{ once: true, margin: '-12%' }}
                     transition={{ duration: 0.55, delay: index * 0.1, ease: EASE }}
-                    className={`min-h-[154px] rounded-[18px] border-[3px] border-paper p-4 text-ink shadow-[8px_9px_0_oklch(99.2%_0.002_85)] sm:min-h-[166px] sm:p-5 ${color}`}
+                    className={`min-h-[166px] rounded-[18px] border-[3px] border-paper p-5 text-ink shadow-[8px_9px_0_oklch(99.2%_0.002_85)] ${signal.color}`}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] border-2 border-ink bg-paper">
-                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.4} />
-                      </span>
-                      <p className="m-0 min-w-0 flex-1 text-[13px] font-black leading-[1.15] tracking-[-0.015em] sm:text-sm">
-                        {title}
-                      </p>
-                    </div>
-                    <p className="m-0 mt-4 border-t border-ink/15 pt-3 text-[11px] font-semibold leading-[1.45] text-ink/70 sm:text-xs sm:leading-[1.5]">
-                      {detail}
-                    </p>
+                    <SignalCardBody signal={signal} />
                   </motion.div>
                 </div>
               </ArcherElement>
