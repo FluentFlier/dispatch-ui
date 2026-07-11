@@ -223,10 +223,10 @@ function Hero({ funnel }: { funnel: FunnelState }) {
               className="origin-bottom transform-gpu overflow-hidden rounded-[22px] border border-ink/15 bg-surface"
             >
               <Image
-                src="/images/content-os-dashboard-relay-command-center.png"
-                alt="Content OS command center showing the weekly relay from signals and drafts through voice QA, publishing, replies, Creator Brain learning, and warm conversations."
-                width={1536}
-                height={864}
+                src="/images/content-os-writing-page.jpg"
+                alt="Content OS Write screen with the prompt What are we creating today and a draft composer for LinkedIn posts in your voice."
+                width={1024}
+                height={642}
                 priority
                 className="h-auto w-full"
               />
