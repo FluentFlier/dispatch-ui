@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { LinkPreview } from '@/components/ui/link-preview';
+import { SmoothCursor } from '@/components/ui/smooth-cursor';
 import { getFunnelCta, type FunnelState } from '@/lib/funnel-cta';
 import LandingSmoothScroll from '../LandingSmoothScroll';
 import KineticPosterSections from './KineticPosterSections';
@@ -146,7 +147,7 @@ function Hero({ funnel }: { funnel: FunnelState }) {
               </span>
             </span>
           </h1>
-          <p className="mx-auto mb-0 mt-6 max-w-[36rem] text-base leading-7 text-ink2 sm:text-lg">
+          <div className="mx-auto mb-0 mt-6 max-w-[36rem] text-base leading-7 text-ink2 sm:text-lg">
             Write in your voice, publish to{' '}
             <LinkPreview
               url="https://www.linkedin.com/"
@@ -178,7 +179,7 @@ function Hero({ funnel }: { funnel: FunnelState }) {
               />
             </LinkPreview>
             {', reply faster, and reach warm contacts without losing the context between each step.'}
-          </p>
+          </div>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
             <Link href={cta.href} className={`quiet-button-primary ${FOCUS}`}>
               Get started
@@ -520,6 +521,7 @@ export default function QuietLanding({ funnel }: { funnel: FunnelState }) {
   return (
     <LandingSmoothScroll>
       <main id="main-content" className="quiet-landing min-h-screen overflow-x-clip bg-paper text-ink">
+        <SmoothCursor />
         <a
           href="#main-content"
           className="sr-only z-[100] focus:fixed focus:left-4 focus:top-4 focus:not-sr-only focus:rounded-[10px] focus:bg-ink focus:px-4 focus:py-3 focus:text-paper"
