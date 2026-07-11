@@ -109,7 +109,7 @@ function VoicePoster() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 max-w-[8ch] text-[clamp(3.65rem,17vw,5.4rem)] font-black uppercase leading-[0.78] tracking-[-0.07em] sm:text-[clamp(4.6rem,9vw,9.5rem)] sm:leading-[0.76] sm:tracking-[-0.075em] md:text-[4.15rem] lg:text-[clamp(4.6rem,9vw,9.5rem)]"
+            className="m-0 mt-6 max-w-full text-[clamp(3.1rem,14vw,4.5rem)] font-black uppercase leading-[0.8] tracking-[-0.065em] sm:max-w-[8ch] sm:text-[clamp(4.2rem,9vw,5.5rem)] sm:leading-[0.76] sm:tracking-[-0.075em] md:text-[4.15rem] lg:text-[clamp(4.6rem,9vw,9.5rem)]"
           >
             <span className="block text-paper">Your voice</span>
             <span className="block">before</span>
@@ -125,7 +125,7 @@ function VoicePoster() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.62, delay: 0.24, ease: EASE }}
-            className="mt-6 w-[200px] max-w-[58vw] sm:w-[220px] sm:max-w-[60vw] md:w-[180px] lg:w-[240px]"
+            className="mt-6 hidden w-[200px] max-w-[58vw] sm:w-[220px] sm:max-w-[60vw] md:block md:w-[180px] lg:w-[240px]"
           >
             <Image
               src="/images/illustrations/voice-character-clean.png"
@@ -182,7 +182,7 @@ function DistributionPoster() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 text-[clamp(3.8rem,18vw,5.5rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] sm:text-[clamp(5rem,9vw,9.2rem)] sm:leading-[0.78] sm:tracking-[-0.075em] md:text-[3.35rem] lg:text-[clamp(5rem,9vw,9.2rem)]"
+            className="m-0 mt-6 max-w-full text-[clamp(3rem,14vw,4.6rem)] font-black uppercase leading-[0.82] tracking-[-0.065em] sm:text-[clamp(4rem,8vw,5rem)] sm:leading-[0.78] sm:tracking-[-0.075em] md:text-[3.35rem] lg:text-[clamp(5rem,9vw,9.2rem)]"
           >
             Repurpose
             <span className="block text-blue">once.</span>
@@ -196,7 +196,7 @@ function DistributionPoster() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.22, ease: EASE }}
-            className="mt-8 w-[220px] max-w-[64vw] sm:mt-9 sm:w-[230px] sm:max-w-[68vw] md:w-[170px] lg:w-[270px]"
+            className="mt-8 hidden w-[220px] max-w-[64vw] sm:mt-9 sm:w-[230px] sm:max-w-[68vw] md:block md:w-[170px] lg:w-[270px]"
           >
             <Image
               src="/images/illustrations/distribution-character.png"
@@ -340,7 +340,7 @@ function LeadsPoster() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 text-[clamp(3.45rem,16.5vw,5.2rem)] font-black uppercase leading-[0.8] tracking-[-0.07em] sm:text-[clamp(4.6rem,8.5vw,8.7rem)] sm:leading-[0.78] sm:tracking-[-0.075em] md:text-[3rem] lg:text-[clamp(4.6rem,8.5vw,8.7rem)]"
+            className="m-0 mt-6 max-w-full text-[clamp(2.7rem,12.5vw,4rem)] font-black uppercase leading-[0.82] tracking-[-0.06em] sm:text-[clamp(3.8rem,8vw,5rem)] sm:leading-[0.78] sm:tracking-[-0.075em] md:text-[3rem] lg:text-[clamp(4.6rem,8.5vw,8.7rem)]"
           >
             <span className="block text-paper">Attention</span>
             <span className="block text-lilac">into</span>
@@ -355,7 +355,7 @@ function LeadsPoster() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.62, delay: 0.2, ease: EASE }}
-            className="mt-8 w-[155px] max-w-[44vw] sm:w-[170px] sm:max-w-[48vw] md:w-[125px] lg:w-[185px]"
+            className="mt-8 hidden w-[155px] max-w-[44vw] sm:w-[170px] sm:max-w-[48vw] md:block md:w-[125px] lg:w-[185px]"
           >
             <Image
               src="/images/illustrations/signal-character-padded.png"
@@ -367,24 +367,65 @@ function LeadsPoster() {
           </motion.div>
         </div>
 
-        <div className="relative md:hidden">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute bottom-8 left-1/2 top-8 border-l-[3px] border-dashed border-lime/55"
-          />
-          {SIGNALS.map((signal, index) => (
-            <motion.div
-              key={signal.title}
-              initial={reduceMotion ? false : { opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-10%' }}
-              transition={{ duration: 0.5, delay: index * 0.08, ease: EASE }}
-              className={`relative z-10 mb-6 w-[86%] rounded-[18px] border-[3px] border-paper p-5 text-ink shadow-[8px_9px_0_oklch(99.2%_0.002_85)] ${
-                index % 2 === 0 ? 'mr-auto -rotate-1' : 'ml-auto rotate-1'
-              } ${signal.color}`}
-            >
-              <SignalCardBody signal={signal} />
-            </motion.div>
+        <div className="relative -translate-x-[7px] px-3 md:hidden">
+          {[SIGNALS.slice(0, 2), SIGNALS.slice(2)].map((group, groupIndex) => (
+            <div key={groupIndex}>
+              {groupIndex === 1 && (
+                <div className="my-3 flex h-32 justify-center" aria-hidden>
+                  <svg viewBox="0 0 90 132" className="h-32 w-24 overflow-visible">
+                    <defs>
+                      <marker id="mobile-signal-arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+                        <path d="M0 0 7 3.5 0 7Z" fill="#c9ff49" />
+                      </marker>
+                    </defs>
+                    <motion.path
+                      d="M45 3 C12 18 75 34 38 50 C10 66 72 80 44 98 C38 107 45 115 45 126"
+                      fill="none"
+                      stroke="#c9ff49"
+                      strokeWidth="5"
+                      strokeDasharray="10 9"
+                      strokeLinecap="round"
+                      markerEnd="url(#mobile-signal-arrow)"
+                      initial={reduceMotion ? false : { pathLength: 0 }}
+                      whileInView={{ pathLength: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, ease: EASE }}
+                    />
+                  </svg>
+                </div>
+              )}
+              <motion.div
+                initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-10%' }}
+                transition={{ duration: 0.55, delay: groupIndex * 0.12, ease: EASE }}
+                className={`mx-auto w-full overflow-hidden rounded-[22px] border-[3px] border-paper text-ink shadow-[0_8px_0_oklch(99.2%_0.002_85)] ${
+                  groupIndex === 0 ? 'bg-lilac' : 'bg-lime'
+                }`}
+              >
+                {group.map((signal, index) => {
+                  const Icon = signal.icon;
+                  return (
+                    <div
+                      key={signal.title}
+                      className={`flex items-start gap-4 p-5 ${
+                        index > 0 ? 'border-t-2 border-ink/15' : ''
+                      }`}
+                    >
+                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[12px] border-2 border-ink bg-paper">
+                        <Icon className="h-5 w-5" strokeWidth={2.4} />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="m-0 text-sm font-black leading-tight">{signal.title}</p>
+                        <p className="m-0 mt-2 text-xs font-semibold leading-5 text-ink/70">
+                          {signal.detail}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </motion.div>
+            </div>
           ))}
         </div>
 
