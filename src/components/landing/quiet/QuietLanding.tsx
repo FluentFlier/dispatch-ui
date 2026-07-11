@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -16,13 +16,12 @@ import {
   Target,
   X,
 } from 'lucide-react';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
 import { LinkPreview } from '@/components/ui/link-preview';
 import { SmoothCursor } from '@/components/ui/smooth-cursor';
 import { getFunnelCta, type FunnelState } from '@/lib/funnel-cta';
 import LandingSmoothScroll from '../LandingSmoothScroll';
 import KineticPosterSections from './KineticPosterSections';
-import QuietProductScreen from './QuietProductScreen';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const FOCUS =
@@ -43,11 +42,10 @@ function QuietNav({ funnel }: { funnel: FunnelState }) {
   return (
     <nav className="relative z-50 border-b border-transparent" aria-label="Main navigation">
       <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between px-5 sm:px-8">
-        <Link href="/" className={`flex min-h-11 items-center gap-2.5 text-[15px] font-semibold text-ink ${FOCUS}`}>
-          <span className="grid h-7 w-7 place-items-center rounded-[9px] border border-ink/15 bg-surface">
-            <span className="h-3 w-3 rounded-[4px] border-[2px] border-ink" />
+        <Link href="/" className={`flex min-h-11 items-center gap-2 text-ink ${FOCUS}`}>
+          <span className="text-[20px] font-bold leading-none tracking-[-0.045em]">
+            content os<span className="text-blue">.</span>
           </span>
-          Content OS
         </Link>
 
         <div className="hidden items-center gap-7 md:flex">
@@ -117,12 +115,32 @@ function QuietNav({ funnel }: { funnel: FunnelState }) {
 function Hero({ funnel }: { funnel: FunnelState }) {
   const reduceMotion = useReducedMotion();
   const cta = getFunnelCta(funnel);
+  const productRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: productScroll } = useScroll({
+    target: productRef,
+    offset: ['start end', 'end start'],
+  });
+  const productLiftY = useSpring(useTransform(productScroll, [0, 0.35, 0.65, 1], [72, 0, 0, -72]), {
+    stiffness: 82,
+    damping: 24,
+    mass: 0.42,
+  });
+  const productScale = useSpring(useTransform(productScroll, [0, 0.35, 0.65, 1], [0.91, 1, 1, 0.91]), {
+    stiffness: 82,
+    damping: 24,
+    mass: 0.42,
+  });
+  const productOpacity = useSpring(useTransform(productScroll, [0, 0.2, 0.72, 1], [0.35, 1, 1, 0]), {
+    stiffness: 100,
+    damping: 26,
+    mass: 0.3,
+  });
 
   return (
-    <header className="relative overflow-hidden bg-surface">
+    <header className="relative overflow-x-clip overflow-y-visible bg-surface">
       <div className="pointer-events-none absolute left-[8%] top-[34%] h-24 w-24 rounded-full bg-lime/20 blur-3xl" aria-hidden />
       <div className="pointer-events-none absolute right-[10%] top-[20%] h-32 w-32 rounded-full bg-lilac/20 blur-3xl" aria-hidden />
-      <div className="relative z-10 mx-auto max-w-[1240px] px-5 pb-20 pt-8 sm:px-8 sm:pt-10 lg:pt-12">
+      <div className="relative z-10 mx-auto max-w-[1240px] px-5 pb-8 pt-8 sm:px-8 sm:pb-10 sm:pt-10 lg:pt-12">
         <div className="mx-auto w-full max-w-[900px]">
           <Image
             src="/images/content-relay-characters.png"
@@ -188,27 +206,33 @@ function Hero({ funnel }: { funnel: FunnelState }) {
           </div>
         </motion.div>
 
-        <motion.div
+        <div
+          ref={productRef}
           id="product"
-          initial={reduceMotion ? false : { opacity: 0, y: 56, scale: 0.975 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.9, delay: reduceMotion ? 0 : 0.85, ease: EASE }}
-          className="relative mx-auto mt-14 max-w-[1120px] sm:mt-16"
+          className="relative z-20 mx-auto -mb-24 mt-16 hidden max-w-[1120px] md:block"
         >
-          <div className="absolute -left-8 top-20 hidden h-20 w-20 rotate-[-8deg] rounded-full bg-lime lg:block" aria-hidden />
-          <div className="absolute -right-8 bottom-24 hidden h-16 w-16 rotate-[12deg] rounded-[20px] bg-flame lg:block" aria-hidden />
-          <div className="relative aspect-[16/9] overflow-hidden rounded-[18px] border-[2px] border-ink bg-surface shadow-[0_36px_80px_-44px_oklch(18%_0.012_55_/_0.32)]">
-            <div className="flex h-9 items-center gap-1.5 border-b border-hair bg-paper2 px-4">
-              <span className="h-2.5 w-2.5 rounded-full bg-flame" />
-              <span className="h-2.5 w-2.5 rounded-full bg-lime" />
-              <span className="h-2.5 w-2.5 rounded-full bg-lilac" />
-              <span className="ml-3 text-[10px] font-semibold text-ink3">Content OS · Today</span>
-            </div>
-            <div className="h-[calc(100%-2.25rem)]">
-              <QuietProductScreen />
-            </div>
+          <div className="relative z-10">
+            <motion.div
+              style={{
+                boxShadow:
+                  '0 48px 96px -34px rgb(24 22 20 / 0.42), 0 18px 38px -24px rgb(24 22 20 / 0.26)',
+                ...(reduceMotion
+                  ? {}
+                  : { y: productLiftY, scale: productScale, opacity: productOpacity }),
+              }}
+              className="origin-bottom transform-gpu overflow-hidden rounded-[22px] border border-ink/15 bg-surface"
+            >
+              <Image
+                src="/images/content-os-dashboard-relay-command-center.png"
+                alt="Content OS command center showing the weekly relay from signals and drafts through voice QA, publishing, replies, Creator Brain learning, and warm conversations."
+                width={1536}
+                height={864}
+                priority
+                className="h-auto w-full"
+              />
+            </motion.div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </header>
   );

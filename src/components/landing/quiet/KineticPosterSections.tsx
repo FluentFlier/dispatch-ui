@@ -19,7 +19,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 function VoiceComposer() {
   return (
-    <div className="w-full max-w-[520px] rotate-[1.5deg] rounded-[18px] border-[3px] border-ink bg-surface p-3 shadow-[14px_16px_0_oklch(18%_0.012_55)] sm:p-4">
+    <div className="w-full max-w-[520px] rotate-[1.5deg] rounded-[18px] border-[3px] border-ink bg-surface p-3 shadow-[14px_16px_0_oklch(18%_0.012_55)] sm:p-4 lg:scale-[1.14] lg:p-5">
       <div className="flex items-center justify-between border-b-2 border-ink/15 pb-3">
         <div className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-[9px] bg-blue text-paper">
@@ -35,8 +35,8 @@ function VoiceComposer() {
         </span>
       </div>
 
-      <div className="mt-3 rounded-[12px] border-2 border-ink bg-paper p-4">
-        <p className="m-0 text-[10px] font-bold uppercase tracking-[0.1em] text-ink3">Behind the scenes</p>
+      <div className="mt-3 rounded-[12px] border-2 border-ink bg-paper p-4 lg:p-6">
+        <p className="m-0 text-[10px] font-semibold tracking-[0.02em] text-ink3">Behind the scenes</p>
         <p className="m-0 mt-3 text-sm font-medium leading-6 text-ink sm:text-base">
           We&apos;re launching something new this June. Can&apos;t wait to share it with you.
         </p>
@@ -68,7 +68,7 @@ function VoiceComposer() {
 function VoiceGauge({ rotation }: { rotation: number | MotionValue<number> }) {
   return (
     <div className="relative w-[190px] rounded-[18px] border-[3px] border-ink bg-lime p-4 text-ink shadow-[8px_10px_0_oklch(18%_0.012_55)]">
-      <p className="m-0 text-center text-xs font-black uppercase tracking-[0.1em]">Voice QA</p>
+      <p className="m-0 text-center text-xs font-bold tracking-[-0.01em]">Voice QA</p>
       <div className="relative mx-auto mt-4 h-20 w-36 overflow-hidden">
         <div className="absolute left-1/2 top-3 h-28 w-28 -translate-x-1/2 rounded-full border-[12px] border-ink bg-surface" />
         <div className="absolute left-1/2 top-3 h-28 w-28 -translate-x-1/2 rounded-full border-[12px] border-flame [clip-path:polygon(0_0,50%_0,50%_50%,0_50%)]" />
@@ -109,7 +109,7 @@ function VoicePoster() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 max-w-full text-[clamp(3.1rem,14vw,4.5rem)] font-black uppercase leading-[0.8] tracking-[-0.065em] sm:max-w-[8ch] sm:text-[clamp(4.2rem,9vw,5.5rem)] sm:leading-[0.76] sm:tracking-[-0.075em] md:text-[4.15rem] lg:text-[clamp(4.6rem,9vw,9.5rem)]"
+            className="m-0 mt-6 max-w-full text-[clamp(3.1rem,14vw,4.5rem)] font-bold leading-[0.88] tracking-[-0.05em] sm:max-w-[8ch] sm:text-[clamp(4.2rem,9vw,5.5rem)] sm:leading-[0.84] sm:tracking-[-0.06em] md:text-[4.15rem] lg:text-[clamp(4.6rem,9vw,9.5rem)]"
           >
             <span className="block text-paper">Your voice</span>
             <span className="block">before</span>
@@ -139,17 +139,17 @@ function VoicePoster() {
 
         <motion.div
           style={{ y: composerY }}
-          className="relative z-10 flex min-h-[390px] items-center justify-center sm:min-h-[440px]"
+        className="relative z-10 flex min-h-[390px] items-center justify-center sm:min-h-[440px] lg:min-h-[520px]"
         >
           <div className="relative z-10 w-full max-w-[520px]">
             <VoiceComposer />
           </div>
-          <div className="absolute -right-2 -top-8 z-20 hidden origin-top-right scale-75 md:block lg:-right-4 lg:-top-10 lg:scale-100">
+          <div className="absolute -right-2 -top-8 z-20 hidden origin-top-right scale-75 md:block lg:-right-10 lg:-top-14 lg:scale-[1.14]">
             <VoiceGauge rotation={reduceMotion ? 8 : dialRotation} />
           </div>
           <motion.div
             aria-hidden
-            className="absolute right-1 top-0 z-20 grid h-16 w-16 place-items-center rounded-full border-[3px] border-ink bg-lilac sm:-right-5 sm:h-20 sm:w-20"
+            className="absolute right-1 top-0 z-20 grid h-16 w-16 place-items-center rounded-full border-[3px] border-ink bg-lilac sm:-right-5 sm:h-20 sm:w-20 lg:-right-8 lg:bottom-2 lg:top-auto lg:h-24 lg:w-24"
             animate={reduceMotion ? undefined : { rotate: [0, 8, 0], y: [0, -8, 0] }}
             transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -165,7 +165,7 @@ function VoicePoster() {
   );
 }
 
-const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
 function DistributionPoster() {
   const ref = useRef<HTMLElement>(null);
@@ -182,7 +182,7 @@ function DistributionPoster() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 max-w-full text-[clamp(3rem,14vw,4.6rem)] font-black uppercase leading-[0.82] tracking-[-0.065em] sm:text-[clamp(4rem,8vw,5rem)] sm:leading-[0.78] sm:tracking-[-0.075em] md:text-[3.35rem] lg:text-[clamp(5rem,9vw,9.2rem)]"
+            className="m-0 mt-6 max-w-full text-[clamp(3rem,14vw,4.6rem)] font-bold leading-[0.9] tracking-[-0.05em] sm:text-[clamp(4rem,8vw,5rem)] sm:leading-[0.85] sm:tracking-[-0.06em] md:text-[3.35rem] lg:text-[clamp(5rem,9vw,9.2rem)]"
           >
             Repurpose
             <span className="block text-blue">once.</span>
@@ -220,13 +220,13 @@ function DistributionPoster() {
           >
             <div className="absolute inset-x-0 top-[8%] rotate-[2deg] rounded-[20px] border-[3px] border-ink bg-blue p-3 shadow-[10px_13px_0_oklch(18%_0.012_55)] sm:inset-x-[-12%] sm:rotate-[5deg] sm:rounded-[24px] sm:p-6 sm:shadow-[14px_18px_0_oklch(18%_0.012_55)] md:inset-x-[4%] md:rotate-[3deg] md:p-4 md:shadow-[10px_12px_0_oklch(18%_0.012_55)] lg:inset-x-[-4%] lg:rotate-[5deg] lg:p-6 lg:shadow-[14px_18px_0_oklch(18%_0.012_55)]">
               <div className="flex items-center justify-between text-paper">
-                <p className="m-0 text-3xl font-black uppercase tracking-[-0.05em] sm:text-5xl md:text-4xl lg:text-5xl">May</p>
+                <p className="m-0 text-3xl font-bold tracking-[-0.035em] sm:text-5xl md:text-4xl lg:text-5xl">May</p>
                 <span className="rounded-[8px] border border-paper/35 px-2 py-1 text-[9px] font-bold sm:px-3 sm:text-xs md:text-[10px] lg:text-xs">Publishing calendar</span>
               </div>
               <div className="mt-5 grid grid-cols-5 overflow-hidden rounded-[14px] border-2 border-ink bg-paper">
                 {DAYS.map((day, index) => (
                   <div key={day} className="min-h-[230px] border-r border-ink/15 p-1.5 last:border-r-0 sm:min-h-[280px] sm:p-3 md:min-h-[240px] md:p-2 lg:min-h-[280px] lg:p-3">
-                    <p className="m-0 text-[9px] font-black tracking-[0.1em] text-ink3">{day}</p>
+                    <p className="m-0 text-[9px] font-bold tracking-[0.04em] text-ink3">{day}</p>
                     <p className="m-0 mt-1 text-lg font-black text-ink">{26 + index}</p>
                     {index === 2 && (
                       <div className="mt-8 h-20 rounded-[8px] border-2 border-ink bg-flame p-1.5 text-[8px] font-bold text-ink shadow-[3px_4px_0_oklch(18%_0.012_55)] sm:mt-12 sm:h-24 sm:rounded-[10px] sm:p-2 sm:text-[9px] sm:shadow-[4px_5px_0_oklch(18%_0.012_55)] md:mt-9 md:h-20 lg:mt-12 lg:h-24">
@@ -263,7 +263,7 @@ function DistributionPoster() {
                   transition={{ duration: 0.6, delay: 0.18, ease: EASE }}
                   className="-rotate-3 rounded-[14px] border-[3px] border-ink bg-flame p-3 shadow-[6px_7px_0_oklch(18%_0.012_55)]"
                 >
-                  <p className="m-0 text-[9px] font-black uppercase tracking-[0.1em]">One source</p>
+                  <p className="m-0 text-[9px] font-bold tracking-[0.03em]">One source</p>
                   <p className="m-0 mt-2 text-xs font-bold">Behind the scenes: shipping with customers</p>
                 </motion.div>
               </div>
@@ -340,7 +340,7 @@ function LeadsPoster() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-15%' }}
             transition={{ duration: 0.72, ease: EASE }}
-            className="m-0 mt-6 max-w-full text-[clamp(2.7rem,12.5vw,4rem)] font-black uppercase leading-[0.82] tracking-[-0.06em] sm:text-[clamp(3.8rem,8vw,5rem)] sm:leading-[0.78] sm:tracking-[-0.075em] md:text-[3rem] lg:text-[clamp(4.6rem,8.5vw,8.7rem)]"
+            className="m-0 mt-6 max-w-full text-[clamp(2.7rem,12.5vw,4rem)] font-bold leading-[0.9] tracking-[-0.05em] sm:text-[clamp(3.8rem,8vw,5rem)] sm:leading-[0.85] sm:tracking-[-0.06em] md:text-[3rem] lg:text-[clamp(4.6rem,8.5vw,8.7rem)]"
           >
             <span className="block text-paper">Attention</span>
             <span className="block text-lilac">into</span>
