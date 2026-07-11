@@ -418,6 +418,25 @@ html.lenis body {
   transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes kinetic-connector-flow {
+  from {
+    stroke-dashoffset: 46;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.kinetic-connector {
+  animation: kinetic-connector-flow 1.15s linear infinite;
+  filter: drop-shadow(0 2px 0 rgb(255 255 255 / 0.18));
+}
+
+.kinetic-connector--delayed {
+  animation-delay: -0.55s;
+}
+
 @media (hover: hover) {
   .footer-mark-piece:hover {
     transform: translateY(-6px) rotate(0deg) scale(1.08);
@@ -431,5 +450,9 @@ html.lenis body {
 
   .footer-mark-piece:hover {
     transform: none;
+  }
+
+  .kinetic-connector {
+    animation: none;
   }
 }

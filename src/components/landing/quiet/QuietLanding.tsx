@@ -20,6 +20,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { LinkPreview } from '@/components/ui/link-preview';
 import { getFunnelCta, type FunnelState } from '@/lib/funnel-cta';
 import LandingSmoothScroll from '../LandingSmoothScroll';
+import KineticPosterSections from './KineticPosterSections';
 import QuietProductScreen from './QuietProductScreen';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -180,15 +181,10 @@ function Hero({ funnel }: { funnel: FunnelState }) {
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
             <Link href={cta.href} className={`quiet-button-primary ${FOCUS}`}>
-              {cta.label}
+              Get started
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <a href="#loop" className={`quiet-text-link ${FOCUS}`}>
-              See the loop
-              <ArrowRight className="h-4 w-4" />
-            </a>
           </div>
-          <p className="m-0 mt-3 text-xs text-ink3">7 days free · No credit card required</p>
         </motion.div>
 
         <motion.div
@@ -466,7 +462,7 @@ function FinalCta({ funnel }: { funnel: FunnelState }) {
             <ArrowRight className="h-4 w-4" />
           </Link>
           <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-paper/60">
-            {['7 days free', 'No credit card', 'Cancel anytime'].map((item) => (
+            {['7 days free', 'Cancel anytime'].map((item) => (
               <span key={item} className="inline-flex items-center gap-2">
                 <Check className="h-3.5 w-3.5 text-lime" />
                 {item}
@@ -532,8 +528,7 @@ export default function QuietLanding({ funnel }: { funnel: FunnelState }) {
         </a>
         <QuietNav funnel={funnel} />
         <Hero funnel={funnel} />
-        <LoopSection />
-        <ProductStories />
+        <KineticPosterSections />
         <FinalCta funnel={funnel} />
         <Footer />
       </main>
