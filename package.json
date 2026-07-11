@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",
+    "@radix-ui/react-hover-card": "^1.1.19",
     "@remotion/player": "^4.0.443",
     "@tabler/icons-react": "^3.44.0",
     "clsx": "^2.1.1",
@@ -19,6 +20,7 @@
     "lucide-react": "^0.468.0",
     "motion": "^12.40.0",
     "next": "14.2.21",
+    "qss": "^3.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.15.0",

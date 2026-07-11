@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
+import { LinkPreview } from '@/components/ui/link-preview';
 import { getFunnelCta, type FunnelState } from '@/lib/funnel-cta';
 import LandingSmoothScroll from '../LandingSmoothScroll';
 import QuietProductScreen from './QuietProductScreen';
@@ -145,8 +146,37 @@ function Hero({ funnel }: { funnel: FunnelState }) {
             </span>
           </h1>
           <p className="mx-auto mb-0 mt-6 max-w-[36rem] text-base leading-7 text-ink2 sm:text-lg">
-            Write in your voice, publish to LinkedIn and X, reply faster, and reach warm contacts
-            without losing the context between each step.
+            Write in your voice, publish to{' '}
+            <LinkPreview
+              url="https://www.linkedin.com/"
+              width={280}
+              height={176}
+              className={`relative inline-flex h-6 w-6 align-[-0.26em] overflow-hidden rounded-[5px] transition-transform hover:-translate-y-0.5 hover:scale-105 ${FOCUS}`}
+            >
+              <Image
+                src="/images/brands/linkedin.png"
+                alt="LinkedIn"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
+            </LinkPreview>
+            {' '}and{' '}
+            <LinkPreview
+              url="https://x.com/"
+              width={280}
+              height={176}
+              className={`relative inline-flex h-6 w-6 items-center justify-center align-[-0.2em] overflow-hidden rounded-[5px] transition-transform hover:-translate-y-0.5 hover:scale-105 ${FOCUS}`}
+            >
+              <Image
+                src="/images/brands/x.png"
+                alt="X"
+                width={20}
+                height={20}
+                className="h-5 w-5 rounded-[3px]"
+              />
+            </LinkPreview>
+            {', reply faster, and reach warm contacts without losing the context between each step.'}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
             <Link href={cta.href} className={`quiet-button-primary ${FOCUS}`}>
@@ -182,14 +212,6 @@ function Hero({ funnel }: { funnel: FunnelState }) {
             </div>
           </div>
         </motion.div>
-        <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-semibold text-ink3">
-          {['Founder-led brands', 'LinkedIn + X', 'Your voice, remembered', 'Replies connected'].map((item) => (
-            <span key={item} className="inline-flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue" />
-              {item}
-            </span>
-          ))}
-        </div>
       </div>
     </header>
   );
@@ -472,7 +494,7 @@ function FooterMark() {
           <div className="ml-2 flex items-center -space-x-1" aria-hidden>
             <span className="footer-mark-piece grid h-10 w-9 rotate-2 place-items-center rounded-full border-2 border-ink bg-lime text-lg font-bold text-ink sm:h-12 sm:w-11 sm:text-xl">o</span>
             <span className="footer-mark-piece grid h-10 w-9 -rotate-2 place-items-center rounded-[15px] border-2 border-ink bg-blue text-lg font-bold text-paper sm:h-12 sm:w-11 sm:text-xl">s</span>
-            <span className="footer-mark-piece ml-4 mt-8 h-2.5 w-2.5 rounded-full border border-ink bg-flame" />
+            <span className="ml-6 mt-8 h-2.5 w-2.5 rounded-full border border-ink bg-flame" />
           </div>
     </div>
   );
