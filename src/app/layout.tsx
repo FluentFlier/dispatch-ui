@@ -39,13 +39,20 @@ export const metadata: Metadata = {
     url: '/',
     siteName: PRODUCT_NAME,
     type: 'website',
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: PRODUCT_NAME }],
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Content OS turns content and leads into one connected loop.',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_TITLE,
     description: SITE_DESC,
-    images: ['/opengraph-image'],
+    images: ['/og.png'],
   },
 };
 
