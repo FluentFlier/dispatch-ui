@@ -1,20 +1,19 @@
 # Content OS brand assets
 
-Reusable campaign artwork based on the current landing-page visual system.
+## `originals/`
+Untouched generated sources at native resolution. Use these when you need the full uncropped artwork.
 
-| File | Size | Suggested use |
-| --- | --- | --- |
-| `content-os-social-square.png` | 1080 × 1080 | LinkedIn, X, and launch posts |
-| `content-os-team-banner.png` | 1200 × 675 | Social banners and announcements |
-| `content-os-story-template.png` | 1080 × 1920 | Stories and vertical updates |
-| `content-os-blog-cover.png` | 1200 × 675 | Blog and newsletter headers |
-| `content-os-presentation-cover.png` | 1600 × 1200 | Deck and document covers |
-| `content-os-sticker-sheet.png` | 2048 × 2048 | Stickers, reactions, and cropped motifs |
+## Root sized assets
+Convenience sizes, fit with matching background padding (no edge cropping).
 
-## Usage notes
+| File | Size |
+| --- | --- |
+| `content-os-social-square.png` | 1080 × 1080 |
+| `content-os-team-banner.png` | 1200 × 675 |
+| `content-os-story-template.png` | 1080 × 1920 |
+| `content-os-blog-cover.png` | 1200 × 675 |
+| `content-os-presentation-cover.png` | 1600 × 1200 |
+| `content-os-sticker-sheet.png` | 2048 × 2048 |
 
-- Add campaign copy only in the intentionally open areas.
-- Keep the wordmark, characters, and illustrations unobstructed.
-- Use Hanken Grotesk for added text.
-- Preserve the warm-white, cobalt, vermilion, lime, lilac, and ink palette.
-- Do not add gradients, glass effects, or unrelated accent colors.
+## `by-ada/`
+Same native originals with a transparent `by ada.` lockup composited on top (no cropping of the art). Live OG is `../../og.png`.
