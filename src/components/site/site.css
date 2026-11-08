@@ -637,8 +637,8 @@ html[data-cos-theme='dark'] .cos-panel:has([data-bg='hero-lake'])::after {
 .cos-piece[data-k='li'] { left: 7%; top: 20%; }
 .cos-piece[data-k='x'] { left: 16.5%; top: 12%; }
 .cos-piece[data-k='post'] { left: 13%; top: 46%; }
-.cos-piece[data-k='threads'] { left: 93%; top: 13%; }
-.cos-piece[data-k='feed'] { left: 86%; top: 56%; }
+.cos-piece[data-k='threads'] { left: 92%; top: 22%; }
+.cos-piece[data-k='feed'] { left: 85%; top: 45%; }
 
 /* glass tiles with a lit top edge and a sweep of light now and then */
 .cos-tile {

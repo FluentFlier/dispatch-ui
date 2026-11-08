@@ -24,7 +24,7 @@ export function SiteHome({ funnel }: { funnel: FunnelState }) {
         <a href="#main" className="cos-skip">
           Skip to content
         </a>
-        <SiteNav cta={cta} />
+        <SiteNav cta={cta} loggedIn={funnel.loggedIn} />
         <main id="main">
           <Hero cta={cta} />
         </main>

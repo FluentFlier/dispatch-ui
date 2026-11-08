@@ -13,7 +13,8 @@ const LINKS = [
   { label: 'Resources', href: '/blog' },
 ];
 
-export function SiteNav({ cta }: { cta: { href: string; label: string } }) {
+/** Signed in: just the way back into the app. Signed out: Sign in and Get started. */
+export function SiteNav({ cta, loggedIn }: { cta: { href: string; label: string }; loggedIn: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -41,9 +42,11 @@ export function SiteNav({ cta }: { cta: { href: string; label: string } }) {
 
         <div className="cos-nav-actions">
           <ThemeToggle />
-          <Link href="/login" className="cos-btn cos-btn-silver cos-btn-sm cos-nav-login">
-            <span>Sign in</span>
-          </Link>
+          {!loggedIn && (
+            <Link href="/login" className="cos-btn cos-btn-silver cos-btn-sm cos-nav-login">
+              <span>Sign in</span>
+            </Link>
+          )}
           <Link href={cta.href} className="cos-btn cos-btn-metal cos-btn-sm">
             <span>{cta.label}</span>
           </Link>
@@ -66,8 +69,13 @@ export function SiteNav({ cta }: { cta: { href: string; label: string } }) {
             {l.label}
           </a>
         ))}
-        <Link href="/login" className="cos-nav-sheet-link">
-          Sign in
+        {!loggedIn && (
+          <Link href="/login" className="cos-nav-sheet-link">
+            Sign in
+          </Link>
+        )}
+        <Link href={cta.href} className="cos-nav-sheet-link">
+          {cta.label}
         </Link>
       </div>
     </header>
