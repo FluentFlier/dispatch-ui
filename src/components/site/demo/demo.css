@@ -179,8 +179,14 @@
   border-radius: 8px;
   font-size: 10.5px;
 }
-.dm-avatar-alt {
-  background: linear-gradient(180deg, #c7bff0, #9d93dc);
+.dm-avatar-initials {
+  background: linear-gradient(180deg, #e4e7ef, #cfd4e0);
+  color: #4b5060;
+  box-shadow: none;
+}
+img.dm-avatar {
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(16, 17, 24, 0.08);
 }
 .dm-name {
   font-size: 13.5px;

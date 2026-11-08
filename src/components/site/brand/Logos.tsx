@@ -1,6 +1,7 @@
-import { IconBrandInstagram, IconBrandThreads, IconBrandTiktok } from '@tabler/icons-react';
+import { useId } from 'react';
+import { IconBrandThreads } from '@tabler/icons-react';
 
-/** Platform marks. LinkedIn and X are the official glyphs; Threads, Instagram, TikTok from Tabler. */
+/** Platform marks in brand color. LinkedIn and X are the official glyphs; Threads is Tabler's. */
 
 export function LinkedInLogo({ size = 16, className }: { size?: number; className?: string }) {
   return (
@@ -29,9 +30,34 @@ export function ThreadsLogo({ size = 16, className }: { size?: number; className
 }
 
 export function InstagramLogo({ size = 16, className }: { size?: number; className?: string }) {
-  return <IconBrandInstagram size={size} stroke={1.8} aria-hidden="true" className={className} />;
+  const id = `ig${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className={className}>
+      <defs>
+        <linearGradient id={id} x1="0.1" y1="1" x2="0.9" y2="0">
+          <stop offset="0" stopColor="#FEDA75" />
+          <stop offset="0.3" stopColor="#FA7E1E" />
+          <stop offset="0.6" stopColor="#D62976" />
+          <stop offset="0.85" stopColor="#962FBF" />
+          <stop offset="1" stopColor="#4F5BD5" />
+        </linearGradient>
+      </defs>
+      <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="5.5" fill="none" stroke={`url(#${id})`} strokeWidth="2.1" />
+      <circle cx="12" cy="12" r="4.3" fill="none" stroke={`url(#${id})`} strokeWidth="2.1" />
+      <circle cx="17.4" cy="6.6" r="1.25" fill={`url(#${id})`} />
+    </svg>
+  );
 }
 
+const TIKTOK =
+  'M21 7.917v4.034a9.948 9.948 0 0 1 -5 -1.951v4.5a6.5 6.5 0 1 1 -8 -6.326v4.326a2.5 2.5 0 1 0 4 2v-11.5h4.083a6.005 6.005 0 0 0 4.917 4.917z';
+
 export function TikTokLogo({ size = 16, className }: { size?: number; className?: string }) {
-  return <IconBrandTiktok size={size} stroke={1.8} aria-hidden="true" className={className} />;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className={className}>
+      <path d={TIKTOK} fill="#25F4EE" transform="translate(-0.9 -0.7)" />
+      <path d={TIKTOK} fill="#FE2C55" transform="translate(0.9 0.7)" />
+      <path d={TIKTOK} fill="#111111" />
+    </svg>
+  );
 }

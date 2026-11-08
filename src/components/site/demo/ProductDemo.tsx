@@ -280,7 +280,7 @@ export function ProductDemo() {
                 <NavItem icon={Target} label="Leads" on={nav === 'leads'} />
               </nav>
               <div className="dm-me">
-                <span className="dm-avatar dm-avatar-sm">MC</span>
+                <img className="dm-avatar dm-avatar-sm" src="/people/maya.webp" alt="" />
                 Maya Chen
               </div>
             </aside>
@@ -408,7 +408,7 @@ function DraftScene({ words }: { words: number }) {
       <p className="dm-note">Drafted from your call notes, in your voice.</p>
       <article className="dm-post">
         <header className="dm-post-head">
-          <span className="dm-avatar">MC</span>
+          <img className="dm-avatar" src="/people/maya.webp" alt="" />
           <div>
             <p className="dm-name">Maya Chen</p>
             <p className="dm-sub">Founder, Relay</p>
@@ -524,7 +524,7 @@ function ReplyScene({ chars, approved }: { chars: number; approved: boolean }) {
       <p className="dm-context">On your post: We almost lost Northwind in week two.</p>
       <article className="dm-comment" data-done={approved}>
         <header className="dm-post-head">
-          <span className="dm-avatar dm-avatar-alt">PS</span>
+          <img className="dm-avatar" src="/people/priya.webp" alt="" />
           <div>
             <p className="dm-name">Priya Shah</p>
             <p className="dm-sub">Head of Operations, Lumen Health</p>
@@ -561,11 +561,11 @@ function ReplyScene({ chars, approved }: { chars: number; approved: boolean }) {
 }
 
 const COLS = ['Engaged', 'Warm', 'Meeting booked'];
-const OTHERS: { col: number; name: string; org: string }[] = [
-  { col: 0, name: 'Diego Alvarez', org: 'Fieldwork' },
+const OTHERS: { col: number; name: string; org: string; photo?: string }[] = [
+  { col: 0, name: 'Diego Alvarez', org: 'Fieldwork', photo: '/people/diego.webp' },
   { col: 0, name: 'Hana Ito', org: 'Kettle' },
   { col: 1, name: 'Sam Okafor', org: 'Brightline' },
-  { col: 2, name: 'Lena Park', org: 'Harbor AI' },
+  { col: 2, name: 'Lena Park', org: 'Harbor AI', photo: '/people/lena.webp' },
 ];
 
 function LeadsScene({ moved }: { moved: boolean }) {
@@ -586,9 +586,21 @@ function LeadsScene({ moved }: { moved: boolean }) {
               {i === 0 && <div className="dm-lead-slot" />}
               {i === 1 && <div className="dm-lead-slot" />}
               {OTHERS.filter((o) => o.col === i).map((o) => (
-                <div key={o.name} className="dm-lead">
-                  <p className="dm-name">{o.name}</p>
-                  <p className="dm-sub">{o.org}</p>
+                <div key={o.name} className="dm-lead dm-post-head">
+                  {o.photo ? (
+                    <img className="dm-avatar dm-avatar-sm" src={o.photo} alt="" />
+                  ) : (
+                    <span className="dm-avatar dm-avatar-sm dm-avatar-initials">
+                      {o.name
+                        .split(' ')
+                        .map((w) => w[0])
+                        .join('')}
+                    </span>
+                  )}
+                  <div>
+                    <p className="dm-name">{o.name}</p>
+                    <p className="dm-sub">{o.org}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -596,7 +608,7 @@ function LeadsScene({ moved }: { moved: boolean }) {
         ))}
         <div className="dm-lead dm-lead-hot" data-moved={moved}>
           <div className="dm-post-head">
-            <span className="dm-avatar dm-avatar-alt">PS</span>
+            <img className="dm-avatar" src="/people/priya.webp" alt="" />
             <div>
               <p className="dm-name">Priya Shah</p>
               <p className="dm-sub">Lumen Health</p>

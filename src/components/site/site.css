@@ -465,25 +465,24 @@ body:has(.cos) {
 }
 .cos-loop-mark {
   position: absolute;
-  left: -0.24em;
-  right: -0.3em;
-  top: -0.16em;
-  bottom: -0.2em;
-  width: calc(100% + 0.54em);
-  height: calc(100% + 0.36em);
+  left: -0.06em;
+  right: -0.06em;
+  top: 86%;
+  width: calc(100% + 0.12em);
+  height: 0.36em;
   overflow: visible;
   pointer-events: none;
 }
 .cos-loop-mark path {
   fill: none;
-  stroke: var(--cos-apricot);
-  stroke-width: 3.5;
+  stroke: var(--cos-blue);
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: cos-draw 1300ms cubic-bezier(0.65, 0, 0.35, 1) 900ms forwards;
+  animation: cos-draw 1100ms cubic-bezier(0.65, 0, 0.35, 1) 900ms forwards;
 }
 @keyframes cos-draw {
   to {
@@ -516,14 +515,7 @@ body:has(.cos) {
 .cos-plat-mark {
   display: inline-grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 7px;
-  background: #fff;
   color: var(--cos-ink);
-  box-shadow:
-    0 0 0 1px rgba(16, 17, 20, 0.07),
-    0 2px 6px -2px rgba(30, 40, 80, 0.2);
   transform: translateY(-1px);
 }
 
@@ -702,18 +694,73 @@ body:has(.cos) {
   font-weight: 650;
 }
 
-@media (max-width: 1099px) {
-  .cos-floaters {
-    display: none;
+/* positions: desktop edges */
+.cos-float[data-k='li'] { left: 6%; top: 25%; }
+.cos-float[data-k='heart'] { left: 15.5%; top: 15%; }
+.cos-float[data-k='post'] { left: 12.5%; top: 47%; }
+.cos-float[data-k='x'] { left: 88%; top: 24%; }
+.cos-float[data-k='threads'] { left: 94%; top: 38%; }
+.cos-float[data-k='event'] { left: 83%; top: 56%; }
+
+/* live notes: leave quickly, arrive softly */
+.cos-note {
+  animation: cos-note-in 520ms var(--cos-ease-out) both;
+}
+.cos-note[data-leaving='true'] {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(-6px) scale(0.98);
+  transition:
+    opacity 220ms ease,
+    filter 220ms ease,
+    transform 220ms ease;
+}
+@keyframes cos-note-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(8px) scale(0.98);
   }
+}
+.cos-bubble-heart {
+  transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.cos-bubble-heart[data-pop='true'] {
+  transform: scale(1.22);
+}
+.cos-note-icon-green {
+  background: linear-gradient(180deg, #4fd18b, #22a565);
+}
+
+/* tablet: the pieces gather in a band above the headline */
+@media (max-width: 1099px) {
+  .cos-hero {
+    padding-top: clamp(196px, 26vh, 236px);
+  }
+  .cos-floaters {
+    height: 220px;
+  }
+  .cos-float[data-k='li'] { left: 11%; top: 118px; }
+  .cos-float[data-k='heart'] { left: 24%; top: 92px; }
+  .cos-float[data-k='x'] { left: 89%; top: 118px; }
+  .cos-float[data-k='threads'] { left: 77%; top: 92px; }
+  .cos-float[data-k='event'] { left: 50%; top: 126px; }
+  .cos-float[data-k='post'] { display: none; }
 }
 
 /* ---------------------------------------------------------------- phones */
 
 @media (max-width: 719px) {
   .cos-hero {
-    padding-top: 116px;
+    padding-top: 176px;
   }
+  .cos-float[data-k='li'],
+  .cos-float[data-k='x'],
+  .cos-float[data-k='heart'],
+  .cos-float[data-k='threads'] {
+    display: none;
+  }
+  .cos-float[data-k='event'] { left: 50%; top: 116px; scale: 0.92; }
   .cos-panel {
     top: 6px;
     left: 6px;

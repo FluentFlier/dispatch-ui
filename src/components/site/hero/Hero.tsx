@@ -31,11 +31,8 @@ export function Hero({ cta }: { cta: { href: string; label: string } }) {
             One{' '}
             <span className="cos-loop">
               loop.
-              <svg className="cos-loop-mark" viewBox="0 0 220 110" preserveAspectRatio="none" aria-hidden="true">
-                <path
-                  pathLength={1}
-                  d="M16 66 C 10 28, 74 10, 128 14 C 186 18, 214 44, 204 70 C 194 96, 120 104, 70 98 C 26 92, 4 74, 22 52 C 34 38, 60 32, 92 30"
-                />
+              <svg className="cos-loop-mark" viewBox="0 0 240 44" preserveAspectRatio="none" aria-hidden="true">
+                <path pathLength={1} d="M6 30 C 48 36, 92 36, 118 28 C 140 21, 146 6, 132 5 C 117 4, 117 24, 138 31 C 166 39, 204 35, 234 26" />
               </svg>
             </span>
           </span>
@@ -45,20 +42,20 @@ export function Hero({ cta }: { cta: { href: string; label: string } }) {
           ContentOS drafts posts in your voice for{' '}
           <span className="cos-plat">
             <span className="cos-plat-mark">
-              <LinkedInLogo size={13} />
+              <LinkedInLogo size={17} />
             </span>
             LinkedIn<span className="cos-plat-punct">,</span>
           </span>{' '}
           <span className="cos-plat">
             <span className="cos-plat-mark">
-              <XLogo size={11} />
+              <XLogo size={15} />
             </span>
             X
           </span>{' '}
           and{' '}
           <span className="cos-plat">
             <span className="cos-plat-mark">
-              <ThreadsLogo size={13} />
+              <ThreadsLogo size={18} />
             </span>
             Threads<span className="cos-plat-punct">.</span>
           </span>{' '}
