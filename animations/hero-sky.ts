@@ -11,7 +11,7 @@
  * The cursor adds depth: bright clouds shift further than the clear sky,
  * so the frame reads as layers without separate plates.
  *
- *   pnpm tsx animations/hero-sky.ts
+ *   pnpm tsx animations/hero-sky.ts   (BG=lake for the lake backdrop)
  *   pnpm clayzo package animations/out/hero-sky.json public/scene/hero-sky.clayzo --poster 0
  */
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -29,6 +29,14 @@ import {
   type SceneNode,
   type Vec2,
 } from '@clayzo/animation/authoring';
+
+// BG picks the backdrop: sky (the painted sky, default) or lake (the mountain lake photo)
+const BG = process.env.BG === 'lake' ? 'lake' : 'sky';
+const DAY_FILE = `${BG}.jpg`;
+const NIGHT_FILE = `${BG}-night.jpg`;
+const ASSET_W = BG === 'sky' ? 2304 : 1344;
+const ASSET_H = BG === 'sky' ? 1316 : 768;
+const OUT = BG === 'sky' ? 'hero-sky' : 'hero-lake';
 
 const W = 1600;
 const H = 914;
@@ -103,7 +111,7 @@ half4 main(float2 p) {
   // stars come out with the night: sparse, soft, twinkling, only in clear sky
   float2 sc = floor(u / 9.0);
   float sh = hash(sc + 41.0);
-  if (night > 0.02 && sh > 0.985 && cloud < 0.2) {
+  if (night > 0.02 && sh > 0.985 && cloud < 0.2 && lum > 0.1 && base0.b > base0.r && u.y < ${f(H * 0.55)}) {
     float2 sl = fract(u / 9.0) - 0.5;
     float tw = 0.55 + 0.45 * sin(phase * 4.0 + sh * 80.0);
     float star = (1.0 - smoothstep(0.0, 0.16, length(sl))) * tw * night * (1.0 - u.y / ${f(H)});
@@ -130,6 +138,14 @@ half4 main(float2 p) {
   rgb = mix(rgb, tint, edge * edge * mix(0.1, 0.14, night));
   // vignette
   rgb *= 1.0 - edge * edge * mix(0.06, 0.16, night);
+
+  // by day the top of the sky deepens into a rich cobalt, fading out before the headline
+  float top = 1.0 - smoothstep(${f(H * 0.08)}, ${f(H * 0.66)}, u.y);
+  top = smoothstep(0.0, 1.0, top) * (1.0 - night);
+  half3 deep = rgb * half3(0.46, 0.62, 1.0);
+  float dl = dot(deep, half3(0.299, 0.587, 0.114));
+  deep = mix(half3(dl), deep, 1.25);
+  rgb = mix(rgb, deep, top * 0.9);
 
   // film grain: fine, animated, strongest in the midtones, a touch of chroma
   float2 gp = floor(u * 1.25);
@@ -220,8 +236,8 @@ const scene = withComputedRevision({
   canvas: { width: W, height: H, pixelAspectRatio: 1, backgroundColor: hex('#9DBDE6') },
   timing: { ticksPerSecond: TPS, frameRate: { numerator: FPS, denominator: 1 }, durationTicks: LOOP, displayStartTick: 0 },
   assets: {
-    sky: { id: 'sky', type: 'image', uri: 'sky.jpg', width: 2304, height: 1316, mimeType: 'image/jpeg' },
-    skyNight: { id: 'skyNight', type: 'image', uri: 'sky-night.jpg', width: 2304, height: 1316, mimeType: 'image/jpeg' },
+    sky: { id: 'sky', type: 'image', uri: DAY_FILE, width: ASSET_W, height: ASSET_H, mimeType: 'image/jpeg' },
+    skyNight: { id: 'skyNight', type: 'image', uri: NIGHT_FILE, width: ASSET_W, height: ASSET_H, mimeType: 'image/jpeg' },
   },
   rootCompositionId: 'main',
   components: {},
@@ -254,7 +270,7 @@ assertValidAnimationDocument(document);
 const diags = validateAnimationDocument(document).diagnostics;
 if (diags.length) console.warn(JSON.stringify(diags).slice(0, 600));
 mkdirSync('animations/out', { recursive: true });
-writeFileSync('animations/out/hero-sky.json', JSON.stringify(document));
-copyFileSync('animations/assets/sky.jpg', 'animations/out/sky.jpg');
-copyFileSync('animations/assets/sky-night.jpg', 'animations/out/sky-night.jpg');
-console.log('wrote animations/out/hero-sky.json', document.revision);
+writeFileSync(`animations/out/${OUT}.json`, JSON.stringify(document));
+copyFileSync(`animations/assets/${DAY_FILE}`, `animations/out/${DAY_FILE}`);
+copyFileSync(`animations/assets/${NIGHT_FILE}`, `animations/out/${NIGHT_FILE}`);
+console.log(`wrote animations/out/${OUT}.json`, document.revision);
