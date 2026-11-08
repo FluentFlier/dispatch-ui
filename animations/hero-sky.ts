@@ -11,7 +11,7 @@
  * The cursor adds depth: bright clouds shift further than the clear sky,
  * so the frame reads as layers without separate plates.
  *
- *   pnpm tsx animations/hero-sky.ts   (BG=lake for the lake backdrop)
+ *   pnpm tsx animations/hero-sky.ts   (BG=india for the India backdrop)
  *   pnpm clayzo package animations/out/hero-sky.json public/scene/hero-sky.clayzo --poster 0
  */
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -30,9 +30,8 @@ import {
   type Vec2,
 } from '@clayzo/animation/authoring';
 
-// BG picks the backdrop: sky (the painted sky, default), lake (the mountain lake photo)
-// or india (an Udaipur-style lake palace, just for fun)
-const BG = process.env.BG === 'lake' || process.env.BG === 'india' ? process.env.BG : 'sky';
+// BG picks the backdrop: sky (the painted sky, default) or india (an Udaipur-style lake palace, just for fun)
+const BG = process.env.BG === 'india' ? 'india' : 'sky';
 const DAY_FILE = `${BG}.jpg`;
 const NIGHT_FILE = `${BG}-night.jpg`;
 const ASSET_W = BG === 'sky' ? 2304 : 1344;

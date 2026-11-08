@@ -9,12 +9,11 @@ import { useTheme } from '../theme';
 /**
  * The hero backdrop (Clayzo, animations/hero-sky.ts): a painted sky whose
  * clouds drift and lean toward the cursor. Day and night switch instantly;
- * the page-wide wipe (theme.tsx) does the reveal. ?bg=lake swaps in the mountain lake,
- * ?bg=india an Udaipur-style lake palace (for fun).
+ * the page-wide wipe (theme.tsx) does the reveal. ?bg=india swaps in an
+ * Udaipur-style lake palace (for fun).
  */
 const BACKDROPS = {
   sky: { scene: 'hero-sky', day: 'sky', night: 'sky-night' },
-  lake: { scene: 'hero-lake', day: 'lake', night: 'lake-night' },
   india: { scene: 'hero-india', day: 'india', night: 'india-night' },
 } as const;
 
@@ -32,7 +31,7 @@ export function SkyField() {
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get('bg');
-    setBd(q === 'lake' || q === 'india' ? BACKDROPS[q] : BACKDROPS.sky);
+    setBd(q === 'india' ? BACKDROPS.india : BACKDROPS.sky);
   }, []);
 
   useEffect(() => {

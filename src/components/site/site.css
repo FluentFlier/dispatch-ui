@@ -397,21 +397,6 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
   inset: 0;
   container-type: size;
 }
-/* a soft veil under the nav and behind the headline, so the busy lake photo stays readable */
-.cos-panel:has([data-bg='hero-lake'])::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(250, 249, 246, 0.62) 0, rgba(250, 249, 246, 0) 120px),
-    radial-gradient(46% 34% at 50% 34%, rgba(250, 249, 246, 0.38), rgba(250, 249, 246, 0) 100%);
-}
-html[data-cos-theme='dark'] .cos-panel:has([data-bg='hero-lake'])::after {
-  background:
-    linear-gradient(180deg, rgba(11, 12, 18, 0.55) 0, rgba(11, 12, 18, 0) 120px),
-    radial-gradient(46% 34% at 50% 34%, rgba(11, 12, 18, 0.3), rgba(11, 12, 18, 0) 100%);
-}
 .cos-sky-stage {
   position: absolute;
   left: 50%;

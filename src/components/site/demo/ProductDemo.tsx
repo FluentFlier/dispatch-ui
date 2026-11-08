@@ -561,32 +561,89 @@ function ReplyScene({ chars, approved }: { chars: number; approved: boolean }) {
 }
 
 const COLS = ['Engaged', 'Warm', 'Meeting booked'];
-const OTHERS: { col: number; name: string; org: string; photo?: string }[] = [
-  { col: 0, name: 'Diego Alvarez', org: 'Fieldwork', photo: '/people/diego.webp' },
-  { col: 0, name: 'Hana Ito', org: 'Kettle' },
-  { col: 1, name: 'Sam Okafor', org: 'Brightline' },
-  { col: 2, name: 'Lena Park', org: 'Harbor AI', photo: '/people/lena.webp' },
+type LeadCard = { id: string; name: string; org: string; photo?: string };
+const BOARD: LeadCard[][] = [
+  [
+    { id: 'diego', name: 'Diego Alvarez', org: 'Fieldwork', photo: '/people/diego.webp' },
+    { id: 'hana', name: 'Hana Ito', org: 'Kettle' },
+  ],
+  [{ id: 'sam', name: 'Sam Okafor', org: 'Brightline' }],
+  [{ id: 'lena', name: 'Lena Park', org: 'Harbor AI', photo: '/people/lena.webp' }],
 ];
+const MOVE_EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
+/**
+ * Priya warms up: her card sits in Engaged with everyone else, then lifts and
+ * glides to the top of Warm while both columns close up and make room (FLIP:
+ * measure, re-render in the new column, animate from the old spot).
+ */
 function LeadsScene({ moved }: { moved: boolean }) {
+  const boardRef = useRef<HTMLDivElement>(null);
+  const rects = useRef(new Map<string, DOMRect>());
+
+  useLayoutEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+    // the whole demo is scaled to fit, so convert screen pixels back to layout pixels
+    const scale = board.getBoundingClientRect().width / board.offsetWidth || 1;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    board.querySelectorAll<HTMLElement>('[data-flip]').forEach((el) => {
+      const key = el.dataset.flip as string;
+      const prev = rects.current.get(key);
+      const now = el.getBoundingClientRect();
+      rects.current.set(key, now);
+      if (still || !prev || (Math.abs(prev.left - now.left) < 0.5 && Math.abs(prev.top - now.top) < 0.5)) return;
+      const dx = (prev.left - now.left) / scale;
+      const dy = (prev.top - now.top) / scale;
+      if (key === 'priya') {
+        el.animate(
+          [
+            { transform: `translate(${dx}px, ${dy}px)`, boxShadow: '0 0 0 1.5px rgba(47, 91, 234, 0.55), 0 8px 20px -12px rgba(30, 40, 80, 0.3)' },
+            {
+              transform: `translate(${dx * 0.5}px, ${dy * 0.5 - 8}px) scale(1.03)`,
+              boxShadow: '0 0 0 1.5px rgba(47, 91, 234, 0.7), 0 26px 44px -16px rgba(30, 40, 80, 0.45)',
+              offset: 0.5,
+            },
+            { transform: 'none', boxShadow: '0 0 0 1.5px rgba(47, 91, 234, 0.55), 0 8px 20px -12px rgba(30, 40, 80, 0.3)' },
+          ],
+          { duration: 820, easing: MOVE_EASE },
+        );
+      } else {
+        el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 620, easing: MOVE_EASE, delay: 80 });
+      }
+    });
+  });
+
+  const priyaCol = moved ? 1 : 0;
   return (
     <div className="dm-leads">
       <header className="dm-cal-head">
         <p className="dm-title">Leads</p>
         <span className="dm-sub">From people who engaged with your posts</span>
       </header>
-      <div className="dm-board">
+      <div className="dm-board" ref={boardRef}>
         {COLS.map((c, i) => (
           <section key={c} className="dm-col">
             <p className="dm-col-head">
               {c}
-              <span>{OTHERS.filter((o) => o.col === i).length + (i === (moved ? 1 : 0) ? 1 : 0)}</span>
+              <span>{BOARD[i].length + (i === priyaCol ? 1 : 0)}</span>
             </p>
             <div className="dm-col-cards">
-              {i === 0 && <div className="dm-lead-slot" />}
-              {i === 1 && <div className="dm-lead-slot" />}
-              {OTHERS.filter((o) => o.col === i).map((o) => (
-                <div key={o.name} className="dm-lead dm-post-head">
+              {i === priyaCol && (
+                <div className="dm-lead dm-lead-hot" data-flip="priya" data-moved={moved}>
+                  <div className="dm-post-head">
+                    <img className="dm-avatar dm-avatar-sm" src="/people/priya.webp" alt="" />
+                    <div>
+                      <p className="dm-name">Priya Shah</p>
+                      <p className="dm-sub">Lumen Health</p>
+                    </div>
+                  </div>
+                  <p className="dm-signal">Replied to your post and asked for the call outline</p>
+                  <p className="dm-next">Next: send the outline</p>
+                </div>
+              )}
+              {BOARD[i].map((o) => (
+                <div key={o.id} className="dm-lead dm-post-head" data-flip={o.id}>
                   {o.photo ? (
                     <img className="dm-avatar dm-avatar-sm" src={o.photo} alt="" />
                   ) : (
@@ -606,17 +663,6 @@ function LeadsScene({ moved }: { moved: boolean }) {
             </div>
           </section>
         ))}
-        <div className="dm-lead dm-lead-hot" data-moved={moved}>
-          <div className="dm-post-head">
-            <img className="dm-avatar" src="/people/priya.webp" alt="" />
-            <div>
-              <p className="dm-name">Priya Shah</p>
-              <p className="dm-sub">Lumen Health</p>
-            </div>
-          </div>
-          <p className="dm-signal">Replied to your post and asked for the call outline</p>
-          <p className="dm-next">Next: send the outline</p>
-        </div>
       </div>
     </div>
   );
