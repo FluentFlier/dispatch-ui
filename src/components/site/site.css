@@ -245,10 +245,9 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
     border-color 240ms ease;
 }
 .cos-nav[data-scrolled='true'] {
-  background: rgba(250, 249, 246, 0.94);
+  /* solid, no backdrop blur: Chrome's backdrop-filter flickered over the animating hero */
+  background: rgba(250, 249, 246, 0.985);
   border-bottom-color: var(--cos-line);
-  -webkit-backdrop-filter: blur(14px) saturate(1.6);
-  backdrop-filter: blur(14px) saturate(1.6);
 }
 .cos-nav-inner {
   display: grid;
@@ -1128,7 +1127,7 @@ html[data-cos-theme='dark'] .cos-panel {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 html[data-cos-theme='dark'] .cos-nav[data-scrolled='true'] {
-  background: rgba(11, 12, 18, 0.9);
+  background: rgba(11, 12, 18, 0.98);
 }
 html[data-cos-theme='dark'] .cos-hero-title {
   text-shadow: 0 2px 40px rgba(10, 12, 40, 0.5);

@@ -29,13 +29,6 @@ import { Mark } from '../brand/Mark';
 type Scene = 'home' | 'draft' | 'calendar' | 'reply' | 'leads';
 type Step = 0 | 1 | 2 | 3;
 
-const STEPS: { label: string; ms: number }[] = [
-  { label: 'Write', ms: 7600 },
-  { label: 'Publish', ms: 3600 },
-  { label: 'Reply', ms: 6100 },
-  { label: 'Leads', ms: 4200 },
-];
-
 const PROMPT = 'Turn my call with Northwind into a LinkedIn post';
 const POST = [
   'We almost lost Northwind in week two.',
@@ -45,6 +38,26 @@ const POST = [
 ];
 const POST_WORDS = POST.join(' \n ').split(' ');
 const REPLY = 'It did. The deck was for us, not them. Happy to share the call outline if it helps.';
+
+// One clock for everything: fixed speeds, so each step's progress bar matches the step exactly.
+// Paced to be read, not skimmed.
+const T = {
+  swap: 420, // the crossfade between screens
+  point: 950, // the cursor gliding to a target
+  click: 160,
+  type: 46, // per prompt character
+  word: 68, // per post word
+  reply: 30, // per two reply characters
+  settle: 650, // a beat after a screen arrives, before anything happens on it
+};
+const HOLD = { drafted: 1100, scheduled: 3200, sent: 3000, moved: 3400 };
+const STEP_MS = [
+  T.swap + T.point + PROMPT.length * T.type + T.point + T.click + 520 + POST_WORDS.filter((w) => w !== '\n').length * T.word + HOLD.drafted + T.point + T.click,
+  T.swap + T.settle + T.point + HOLD.scheduled,
+  T.swap + T.settle + Math.ceil(REPLY.length / 2) * T.reply + T.point + T.click + HOLD.sent,
+  T.swap + T.settle + T.point + T.click + T.point + HOLD.moved,
+];
+const STEPS = ['Write', 'Publish', 'Reply', 'Leads'].map((label, i) => ({ label, ms: STEP_MS[i] }));
 
 const DESIGN_W = 1120;
 const DESIGN_W_NARROW = 760;
@@ -64,13 +77,18 @@ export function ProductDemo() {
   const [step, setStep] = useState<Step>(0);
   const [stepStart, setStepStart] = useState(0);
   const [scene, setScene] = useState<Scene>('home');
+  const [leaving, setLeaving] = useState<{ scene: Scene; n: number } | null>(null);
+  const lastScene = useRef<Scene>('home');
   const [typed, setTyped] = useState('');
   const [words, setWords] = useState(0);
   const [scheduled, setScheduled] = useState(false);
   const [replyChars, setReplyChars] = useState(0);
   const [approved, setApproved] = useState(false);
   const [leadMoved, setLeadMoved] = useState(false);
-  const [cursor, setCursor] = useState({ x: 560, y: 520, on: false, down: false });
+  const [cursor, setCursor] = useState({ x: 560, y: 520, on: false, down: false, instant: false });
+  const firstRun = useRef(true);
+  const sideRef = useRef<HTMLElement>(null);
+  const [pill, setPill] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
 
   // fit the fixed-size window to its column
   useLayoutEffect(() => {
@@ -88,10 +106,31 @@ export function ProductDemo() {
     return () => ro.disconnect();
   }, []);
 
+  // crossfade: when the screen changes, keep the old one for a moment while it fades out
+  useLayoutEffect(() => {
+    if (lastScene.current === scene) return;
+    const from = lastScene.current;
+    lastScene.current = scene;
+    if (reduced) return;
+    const n = performance.now();
+    setLeaving({ scene: from, n });
+    const t = window.setTimeout(() => setLeaving((l) => (l && l.n === n ? null : l)), T.swap);
+    return () => window.clearTimeout(t);
+  }, [scene, reduced]);
+
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReduced(mq.matches);
-    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.25 });
+    // play once the demo is (essentially) fully on screen; pause when it has mostly left.
+    // If the demo is taller than the viewport, "fully" means it fills most of the screen.
+    const io = new IntersectionObserver(
+      ([e]) => {
+        const shown = e.intersectionRect.height;
+        const full = e.intersectionRatio >= 0.92 || shown >= window.innerHeight * 0.85;
+        setVisible((v) => (full ? true : e.intersectionRatio < 0.3 ? false : v));
+      },
+      { threshold: [0, 0.1, 0.2, 0.3, 0.5, 0.7, 0.85, 0.92, 1] },
+    );
     if (frameRef.current) io.observe(frameRef.current);
     return () => io.disconnect();
   }, []);
@@ -118,25 +157,25 @@ export function ProductDemo() {
       const wait = (ms: number) =>
         new Promise<void>((res) => window.setTimeout(res, ms)).then(alive);
       const nextFrame = () => new Promise<void>((res) => requestAnimationFrame(() => res())).then(alive);
-      const point = async (target: string, dx = 0, dy = 0) => {
-        await nextFrame();
+      // where a target sits, in the window's own (unscaled) pixels; skips the screen that is fading out
+      const measure = (target: string, dx = 0, dy = 0) => {
         const win = winRef.current;
-        const el = win?.querySelector<HTMLElement>(`[data-demo="${target}"]`);
-        if (!win || !el) return;
+        const el = win?.querySelector<HTMLElement>(`.dm-scene:not([data-leaving]) [data-demo="${target}"]`);
+        if (!win || !el) return null;
         const w = win.getBoundingClientRect();
         const r = el.getBoundingClientRect();
         const s = w.width / win.offsetWidth;
-        setCursor((c) => ({
-          ...c,
-          on: true,
-          x: (r.left - w.left + r.width * 0.62) / s + dx,
-          y: (r.top - w.top + r.height * 0.58) / s + dy,
-        }));
-        await wait(760);
+        return { x: (r.left - w.left + r.width * 0.62) / s + dx, y: (r.top - w.top + r.height * 0.58) / s + dy };
+      };
+      const point = async (target: string, dx = 0, dy = 0) => {
+        await nextFrame();
+        const at = measure(target, dx, dy);
+        if (at) setCursor((c) => ({ ...c, on: true, ...at }));
+        await wait(T.point);
       };
       const click = async () => {
         setCursor((c) => ({ ...c, down: true }));
-        await wait(140);
+        await wait(T.click);
         setCursor((c) => ({ ...c, down: false }));
       };
       const begin = (s: Step) => {
@@ -150,62 +189,83 @@ export function ProductDemo() {
         while (true) {
           if (s === 0) {
             begin(0);
-            setScene('home');
+            // the new screen's state first, then the old screen's once it has faded out
             setTyped('');
             setWords(0);
+            setScene('home');
+            await wait(T.swap);
             setScheduled(false);
             setReplyChars(0);
             setApproved(false);
             setLeadMoved(false);
-            await point('composer', -120);
+            if (firstRun.current) {
+              // first play: the cursor fades in already resting on the prompt box, no glide from below
+              firstRun.current = false;
+              await nextFrame();
+              const at = measure('composer', -120);
+              if (at) setCursor((c) => ({ ...c, ...at, on: true, instant: true }));
+              await nextFrame();
+              setCursor((c) => ({ ...c, instant: false }));
+              await wait(T.point);
+            } else {
+              await point('composer', -120);
+            }
             for (let i = 1; i <= PROMPT.length; i += 1) {
               setTyped(PROMPT.slice(0, i));
-              await wait(20 + Math.random() * 26);
+              await wait(T.type);
             }
             await point('send');
             await click();
             setScene('draft');
-            await wait(380);
+            await wait(520);
             for (let i = 1; i <= POST_WORDS.length; i += 1) {
               setWords(i);
-              await wait(30);
+              if (POST_WORDS[i - 1] !== '\n') await wait(T.word);
             }
-            await wait(300);
+            await wait(HOLD.drafted);
             await point('schedule');
             await click();
             s = 1;
           } else if (s === 1) {
             begin(1);
-            setScene('calendar');
             setScheduled(false);
-            setCursor((c) => ({ ...c, on: false }));
-            await wait(520);
+            setScene('calendar');
+            await wait(T.swap + T.settle);
+            // the cursor follows the post to its slot, and it lands as the cursor arrives
+            await point('cal-new');
             setScheduled(true);
-            await wait(2900);
+            await wait(HOLD.scheduled);
             s = 2;
           } else if (s === 2) {
             begin(2);
-            setScene('reply');
             setReplyChars(0);
             setApproved(false);
-            await wait(700);
+            setScene('reply');
+            await wait(T.swap + T.settle);
             for (let i = 1; i <= REPLY.length; i += 2) {
               setReplyChars(i + 1);
-              await wait(18);
+              await wait(T.reply);
             }
             await point('approve');
             await click();
             setApproved(true);
-            await wait(2400);
+            await wait(HOLD.sent);
             s = 3;
           } else {
             begin(3);
-            setScene('leads');
             setLeadMoved(false);
-            setCursor((c) => ({ ...c, on: false }));
-            await wait(900);
+            setScene('leads');
+            await wait(T.swap + T.settle);
+            // pick Priya up and carry her card into Warm
+            await point('lead-priya');
+            const drop = measure('lead-drop');
+            setCursor((c) => ({ ...c, down: true }));
+            await wait(T.click);
             setLeadMoved(true);
-            await wait(3200);
+            if (drop) setCursor((c) => ({ ...c, ...drop }));
+            await wait(T.point);
+            setCursor((c) => ({ ...c, down: false }));
+            await wait(HOLD.moved);
             s = 0;
           }
         }
@@ -244,8 +304,23 @@ export function ProductDemo() {
     }
   };
 
+  const renderScene = (sc: Scene) => {
+    if (sc === 'home') return <HomeScene typed={typed} />;
+    if (sc === 'draft') return <DraftScene words={words} />;
+    if (sc === 'calendar') return <CalendarScene scheduled={scheduled} />;
+    if (sc === 'reply') return <ReplyScene chars={replyChars} approved={approved} />;
+    return <LeadsScene moved={leadMoved} />;
+  };
+
   const designW = narrow ? DESIGN_W_NARROW : DESIGN_W;
   const nav = scene === 'calendar' ? 'calendar' : scene === 'reply' ? 'autopilot' : scene === 'leads' ? 'leads' : 'home';
+
+  // the sidebar's highlight slides to the active item instead of jumping
+  useLayoutEffect(() => {
+    const side = sideRef.current;
+    const item = side?.querySelector<HTMLElement>('.dm-nav-item[data-on="true"]');
+    if (item) setPill({ x: item.offsetLeft, y: item.offsetTop, w: item.offsetWidth, h: item.offsetHeight });
+  }, [nav, narrow]);
 
   return (
     <div className="dm" ref={frameRef}>
@@ -258,7 +333,13 @@ export function ProductDemo() {
           aria-hidden="true"
         >
           {!narrow && (
-            <aside className="dm-side">
+            <aside className="dm-side" ref={sideRef}>
+              {pill && (
+                <span
+                  className="dm-nav-pill"
+                  style={{ width: pill.w, height: pill.h, transform: `translate(${pill.x}px, ${pill.y}px)` }}
+                />
+              )}
               <div className="dm-brand">
                 <Mark size={16} />
                 <span>ContentOS</span>
@@ -287,12 +368,13 @@ export function ProductDemo() {
           )}
 
           <main className="dm-main">
+            {leaving && leaving.scene !== scene && (
+              <div className="dm-scene" data-leaving="true" key={`out-${leaving.scene}-${leaving.n}`}>
+                {renderScene(leaving.scene)}
+              </div>
+            )}
             <div className="dm-scene" key={scene}>
-              {scene === 'home' && <HomeScene typed={typed} />}
-              {scene === 'draft' && <DraftScene words={words} />}
-              {scene === 'calendar' && <CalendarScene scheduled={scheduled} />}
-              {scene === 'reply' && <ReplyScene chars={replyChars} approved={approved} />}
-              {scene === 'leads' && <LeadsScene moved={leadMoved} />}
+              {renderScene(scene)}
             </div>
           </main>
 
@@ -300,9 +382,12 @@ export function ProductDemo() {
             className="dm-cursor"
             data-on={cursor.on}
             data-down={cursor.down}
+            data-instant={cursor.instant}
             style={{ transform: `translate(${cursor.x}px, ${cursor.y}px)` }}
           >
             <svg width="22" height="22" viewBox="0 0 22 22">
+              {/* shadow drawn in the SVG (no CSS filter, which made the nav's glass flicker) */}
+              <path d="M4 2.5 L4 17.5 L8 13.8 L10.8 19.6 L13.4 18.4 L10.7 12.7 L16.2 12.4 Z" fill="rgba(16,17,24,0.22)" transform="translate(0.8 1.6)" />
               <path d="M4 2.5 L4 17.5 L8 13.8 L10.8 19.6 L13.4 18.4 L10.7 12.7 L16.2 12.4 Z" fill="#fff" stroke="#0b0b0d" strokeWidth="1.3" strokeLinejoin="round" />
             </svg>
           </div>
@@ -400,7 +485,12 @@ function HomeScene({ typed }: { typed: string }) {
 }
 
 function DraftScene({ words }: { words: number }) {
-  const shown = POST_WORDS.slice(0, words).join(' ').split(' \n ');
+  // paragraphs of word spans; each new word fades in as it arrives
+  const paras: { w: string; i: number }[][] = [[]];
+  POST_WORDS.slice(0, words).forEach((w, i) => {
+    if (w === '\n') paras.push([]);
+    else paras[paras.length - 1].push({ w, i });
+  });
   const done = words >= POST_WORDS.length;
   return (
     <div className="dm-session">
@@ -416,8 +506,14 @@ function DraftScene({ words }: { words: number }) {
           <LinkedInLogo size={16} className="dm-push" />
         </header>
         <div className="dm-post-body">
-          {shown.map((p, i) => (
-            <p key={i}>{p}</p>
+          {paras.map((p, k) => (
+            <p key={k}>
+              {p.map(({ w, i }) => (
+                <span key={i} className="dm-word">
+                  {w}{' '}
+                </span>
+              ))}
+            </p>
           ))}
         </div>
       </article>
@@ -490,7 +586,7 @@ function Row({ time, r, scheduled }: { time: string; r: number; scheduled: boole
         const e = EXISTING[`${c}-${r}`];
         const isNew = c === 3 && r === 0;
         return (
-          <div key={c} className="dm-cal-cell" data-target={isNew && scheduled}>
+          <div key={c} className="dm-cal-cell" data-target={isNew && scheduled} data-demo={isNew ? 'cal-new' : undefined}>
             {e && (
               <span className="dm-cal-post">
                 {e.x ? <XLogo size={10} /> : <LinkedInLogo size={11} />}
@@ -579,7 +675,7 @@ const MOVE_EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
  */
 function LeadsScene({ moved }: { moved: boolean }) {
   const boardRef = useRef<HTMLDivElement>(null);
-  const rects = useRef(new Map<string, DOMRect>());
+  const rects = useRef(new Map<string, { left: number; top: number }>());
 
   useLayoutEffect(() => {
     const board = boardRef.current;
@@ -587,14 +683,18 @@ function LeadsScene({ moved }: { moved: boolean }) {
     // the whole demo is scaled to fit, so convert screen pixels back to layout pixels
     const scale = board.getBoundingClientRect().width / board.offsetWidth || 1;
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // positions relative to the board, in layout pixels: the screen sliding in, or the demo
+    // being scaled, moves the board and every card together, so it never reads as a move
+    const b = board.getBoundingClientRect();
     board.querySelectorAll<HTMLElement>('[data-flip]').forEach((el) => {
       const key = el.dataset.flip as string;
       const prev = rects.current.get(key);
-      const now = el.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      const now = { left: (r.left - b.left) / scale, top: (r.top - b.top) / scale };
       rects.current.set(key, now);
-      if (still || !prev || (Math.abs(prev.left - now.left) < 0.5 && Math.abs(prev.top - now.top) < 0.5)) return;
-      const dx = (prev.left - now.left) / scale;
-      const dy = (prev.top - now.top) / scale;
+      if (still || !prev || (Math.abs(prev.left - now.left) < 1 && Math.abs(prev.top - now.top) < 1)) return;
+      const dx = prev.left - now.left;
+      const dy = prev.top - now.top;
       if (key === 'priya') {
         el.animate(
           [
@@ -606,10 +706,11 @@ function LeadsScene({ moved }: { moved: boolean }) {
             },
             { transform: 'none', boxShadow: '0 0 0 1.5px rgba(47, 91, 234, 0.55), 0 8px 20px -12px rgba(30, 40, 80, 0.3)' },
           ],
-          { duration: 820, easing: MOVE_EASE },
+          { duration: 950, easing: MOVE_EASE },
         );
       } else {
-        el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 620, easing: MOVE_EASE, delay: 80 });
+        // fill backwards: hold the old spot through the delay, or the card blinks to its new place first
+        el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 760, easing: MOVE_EASE, delay: 90, fill: 'backwards' });
       }
     });
   });
@@ -630,7 +731,7 @@ function LeadsScene({ moved }: { moved: boolean }) {
             </p>
             <div className="dm-col-cards">
               {i === priyaCol && (
-                <div className="dm-lead dm-lead-hot" data-flip="priya" data-moved={moved}>
+                <div className="dm-lead dm-lead-hot" data-flip="priya" data-moved={moved} data-demo="lead-priya">
                   <div className="dm-post-head">
                     <img className="dm-avatar dm-avatar-sm" src="/people/priya.webp" alt="" />
                     <div>
@@ -642,8 +743,13 @@ function LeadsScene({ moved }: { moved: boolean }) {
                   <p className="dm-next">Next: send the outline</p>
                 </div>
               )}
-              {BOARD[i].map((o) => (
-                <div key={o.id} className="dm-lead dm-post-head" data-flip={o.id}>
+              {BOARD[i].map((o, k) => (
+                <div
+                  key={o.id}
+                  className="dm-lead dm-post-head"
+                  data-flip={o.id}
+                  data-demo={i === 1 && k === 0 && !moved ? 'lead-drop' : undefined}
+                >
                   {o.photo ? (
                     <img className="dm-avatar dm-avatar-sm" src={o.photo} alt="" />
                   ) : (

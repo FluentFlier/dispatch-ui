@@ -55,6 +55,7 @@
 
 /* sidebar */
 .dm-side {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: none;
@@ -105,10 +106,23 @@
     background-color 300ms ease,
     color 300ms ease;
 }
+.dm-nav-item {
+  position: relative;
+  z-index: 1;
+}
 .dm-nav-item[data-on='true'] {
-  background: #fff;
   color: var(--dm-text);
+}
+/* one highlight that glides between items */
+.dm-nav-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  border-radius: 8px;
+  background: #fff;
   box-shadow: 0 0 0 1px var(--dm-line), 0 1px 2px rgba(16, 17, 24, 0.05);
+  transition: transform 640ms cubic-bezier(0.65, 0, 0.35, 1);
 }
 .dm-badge {
   display: grid;
@@ -150,13 +164,33 @@
 .dm-scene {
   position: absolute;
   inset: 0;
-  animation: dm-in 520ms var(--cos-ease-out) both;
+  animation: dm-in 560ms cubic-bezier(0.23, 1, 0.32, 1) 160ms both;
 }
+/* opacity and movement only: blur animations here made the nav's frosted glass flicker in Chrome */
 @keyframes dm-in {
   from {
     opacity: 0;
-    filter: blur(8px);
-    transform: translateY(8px) scale(0.99);
+    transform: translateY(6px);
+  }
+}
+/* the screen being left fades up and away while the next one arrives */
+.dm-scene[data-leaving='true'] {
+  pointer-events: none;
+  animation: dm-out 360ms ease-in both;
+}
+@keyframes dm-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+/* drafted words ease in as they arrive */
+.dm-word {
+  animation: dm-word 360ms ease-out both;
+}
+@keyframes dm-word {
+  from {
+    opacity: 0;
   }
 }
 
@@ -647,12 +681,14 @@ img.dm-avatar {
     0 0 0 1.5px rgba(47, 91, 234, 0.55),
     0 8px 20px -12px rgba(30, 40, 80, 0.3);
 }
+/* the next step keeps its space in both columns, so the card is the same size before
+   and after the move and only its position animates */
 .dm-lead-hot[data-moved='false'] .dm-next {
-  display: none;
+  visibility: hidden;
 }
 /* the card is re-created in its new column, so the next step fades in as it lands */
 .dm-lead-hot[data-moved='true'] .dm-next {
-  animation: dm-next-in 420ms var(--dm-ease) 760ms both;
+  animation: dm-next-in 440ms var(--dm-ease) 980ms both;
 }
 @keyframes dm-next-in {
   from {
@@ -682,12 +718,15 @@ img.dm-avatar {
   pointer-events: none;
   opacity: 0;
   transition:
-    transform 760ms var(--dm-ease),
+    transform 950ms var(--dm-ease),
     opacity 300ms ease;
-  filter: drop-shadow(0 2px 4px rgba(16, 17, 24, 0.35));
 }
 .dm-cursor[data-on='true'] {
   opacity: 1;
+}
+/* placed without a glide (the very first appearance) */
+.dm-cursor[data-instant='true'] {
+  transition: opacity 400ms ease;
 }
 .dm-cursor svg {
   display: block;
@@ -761,8 +800,12 @@ img.dm-avatar {
 @media (prefers-reduced-motion: reduce) {
   .dm-scene,
   .dm-caret,
+  .dm-word,
   .dm-lead-hot .dm-next {
     animation: none;
+  }
+  .dm-nav-pill {
+    transition: none;
   }
   .dm-cal-new,
   .dm-lead-hot,
@@ -795,7 +838,7 @@ html[data-cos-theme='dark'] .dm-win {
     0 0 0 2px rgba(0, 0, 0, 0.6),
     0 50px 100px -40px rgba(0, 0, 0, 0.7);
 }
-html[data-cos-theme='dark'] .dm-nav-item[data-on='true'],
+html[data-cos-theme='dark'] .dm-nav-pill,
 html[data-cos-theme='dark'] .dm-seg span[data-on='true'] {
   background: rgba(255, 255, 255, 0.08);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
