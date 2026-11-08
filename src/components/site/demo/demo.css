@@ -751,3 +751,49 @@ img.dm-avatar {
     transition: none;
   }
 }
+
+/* the app's dark theme */
+html[data-cos-theme='dark'] .dm {
+  --dm-bg: #0f1015;
+  --dm-side: rgba(20, 21, 28, 0.82);
+  --dm-panel: #17181f;
+  --dm-panel-2: #1e1f27;
+  --dm-line: rgba(255, 255, 255, 0.07);
+  --dm-line-2: rgba(255, 255, 255, 0.12);
+  --dm-text: #ececf1;
+  --dm-text-2: #a3a5b3;
+  --dm-text-3: #6f7181;
+  --dm-blue: #94a1ff;
+  --dm-tint: rgba(255, 255, 255, 0.035);
+  --dm-tint-2: rgba(255, 255, 255, 0.07);
+}
+html[data-cos-theme='dark'] .dm-win {
+  background: rgba(15, 16, 21, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 0 2px rgba(0, 0, 0, 0.6),
+    0 50px 100px -40px rgba(0, 0, 0, 0.7);
+}
+html[data-cos-theme='dark'] .dm-nav-item[data-on='true'],
+html[data-cos-theme='dark'] .dm-seg span[data-on='true'] {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+html[data-cos-theme='dark'] .dm-btn-light:not([data-done='true']),
+html[data-cos-theme='dark'] .dm-send[data-ready='true'] {
+  color: #111114;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f0f2 48%, #dedee2 52%, #ececef 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+html[data-cos-theme='dark'] .dm-toast {
+  background: #f3f3f5;
+  color: #111114;
+}
+html[data-cos-theme='dark'] .dm-lead-hot {
+  background: var(--dm-panel-2);
+}
+html[data-cos-theme='dark'] .dm-post-head .dm-push path[fill='#0A66C2'] {
+  fill: #4f9cf0;
+}

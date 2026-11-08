@@ -41,6 +41,7 @@ uniform shader inputImage;
 uniform float phase;
 uniform float2 focus;
 uniform float focusRadius;
+uniform float night;
 uniform float2 renderScale;
 
 float hash(float2 c) {
@@ -95,7 +96,17 @@ half4 main(float2 p) {
   // a warm glow breathing at the horizon
   float2 g = (u - float2(${W / 2}.0, ${H}.0)) / float2(${W * 0.5}.0, ${H * 0.55}.0);
   float glow = exp(-dot(g, g) * 1.6) * (0.06 + 0.03 * sin(phase * 2.0));
-  half3 rgb = c.rgb + half3(1.0, 0.72, 0.5) * glow;
+  half3 rgb = c.rgb + mix(half3(1.0, 0.72, 0.5), half3(0.55, 0.6, 1.0), night) * glow;
+
+  // stars come out with the night: sparse, soft, twinkling, only in clear sky
+  float2 sc = floor(u / 9.0);
+  float sh = hash(sc + 41.0);
+  if (night > 0.02 && sh > 0.985 && cloud < 0.2) {
+    float2 sl = fract(u / 9.0) - 0.5;
+    float tw = 0.55 + 0.45 * sin(phase * 4.0 + sh * 80.0);
+    float star = (1.0 - smoothstep(0.0, 0.16, length(sl))) * tw * night * (1.0 - u.y / ${H}.0);
+    rgb += half3(0.85, 0.88, 1.0) * star;
+  }
 
   float grain = hash(floor(p) + floor(phase * 30.0)) - 0.5;
   rgb += grain * 0.022;
@@ -103,13 +114,42 @@ half4 main(float2 p) {
 }
 `;
 
+// The toggle sits near the panel's top-right corner; night spreads from there.
+const ORIGIN = { x: W - 70, y: 40 };
+const REACH = Math.hypot(ORIGIN.x, H - ORIGIN.y) * 2 + 40;
+
 const nodes: Record<string, SceneNode> = {
-  painting: {
-    ...base('painting', { outTick: LOOP, x: W / 2, y: H / 2 }),
+  day: {
+    ...base('day', { outTick: LOOP, x: W / 2, y: H / 2 }),
     type: 'image',
     assetId: 'sky',
     size: constant({ width: W, height: H }),
     fit: 'cover',
+  } as SceneNode,
+  'night-img': {
+    ...base('night-img', { outTick: LOOP, x: W / 2, y: H / 2 }),
+    type: 'image',
+    assetId: 'skyNight',
+    size: constant({ width: W, height: H }),
+    fit: 'cover',
+  } as SceneNode,
+  'night-clip': {
+    ...base('night-clip', { outTick: LOOP, x: ORIGIN.x, y: ORIGIN.y }),
+    type: 'ellipse',
+    size: constant({ width: 2, height: 2 }),
+    style: {},
+  } as SceneNode,
+  'night-layer': {
+    ...base('night-layer', { outTick: LOOP }),
+    type: 'group',
+    children: ['night-img'],
+    clipPathId: 'night-clip',
+  } as SceneNode,
+  painting: {
+    ...base('painting', { outTick: LOOP }),
+    type: 'group',
+    isolation: true,
+    children: ['day', 'night-layer'],
   } as SceneNode,
   sky: {
     ...base('sky', { outTick: LOOP }),
@@ -139,6 +179,7 @@ const nodes: Record<string, SceneNode> = {
         value: constant({ x: W / 2, y: H / 2 } as Vec2),
       },
       { id: 'focusRadius', name: 'focusRadius', valueType: 'number', minimum: 0, maximum: 600, value: constant(0) },
+      { id: 'night', name: 'night', valueType: 'number', minimum: 0, maximum: 1, value: constant(0) },
     ],
   } as SceneNode,
 };
@@ -149,7 +190,10 @@ const scene = withComputedRevision({
   name: 'ContentOS hero sky',
   canvas: { width: W, height: H, pixelAspectRatio: 1, backgroundColor: hex('#9DBDE6') },
   timing: { ticksPerSecond: TPS, frameRate: { numerator: FPS, denominator: 1 }, durationTicks: LOOP, displayStartTick: 0 },
-  assets: { sky: { id: 'sky', type: 'image', uri: 'sky.jpg', width: 2304, height: 1316, mimeType: 'image/jpeg' } },
+  assets: {
+    sky: { id: 'sky', type: 'image', uri: 'sky.jpg', width: 2304, height: 1316, mimeType: 'image/jpeg' },
+    skyNight: { id: 'skyNight', type: 'image', uri: 'sky-night.jpg', width: 2304, height: 1316, mimeType: 'image/jpeg' },
+  },
   rootCompositionId: 'main',
   components: {},
   compositions: { main: { id: 'main', name: 'Main', width: W, height: H, durationTicks: LOOP, nodes, rootNodeIds: ['sky'] } },
@@ -158,9 +202,24 @@ const scene = withComputedRevision({
   capabilities: { required: [], optional: [], unsupportedPolicy: 'warn' },
 });
 
+// night: 0 = day, 1 = night. Eased natively so the reveal plays inside Clayzo.
+const eased = (id: string) => [
+  { id: `${id}.in`, op: 'input' as const, input: 'night' },
+  { id: `${id}.ease`, op: 'spring' as const, stiffness: 46, damping: 13.6, mass: 1 },
+  { id: `${id}.clamp`, op: 'clamp' as const, minimum: 0, maximum: 1 },
+];
+const radius = (id: string) => [
+  ...eased(id),
+  { id: `${id}.map`, op: 'map-range' as const, inputMinimum: 0, inputMaximum: 1, outputMinimum: 2, outputMaximum: REACH, clamp: true },
+];
+
 const document = withInteraction(scene, [
   pointerFieldMacro({ effectNodeId: 'sky', focusParameterId: 'focus', radiusParameterId: 'focusRadius', radius: 600, halfLife: 0.35 }),
-]);
+  { input: { id: 'input-night', name: 'night', kind: 'number', defaultValue: 0, minimum: 0, maximum: 1, label: 'Night' } },
+  { id: 'night-w', target: { kind: 'node-property', nodeId: 'night-clip', property: 'size', axis: 'width' }, blend: 'set', steps: radius('nw') },
+  { id: 'night-h', target: { kind: 'node-property', nodeId: 'night-clip', property: 'size', axis: 'height' }, blend: 'set', steps: radius('nh') },
+  { id: 'night-fx', target: { kind: 'effect-parameter', nodeId: 'sky', parameterId: 'night' }, blend: 'set', steps: eased('nf') },
+] as never);
 
 assertValidAnimationDocument(document);
 const diags = validateAnimationDocument(document).diagnostics;
@@ -168,4 +227,5 @@ if (diags.length) console.warn(JSON.stringify(diags).slice(0, 600));
 mkdirSync('animations/out', { recursive: true });
 writeFileSync('animations/out/hero-sky.json', JSON.stringify(document));
 copyFileSync('animations/assets/sky.jpg', 'animations/out/sky.jpg');
+copyFileSync('animations/assets/sky-night.jpg', 'animations/out/sky-night.jpg');
 console.log('wrote animations/out/hero-sky.json', document.revision);

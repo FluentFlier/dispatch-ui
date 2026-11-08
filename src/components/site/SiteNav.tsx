@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Wordmark } from './brand/Mark';
+import { ThemeToggle } from './ThemeToggle';
 
 const LINKS = [
   { label: 'Product', href: '#product' },
@@ -39,6 +40,7 @@ export function SiteNav({ cta }: { cta: { href: string; label: string } }) {
         </nav>
 
         <div className="cos-nav-actions">
+          <ThemeToggle />
           <Link href="/login" className="cos-btn cos-btn-silver cos-btn-sm cos-nav-login">
             <span>Sign in</span>
           </Link>
