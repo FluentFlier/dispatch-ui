@@ -139,6 +139,28 @@ half4 main(float2 p) {
   // vignette
   rgb *= 1.0 - edge * edge * mix(0.06, 0.16, night);
 
+  // ---- daylight grade (night is left exactly as it was) ----
+  float day = 1.0 - night;
+  // sunbeams: faint rays fanning up from a sun just below the frame, turning slowly
+  float2 sv = u - float2(${f(W / 2)}, ${f(H * 1.04)});
+  float sd = length(sv) / ${f(H)};
+  float sa = atan(sv.y, sv.x);
+  float ray = 0.5 + 0.5 * sin(sa * 15.0 + sin(sa * 4.0 + phase) * 1.6 + phase * 0.5);
+  ray = pow(ray, 5.0) * 0.7 + pow(0.5 + 0.5 * sin(sa * 7.0 - phase * 0.35 + 1.3), 8.0) * 0.5;
+  float beam = ray * exp(-sd * 2.3) * smoothstep(0.05, 0.3, sd);
+  rgb += half3(1.0, 0.84, 0.68) * beam * 0.085 * day;
+  // a warmer sun glow at the horizon
+  float2 hg = (u - float2(${f(W / 2)}, ${f(H * 1.02)})) / float2(${f(W * 0.42)}, ${f(H * 0.5)});
+  rgb += half3(1.0, 0.66, 0.42) * exp(-dot(hg, hg) * 1.4) * 0.07 * day;
+  // a lilac breath through the middle of the sky, so it never reads as flat pale blue
+  float midb = smoothstep(${f(H * 0.18)}, ${f(H * 0.42)}, u.y) * (1.0 - smoothstep(${f(H * 0.5)}, ${f(H * 0.8)}, u.y));
+  rgb = mix(rgb, rgb * half3(0.93, 0.88, 1.0), midb * 0.55 * day);
+  // gentle S-curve for depth, cool shadows and warm highlights
+  half3 scurve = rgb * rgb * (3.0 - 2.0 * rgb);
+  rgb = mix(rgb, scurve, 0.22 * day);
+  float ll = dot(rgb, half3(0.299, 0.587, 0.114));
+  rgb += (half3(-0.01, 0.0, 0.025) * (1.0 - ll) + half3(0.025, 0.012, -0.012) * ll) * day;
+
   // by day the top of the sky deepens into a rich cobalt, fading out before the headline
   float top = 1.0 - smoothstep(${f(H * 0.08)}, ${f(H * 0.66)}, u.y);
   top = smoothstep(0.0, 1.0, top) * (1.0 - night);
