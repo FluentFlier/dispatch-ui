@@ -228,7 +228,7 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
 .cos-wordmark {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   font-size: 19px;
   font-weight: 600;
   letter-spacing: -0.035em;
@@ -510,31 +510,6 @@ html[data-cos-theme='dark'] .cos-panel:has([data-bg='hero-lake'])::after {
 .cos-line {
   display: block;
   padding-bottom: 0.04em;
-}
-.cos-loop {
-  position: relative;
-  display: inline-block;
-}
-.cos-loop-mark {
-  position: absolute;
-  left: -0.06em;
-  right: -0.06em;
-  top: 86%;
-  width: calc(100% + 0.12em);
-  height: 0.36em;
-  overflow: visible;
-  pointer-events: none;
-}
-.cos-loop-mark path {
-  fill: none;
-  stroke: var(--cos-blue);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: cos-draw 1100ms cubic-bezier(0.65, 0, 0.35, 1) 900ms forwards;
 }
 @keyframes cos-draw {
   to {
@@ -1113,10 +1088,6 @@ html[data-cos-theme='dark'] .cos-panel:has([data-bg='hero-lake'])::after {
   .cos-tile::after,
   .cos-post-body {
     animation: none;
-  }
-  .cos-loop-mark path {
-    animation: none;
-    stroke-dashoffset: 0;
   }
 }
 
