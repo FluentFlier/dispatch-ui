@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
 import { ProductDemo } from '../demo/ProductDemo';
-import { InstagramLogo, PlatformIcon, TikTokLogo } from '../brand/Logos';
+import { PlatformIcon } from '../brand/Logos';
 import { HeroLoop } from './HeroLoop';
 import { SkyField } from './SkyField';
 
@@ -14,15 +13,6 @@ export function Hero({ cta }: { cta: { href: string; label: string } }) {
       <HeroLoop />
 
       <div className="cos-hero-copy">
-        <Link href="/roadmap" className="cos-news cos-rise" style={{ ['--d' as string]: 0 }}>
-          <span className="cos-news-logos">
-            <InstagramLogo size={14} />
-            <TikTokLogo size={14} />
-          </span>
-          Instagram and TikTok are coming soon
-          <ChevronRight size={14} strokeWidth={2.2} aria-hidden="true" />
-        </Link>
-
         <h1 id="cos-hero-title" className="cos-hero-title">
           <span className="cos-line cos-rise" style={{ ['--d' as string]: 1 }}>
             Content and leads.

@@ -269,6 +269,20 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
 .cos-nav-links {
   display: flex;
   gap: 4px;
+  transition:
+    opacity 320ms var(--cos-ease-out),
+    transform 420ms var(--cos-ease-out),
+    visibility 0s linear 0s;
+}
+/* over the sky the hero speaks for itself: the section links arrive once you scroll */
+.cos-nav:not([data-scrolled='true']) .cos-nav-links {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease,
+    visibility 0s linear 200ms;
 }
 .cos-nav-link {
   display: inline-flex;
@@ -361,7 +375,7 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
 
 .cos-hero {
   position: relative;
-  padding-top: clamp(132px, 17vh, 184px);
+  padding-top: clamp(156px, 20vh, 212px);
   padding-bottom: clamp(48px, 7vh, 88px);
 }
 
@@ -1203,15 +1217,15 @@ html[data-cos-theme='dark'] .cos-btn-silver::before {
 }
 
 /* the scene at night */
+/* at night every tile is bright frosted glass, so the brand marks never sink into it */
 html[data-cos-theme='dark'] .cos-tile:not(.cos-tile-ink) {
   background:
-    radial-gradient(120% 80% at 50% 0%, rgba(160, 172, 255, 0.22), rgba(160, 172, 255, 0) 60%),
-    linear-gradient(180deg, rgba(42, 44, 62, 0.85), rgba(18, 19, 30, 0.85));
+    radial-gradient(120% 80% at 50% 0%, #fff, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(246, 246, 250, 0.95), rgba(214, 216, 228, 0.92));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 0 0 1px rgba(148, 161, 255, 0.18),
-    0 0 0 1px rgba(0, 0, 0, 0.5),
-    0 22px 40px -18px rgba(0, 0, 0, 0.7);
+    inset 0 1px 0 #fff,
+    0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 22px 40px -18px rgba(148, 161, 255, 0.45);
 }
 html[data-cos-theme='dark'] .cos-tile-ink {
   background:
@@ -1298,15 +1312,42 @@ html[data-cos-theme='dark'] .cos-hero-demo::before {
   }
 }
 
-/* while the theme changes, colours ease everywhere at once */
-html[data-cos-theming='true'] .cos,
-html[data-cos-theming='true'] .cos *,
-html[data-cos-theming='true'] .cos *::before {
-  transition-property: background-color, background, color, border-color, box-shadow, fill, stroke, text-shadow !important;
-  transition-duration: 760ms !important;
-  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1) !important;
-  transition-delay: 0ms !important;
+/* the theme switch: one wipe from the toggle over the whole page (theme.tsx).
+   The toggle rides on its own layer, live above the wipe, so its slide is never clipped. */
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-old(cos-nav),
+::view-transition-new(cos-nav) {
+  animation: none;
+  mix-blend-mode: normal;
 }
+::view-transition-new(root),
+::view-transition-new(cos-nav) {
+  z-index: 1;
+}
+/* the nav is its own layer, wiped by the same circle (it sits at the top-left, so the
+   circle's page coordinates line up with its own) */
+.cos-nav {
+  view-transition-name: cos-nav;
+}
+::view-transition-group(cos-nav) {
+  z-index: 2;
+  animation: none;
+}
+.cos-theme-toggle {
+  view-transition-name: cos-theme-toggle;
+}
+::view-transition-group(cos-theme-toggle) {
+  z-index: 3;
+  animation: none;
+}
+::view-transition-old(cos-theme-toggle) {
+  display: none;
+}
+::view-transition-new(cos-theme-toggle) {
+  animation: none;
+}
+
 
 @media (max-width: 719px) {
   .cos-nav-actions .cos-btn-metal {

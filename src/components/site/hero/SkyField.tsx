@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ClayzoPlayer } from '@clayzo/webgl-player/react';
 import type { PlayerHandle } from '@clayzo/webgl-player';
 import { readClayzoBundle, type LoadedClayzo } from '@clayzo/animation/bundle';
@@ -8,8 +8,8 @@ import { useTheme } from '../theme';
 
 /**
  * The hero backdrop (Clayzo, animations/hero-sky.ts): a painted sky whose
- * clouds drift and lean toward the cursor. At night the starlit version
- * spreads out from the toggle's corner. ?bg=lake swaps in the mountain lake.
+ * clouds drift and lean toward the cursor. Day and night switch instantly;
+ * the page-wide wipe (theme.tsx) does the reveal. ?bg=lake swaps in the mountain lake.
  */
 const BACKDROPS = {
   sky: { scene: 'hero-sky', day: 'sky', night: 'sky-night' },
@@ -23,7 +23,8 @@ export function SkyField() {
   const playerRef = useRef<PlayerHandle | null>(null);
   const night = theme === 'dark' ? 1 : 0;
 
-  useEffect(() => {
+  // layout effect so the sky has switched before the page's view transition captures it
+  useLayoutEffect(() => {
     playerRef.current?.setInput('night', night);
   }, [night]);
 

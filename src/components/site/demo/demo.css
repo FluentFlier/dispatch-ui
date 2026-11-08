@@ -488,21 +488,47 @@ img.dm-avatar {
   flex: none;
 }
 .dm-cal-new {
-  background: linear-gradient(180deg, #5c7aff, #3555f0);
-  color: #fff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  padding-left: 10px;
+  background: var(--dm-panel);
+  color: var(--dm-text);
+  font-weight: 550;
+  box-shadow:
+    inset 0 0 0 1px rgba(47, 91, 234, 0.35),
+    0 6px 14px -8px rgba(47, 91, 234, 0.45);
   opacity: 0;
-  transform: translateY(-46px) scale(0.94);
-  filter: blur(4px);
+  transform: translateY(4px) scale(0.96);
+  transform-origin: 50% 0;
   transition:
-    opacity 360ms ease,
-    transform 700ms cubic-bezier(0.34, 1.32, 0.64, 1),
-    filter 400ms ease;
+    opacity 260ms ease,
+    transform 420ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+/* a cobalt accent bar marks it as the one just scheduled */
+.dm-cal-new::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--dm-blue);
 }
 .dm-cal-new[data-on='true'] {
   opacity: 1;
   transform: none;
-  filter: none;
+}
+/* the cell answers once as the post lands */
+.dm-cal-cell[data-target='true'] {
+  animation: dm-land 900ms ease-out;
+}
+@keyframes dm-land {
+  0% {
+    box-shadow: inset 0 0 0 1px rgba(47, 91, 234, 0.45), 0 0 0 0 rgba(47, 91, 234, 0.35);
+  }
+  100% {
+    box-shadow: inset 0 0 0 1px rgba(47, 91, 234, 0.45), 0 0 0 10px rgba(47, 91, 234, 0);
+  }
 }
 .dm-toast {
   position: absolute;

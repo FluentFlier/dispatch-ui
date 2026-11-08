@@ -272,7 +272,6 @@ const scene = withComputedRevision({
 // night: 0 = day, 1 = night. Eased natively so the reveal plays inside Clayzo.
 const eased = (id: string) => [
   { id: `${id}.in`, op: 'input' as const, input: 'night' },
-  { id: `${id}.ease`, op: 'spring' as const, stiffness: 46, damping: 13.6, mass: 1 },
   { id: `${id}.clamp`, op: 'clamp' as const, minimum: 0, maximum: 1 },
 ];
 const radius = (id: string) => [

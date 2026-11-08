@@ -39,7 +39,13 @@ export function ThemeToggle() {
       aria-label="Dark theme"
       className="cos-theme-toggle"
       data-theme-toggle
-      onClick={toggle}
+      onClick={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        // the thumb starts sliding on the click itself, in step with the curtain
+        if (toggle({ x: r.left + r.width / 2, y: r.top + r.height / 2 })) {
+          playerRef.current?.setInput('dark', !dark);
+        }
+      }}
     >
       {ready && (
         <ClayzoPlayer
