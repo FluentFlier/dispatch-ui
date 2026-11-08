@@ -142,10 +142,10 @@ half4 main(float2 p) {
   // by day the top of the sky deepens into a rich cobalt, fading out before the headline
   float top = 1.0 - smoothstep(${f(H * 0.08)}, ${f(H * 0.66)}, u.y);
   top = smoothstep(0.0, 1.0, top) * (1.0 - night);
-  half3 deep = rgb * half3(0.46, 0.62, 1.0);
+  half3 deep = rgb * half3(0.58, 0.72, 1.0);
   float dl = dot(deep, half3(0.299, 0.587, 0.114));
-  deep = mix(half3(dl), deep, 1.25);
-  rgb = mix(rgb, deep, top * 0.9);
+  deep = mix(half3(dl), deep, 1.12);
+  rgb = mix(rgb, deep, top * 0.72);
 
   // film grain: fine, animated, strongest in the midtones, a touch of chroma
   float2 gp = floor(u * 1.25);
