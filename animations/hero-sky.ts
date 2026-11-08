@@ -36,6 +36,8 @@ const TPS = 240;
 const FPS = 60;
 const LOOP = 24 * TPS;
 
+const f = (x: number) => x.toFixed(2);
+
 const SKSL = `
 uniform shader inputImage;
 uniform float phase;
@@ -77,7 +79,7 @@ half4 main(float2 p) {
   float lum = dot(base0.rgb, half3(0.299, 0.587, 0.114));
   float sat = max(base0.r, max(base0.g, base0.b)) - min(base0.r, min(base0.g, base0.b));
   float cloud = smoothstep(0.66, 0.9, lum) * (1.0 - smoothstep(0.32, 0.5, sat));
-  cloud = max(cloud, smoothstep(0.55, 0.8, lum) * smoothstep(0.55, 1.0, u.y / ${H}.0));
+  cloud = max(cloud, smoothstep(0.55, 0.8, lum) * smoothstep(0.55, 1.0, u.y / ${f(H)}));
 
   // looping flow: walk a circle through the noise field
   float2 loop = float2(cos(phase), sin(phase)) * 1.6;
@@ -88,13 +90,13 @@ half4 main(float2 p) {
 
   // depth parallax under the cursor
   float presence = clamp(focusRadius / 600.0, 0.0, 1.0);
-  float2 lean = (focus / s - float2(${W / 2}.0, ${H / 2}.0)) / float2(${W / 2}.0, ${H / 2}.0);
+  float2 lean = (focus / s - float2(${f(W / 2)}, ${f(H / 2)})) / float2(${f(W / 2)}, ${f(H / 2)});
   off -= lean * presence * (3.0 + cloud * 22.0);
 
   half4 c = unpremul(inputImage.eval((u + off) * s));
 
   // a warm glow breathing at the horizon
-  float2 g = (u - float2(${W / 2}.0, ${H}.0)) / float2(${W * 0.5}.0, ${H * 0.55}.0);
+  float2 g = (u - float2(${f(W / 2)}, ${f(H)})) / float2(${f(W * 0.5)}, ${f(H * 0.55)});
   float glow = exp(-dot(g, g) * 1.6) * (0.06 + 0.03 * sin(phase * 2.0));
   half3 rgb = c.rgb + mix(half3(1.0, 0.72, 0.5), half3(0.55, 0.6, 1.0), night) * glow;
 
@@ -104,12 +106,39 @@ half4 main(float2 p) {
   if (night > 0.02 && sh > 0.985 && cloud < 0.2) {
     float2 sl = fract(u / 9.0) - 0.5;
     float tw = 0.55 + 0.45 * sin(phase * 4.0 + sh * 80.0);
-    float star = (1.0 - smoothstep(0.0, 0.16, length(sl))) * tw * night * (1.0 - u.y / ${H}.0);
+    float star = (1.0 - smoothstep(0.0, 0.16, length(sl))) * tw * night * (1.0 - u.y / ${f(H)});
     rgb += half3(0.85, 0.88, 1.0) * star;
   }
 
-  float grain = hash(floor(p) + floor(phase * 30.0)) - 0.5;
-  rgb += grain * 0.022;
+  // shader-gradient wash: brand hues drift through a warped field, gathering at the edges
+  float2 wl = float2(cos(phase), sin(phase)) * 0.75;
+  float2 wq = u * 0.0012;
+  float w1 = fbm(wq + wl + fbm(wq * 1.7 - wl) * 1.4);
+  float w2 = fbm(wq * 1.35 - wl.yx + float2(3.1, 7.7));
+  half3 tA = mix(half3(1.0, 0.6, 0.38), half3(0.5, 0.33, 1.0), night);   // apricot / violet
+  half3 tB = mix(half3(0.78, 0.68, 1.0), half3(0.16, 0.5, 1.0), night);  // lilac / electric blue
+  half3 tC = mix(half3(0.3, 0.48, 1.0), half3(1.0, 0.42, 0.72), night);  // cobalt / rose
+  half3 tint = mix(mix(tA, tB, smoothstep(0.32, 0.68, w1)), tC, smoothstep(0.5, 0.78, w2));
+  float2 e = (u - float2(${f(W / 2)}, ${f(H * 0.42)})) / float2(${f(W / 2)}, ${f(H / 2)});
+  float edge = smoothstep(0.2, 1.25, length(e * float2(0.85, 1.1)));
+  float amt = 0.2 + 0.5 * edge;
+  half3 lo = 2.0 * rgb * tint + rgb * rgb * (1.0 - 2.0 * tint);
+  half3 hi = sqrt(saturate(rgb)) * (2.0 * tint - 1.0) + 2.0 * rgb * (1.0 - tint);
+  half3 soft = mix(lo, hi, step(half3(0.5), tint));
+  rgb = mix(rgb, soft, amt);
+  // a whisper of the colour itself in the corners, so it reads as light not filter
+  rgb = mix(rgb, tint, edge * edge * mix(0.1, 0.14, night));
+  // vignette
+  rgb *= 1.0 - edge * edge * mix(0.06, 0.16, night);
+
+  // film grain: fine, animated, strongest in the midtones, a touch of chroma
+  float2 gp = floor(u * 1.25);
+  float gt = floor(phase * 40.0);
+  float gl = hash(gp + gt * 13.0) - 0.5;
+  half3 gc = half3(hash(gp + gt * 7.0 + 3.0), hash(gp + gt * 5.0 + 11.0), hash(gp + gt * 3.0 + 29.0)) - 0.5;
+  float luma = dot(rgb, half3(0.299, 0.587, 0.114));
+  float mid = 1.0 - abs(luma - 0.5) * 1.2;
+  rgb += (gl * 0.75 + gc * 0.25) * mix(0.055, 0.07, night) * mid;
   return half4(saturate(rgb), 1.0);
 }
 `;

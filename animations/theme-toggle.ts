@@ -218,21 +218,23 @@ const thumbX = keyed<{ x: number; y: number; z: number }>('thumb.x', [
   [END, { x: DAY_X, y: CY, z: 0 }],
 ]);
 
-nodes['glow-shape'] = {
-  ...base('glow-shape', { outTick: END }),
-  type: 'rect',
-  size: constant({ width: 66, height: 66 }),
-  cornerRadius: constant(21),
-  style: { stroke: stroke(swing<Color>('glow.col', PAL.day.rim, PAL.night.rim, INOUT, 0.3, 0.75), 5, { opacity: 0.9 }) },
-} as SceneNode;
-nodes['glow-blur'] = {
-  ...base('glow-blur', { outTick: END }),
-  type: 'effect',
-  effect: 'blur',
-  inputId: 'glow-shape',
-  parameters: [{ id: 'radius', name: 'radius', valueType: 'number', minimum: 0, maximum: 40, value: constant(7) }],
-  capability: { requires: ['image-filter'], fallback: 'passthrough', maxTemporarySurfaces: 1 },
-} as SceneNode;
+// rim glow: concentric soft strokes (no blur layer, so nothing beneath gets cut out)
+const glowIds: string[] = [];
+[
+  [71, 23, 5, 0.1],
+  [69, 22, 4, 0.16],
+  [66.5, 21, 3, 0.26],
+].forEach(([size, r, w, op], i) => {
+  const id = `glow-${i}`;
+  nodes[id] = {
+    ...base(id, { outTick: END }),
+    type: 'rect',
+    size: constant({ width: size, height: size }),
+    cornerRadius: constant(r),
+    style: { stroke: stroke(swing<Color>(`${id}.col`, PAL.day.rim, PAL.night.rim, INOUT, 0.3, 0.75), w, { opacity: op }) },
+  } as SceneNode;
+  glowIds.push(id);
+});
 
 nodes['thumb-face'] = {
   ...base('thumb-face', { outTick: END }),
@@ -277,7 +279,7 @@ nodes.icon = {
 nodes.thumb = {
   ...base('thumb', { outTick: END, position: thumbX }),
   type: 'group',
-  children: ['glow-blur', 'thumb-face', 'thumb-under', 'thumb-sheen', 'thumb-rim', 'icon'],
+  children: [...glowIds, 'thumb-face', 'thumb-under', 'thumb-sheen', 'thumb-rim', 'icon'],
 } as SceneNode;
 
 const scene = withComputedRevision({
