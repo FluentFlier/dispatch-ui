@@ -16,7 +16,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import { IconBrandLinkedin, IconBrandX } from '@tabler/icons-react';
+import { LinkedInLogo, XLogo } from '../brand/Logos';
 import { Mark } from '../brand/Mark';
 
 /**
@@ -370,10 +370,10 @@ function Composer({ value, active }: { value: string; active: boolean }) {
         )}
       </div>
       <span className="dm-plat" data-on="true">
-        <IconBrandX size={13} stroke={1.8} />
+        <XLogo size={12} />
       </span>
       <span className="dm-plat" data-on="true">
-        <IconBrandLinkedin size={13} stroke={1.8} />
+        <LinkedInLogo size={13} />
       </span>
       <Mic size={15} strokeWidth={1.8} className="dm-dim" />
       <span className="dm-send" data-ready={value.length > 0} data-demo="send">
@@ -413,7 +413,7 @@ function DraftScene({ words }: { words: number }) {
             <p className="dm-name">Maya Chen</p>
             <p className="dm-sub">Founder, Relay</p>
           </div>
-          <IconBrandLinkedin size={16} stroke={1.8} className="dm-dim dm-push" />
+          <LinkedInLogo size={16} className="dm-push" />
         </header>
         <div className="dm-post-body">
           {shown.map((p, i) => (
@@ -427,7 +427,7 @@ function DraftScene({ words }: { words: number }) {
           Sounds like you
         </span>
         <span className="dm-pill">
-          <IconBrandX size={11} stroke={2} />
+          <XLogo size={10} />
           X version ready
         </span>
         <span className="dm-push" />
@@ -493,13 +493,13 @@ function Row({ time, r, scheduled }: { time: string; r: number; scheduled: boole
           <div key={c} className="dm-cal-cell" data-target={isNew && scheduled}>
             {e && (
               <span className="dm-cal-post">
-                {e.x ? <IconBrandX size={11} stroke={2} /> : <IconBrandLinkedin size={11} stroke={2} />}
+                {e.x ? <XLogo size={10} /> : <LinkedInLogo size={11} />}
                 {e.t}
               </span>
             )}
             {isNew && (
               <span className="dm-cal-post dm-cal-new" data-on={scheduled}>
-                <IconBrandLinkedin size={11} stroke={2} />
+                <LinkedInLogo size={11} />
                 We almost lost Northwind
               </span>
             )}
