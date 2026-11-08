@@ -30,13 +30,14 @@ import {
   type Vec2,
 } from '@clayzo/animation/authoring';
 
-// BG picks the backdrop: sky (the painted sky, default) or lake (the mountain lake photo)
-const BG = process.env.BG === 'lake' ? 'lake' : 'sky';
+// BG picks the backdrop: sky (the painted sky, default), lake (the mountain lake photo)
+// or india (an Udaipur-style lake palace, just for fun)
+const BG = process.env.BG === 'lake' || process.env.BG === 'india' ? process.env.BG : 'sky';
 const DAY_FILE = `${BG}.jpg`;
 const NIGHT_FILE = `${BG}-night.jpg`;
 const ASSET_W = BG === 'sky' ? 2304 : 1344;
 const ASSET_H = BG === 'sky' ? 1316 : 768;
-const OUT = BG === 'sky' ? 'hero-sky' : 'hero-lake';
+const OUT = BG === 'sky' ? 'hero-sky' : `hero-${BG}`;
 
 const W = 1600;
 const H = 914;
