@@ -61,3 +61,29 @@ export function TikTokLogo({ size = 16, className }: { size?: number; className?
     </svg>
   );
 }
+
+const PLATFORMS = {
+  linkedin: { label: 'LinkedIn' },
+  x: { label: 'X' },
+  threads: { label: 'Threads' },
+} as const;
+
+/**
+ * A platform as its app icon, inline in copy. LinkedIn and X use the brand
+ * images from /images/brands (as on the current site); Threads is drawn to
+ * match the X tile.
+ */
+export function PlatformIcon({ name }: { name: keyof typeof PLATFORMS }) {
+  const label = PLATFORMS[name].label;
+  return (
+    <span className="cos-app-icon" data-p={name}>
+      {name === 'linkedin' && <img src="/images/brands/linkedin.png" alt={label} width={24} height={24} />}
+      {name === 'x' && <img src="/images/brands/x.png" alt={label} width={20} height={20} />}
+      {name === 'threads' && (
+        <span className="cos-app-icon-tile" role="img" aria-label={label}>
+          <ThreadsLogo size={14} />
+        </span>
+      )}
+    </span>
+  );
+}

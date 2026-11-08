@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { ProductDemo } from '../demo/ProductDemo';
-import { InstagramLogo, LinkedInLogo, ThreadsLogo, TikTokLogo, XLogo } from '../brand/Logos';
-import { Floaters } from './Floaters';
+import { InstagramLogo, PlatformIcon, TikTokLogo } from '../brand/Logos';
+import { HeroLoop } from './HeroLoop';
 import { SkyField } from './SkyField';
 
 export function Hero({ cta }: { cta: { href: string; label: string } }) {
@@ -11,7 +11,7 @@ export function Hero({ cta }: { cta: { href: string; label: string } }) {
       <div className="cos-panel" aria-hidden="true">
         <SkyField />
       </div>
-      <Floaters />
+      <HeroLoop />
 
       <div className="cos-hero-copy">
         <Link href="/roadmap" className="cos-news cos-rise" style={{ ['--d' as string]: 0 }}>
@@ -40,24 +40,12 @@ export function Hero({ cta }: { cta: { href: string; label: string } }) {
 
         <p className="cos-hero-sub cos-rise" style={{ ['--d' as string]: 3 }}>
           ContentOS drafts posts in your voice for{' '}
-          <span className="cos-plat">
-            <span className="cos-plat-mark">
-              <LinkedInLogo size={17} />
-            </span>
-            LinkedIn<span className="cos-plat-punct">,</span>
+          <span className="cos-nowrap">
+            <PlatformIcon name="linkedin" />,
           </span>{' '}
-          <span className="cos-plat">
-            <span className="cos-plat-mark">
-              <XLogo size={15} />
-            </span>
-            X
-          </span>{' '}
-          and{' '}
-          <span className="cos-plat">
-            <span className="cos-plat-mark">
-              <ThreadsLogo size={18} />
-            </span>
-            Threads<span className="cos-plat-punct">.</span>
+          <PlatformIcon name="x" /> and{' '}
+          <span className="cos-nowrap">
+            <PlatformIcon name="threads" />.
           </span>{' '}
           You approve. It publishes, works the replies, and shows you which conversations are turning into customers.
         </p>
