@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Fraunces, Hanken_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { DM_Sans, Fraunces, Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 import { PRODUCT_NAME, SITE_TITLE } from '@/lib/brand';
 import './globals.css';
 
@@ -23,6 +25,14 @@ const hanken = Hanken_Grotesk({
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrains',
+  display: 'swap',
+});
+
+const instrument = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-instrument',
   display: 'swap',
 });
 
@@ -64,7 +74,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`scroll-smooth ${dmSans.variable} ${fraunces.variable} ${hanken.variable} ${jetbrains.variable}`}
+      className={`scroll-smooth ${dmSans.variable} ${fraunces.variable} ${hanken.variable} ${jetbrains.variable} ${instrument.variable} ${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body className={dmSans.className}>{children}</body>
     </html>
