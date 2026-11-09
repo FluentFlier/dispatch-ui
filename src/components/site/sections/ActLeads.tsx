@@ -23,6 +23,17 @@ export function ActLeads() {
         />
       </div>
 
+      {/* under 1024 px the crowd becomes a strip above the heading */}
+      <div className="cos-act-crowd" aria-hidden="true">
+        <ClayzoScene
+          name="people-field"
+          width={390}
+          height={190}
+          narrow={{ width: 390, height: 190 }}
+          playWhen="visible"
+        />
+      </div>
+
       <div className="cos-act-inner">
         <div className="cos-act-head">
           <h2 id="act-leads-title" className="cos-act-title">

@@ -1446,6 +1446,26 @@ html[data-cos-theme='dark'] .cos-act-scene {
     height: 100%;
   }
 }
+/* under 1024 px: the crowd as a strip above the heading (the narrow people-field build) */
+.cos-act-crowd {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .cos-act:has(.cos-act-crowd) {
+    padding-top: calc(min(100vw, 520px) * 190 / 390 + 28px);
+  }
+  .cos-act-crowd {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 10px;
+    left: 0;
+    right: 0;
+    width: min(100%, 520px);
+    margin: 0 auto;
+    pointer-events: none;
+  }
+}
 /* the lead sort's window: 22 of 1200 x 440 */
 .cos-act-scene-leads {
   border-radius: 1.833% / 5%;

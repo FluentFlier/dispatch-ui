@@ -9,9 +9,9 @@
  *   geometry  a square dot grid; dot size is presence, so the back rows are fainter and every
  *             person is shaded top to bottom; a thin gap keeps each silhouette its own
  *   palette   ink dots, faint (pale on dark); the picked ones cobalt / sea cyan, near full
- *   scale     1000 x 700, shown large beside the section's heading
+ *   scale     1000 x 700 beside the desktop heading; 390 x 190 as a strip above it on phones
  *
- *   pnpm tsx animations/people-field.ts   (writes public/scene/people-field/{light,dark}.json)
+ *   pnpm tsx animations/people-field.ts   (writes public/scene/people-field/*.json)
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import {
@@ -29,37 +29,50 @@ import {
 } from '@clayzo/animation/authoring';
 import { FPS, OUT, TPS, t, type K } from './lib/kit';
 
-const W = 1000;
-const H = 700;
 const END = t(12);
 // the marker colour the shader reads as empty: each person's halo is drawn in it, so whoever
 // stands in front cuts a clean gap out of whoever stands behind
 const GAP: Color = { r: 0, g: 1, b: 0, a: 1 };
 
-// a crowd, not a grid: three loose rows, each person a little off the line and their own size
-let seed = 11;
-const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 type Person = { x: number; by: number; h: number; tone: number };
-const ROWS: Person[][] = [
-  { n: 6, x0: 95, step: 168, h: 158, by: 292, tone: 0.42 },
-  { n: 6, x0: 30, step: 182, h: 206, by: 470, tone: 0.68 },
-  { n: 5, x0: 120, step: 205, h: 262, by: 700, tone: 1 },
-].map((r) =>
-  Array.from({ length: r.n }, (_, i) => ({
-    x: r.x0 + i * r.step + (rnd() - 0.5) * r.step * 0.34,
-    by: r.by + (rnd() - 0.5) * 22,
-    h: r.h * (0.9 + rnd() * 0.18),
-    tone: r.tone * (0.88 + rnd() * 0.12),
-  })),
-);
-// the buyers: [row, index], each lit in turn
-const BUYERS: [number, number][] = [
-  [2, 1],
-  [1, 4],
-  [0, 2],
-];
+type RowSpec = { n: number; x0: number; step: number; h: number; by: number; tone: number };
+// a crowd, not a grid: three loose rows, each person a little off the line and their own size
+function crowd(rows: RowSpec[], jitter: number): Person[][] {
+  let seed = 11;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  return rows.map((r) =>
+    Array.from({ length: r.n }, (_, i) => ({
+      x: r.x0 + i * r.step + (rnd() - 0.5) * r.step * 0.34,
+      by: r.by + (rnd() - 0.5) * jitter,
+      h: r.h * (0.9 + rnd() * 0.18),
+      tone: r.tone * (0.88 + rnd() * 0.12),
+    })),
+  );
+}
+// wide: the field beside the desktop heading; narrow: a strip above the heading on phones
+function layout(narrow: boolean) {
+  return narrow
+    ? {
+        // two rows fit a strip this shallow; three hid the buyers behind each other
+        W: 390, H: 190, cell: 5.4, gap: 4, edgeX: 38, edgeY: 16,
+        rows: crowd([
+          { n: 5, x0: 38, step: 78, h: 80, by: 98, tone: 0.5 },
+          { n: 4, x0: 52, step: 96, h: 116, by: 190, tone: 1 },
+        ], 8),
+        buyers: [[1, 1], [0, 3], [1, 2]] as [number, number][],
+      }
+    : {
+        W: 1000, H: 700, cell: 9, gap: 7, edgeX: 110, edgeY: 70,
+        rows: crowd([
+          { n: 6, x0: 95, step: 168, h: 158, by: 292, tone: 0.42 },
+          { n: 6, x0: 30, step: 182, h: 206, by: 470, tone: 0.68 },
+          { n: 5, x0: 120, step: 205, h: 262, by: 700, tone: 1 },
+        ], 22),
+        buyers: [[2, 1], [1, 4], [0, 2]] as [number, number][],
+      };
+}
 
-const SKSL = `
+const sksl = (L: ReturnType<typeof layout>) => `
 uniform shader inputImage;
 uniform float phase;
 uniform half4 ink;
@@ -71,7 +84,7 @@ float gapOf(half4 c) { return step(0.5, c.a) * step(0.5, c.g); }
 half4 main(float2 q) {
   float s = renderScale.x;
   float2 u = q / s;
-  float CELL = 9.0;
+  float CELL = ${L.cell.toFixed(2)};
   float2 cell = floor(u / CELL);
   float2 cc = (cell + 0.5) * CELL;
   // the source is drawn opaque, one meaning per channel: red is presence (the shading), blue is
@@ -98,14 +111,16 @@ half4 main(float2 q) {
   float r = CELL * 0.5 * sqrt(a) * (0.82 + 0.3 * crest);
   float d = length(u - cc);
   float cov = 1.0 - smoothstep(r - 0.6, r + 0.5, d);
-  float edge = smoothstep(0.0, 110.0, u.x) * smoothstep(${W}.0, ${W - 110}.0, u.x) * smoothstep(0.0, 70.0, u.y);
+  float edge = smoothstep(0.0, ${L.edgeX.toFixed(1)}, u.x) * smoothstep(${L.W.toFixed(1)}, ${(L.W - L.edgeX).toFixed(1)}, u.x) * smoothstep(0.0, ${L.edgeY.toFixed(1)}, u.y);
   float strength = mix(ink.a, glint.a, lit) * edge;
   half3 col = mix(ink.rgb, glint.rgb, lit);
   return half4(col * strength * cov, strength * cov);
 }
 `;
 
-function build(dark: boolean) {
+function build(dark: boolean, narrow: boolean) {
+  const L = layout(narrow);
+  const { W, H } = L;
   const nodes: Record<string, SceneNode> = {};
   const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
   const ink: Color = dark ? hexA('#E4ECF0', 0.17) : hexA('#101114', 0.19);
@@ -148,7 +163,7 @@ function build(dark: boolean) {
     ];
   };
   const halo = (id: string, x: number, by: number, h: number) => {
-    const gap = 7;
+    const gap = L.gap;
     const hr = 0.17 * h;
     return [
       add({
@@ -167,11 +182,11 @@ function build(dark: boolean) {
   };
 
   const kids: string[] = [];
-  ROWS.forEach((row, ri) => {
+  L.rows.forEach((row, ri) => {
     row.forEach(({ x, by, h, tone }, pi) => {
       const id = `p${ri}-${pi}`;
       kids.push(...halo(id, x, by, h));
-      const b = BUYERS.findIndex(([r, i]) => r === ri && i === pi);
+      const b = L.buyers.findIndex(([r, i]) => r === ri && i === pi);
       const a = 1 + b * 3.6;
       // a buyer's lit self is drawn opaque over them and faded in and out
       kids.push(...person(id, x, by, h, inkRgb, tone));
@@ -192,7 +207,7 @@ function build(dark: boolean) {
     type: 'effect',
     effect: 'custom-sksl',
     inputId: 'crowd-src',
-    implementation: SKSL,
+    implementation: sksl(L),
     capability: { requires: ['runtime-effect'], fallback: 'passthrough', maxTemporarySurfaces: 1 },
     parameters: [
       { id: 'phase', name: 'phase', valueType: 'number', minimum: 0, maximum: 7, value: keyed('crowd.phase', [[0, 0, 'linear'], [END, Math.PI * 2]]) },
@@ -203,7 +218,7 @@ function build(dark: boolean) {
 
   const doc = withComputedRevision({
     version: ANIMATION_DOCUMENT_VERSION,
-    id: `contentos-people-field-${dark ? 'dark' : 'light'}`,
+    id: `contentos-people-field-${dark ? 'dark' : 'light'}${narrow ? '-narrow' : ''}`,
     name: 'ContentOS audience, halftone people',
     canvas: { width: W, height: H, pixelAspectRatio: 1, backgroundColor: { r: 0, g: 0, b: 0, a: 0 } },
     timing: { ticksPerSecond: TPS, frameRate: { numerator: FPS, denominator: 1 }, durationTicks: END, displayStartTick: 0 },
@@ -229,10 +244,12 @@ function hexA(h: string, a: number): Color {
 const OUTDIR = 'public/scene/people-field';
 mkdirSync(OUTDIR, { recursive: true });
 mkdirSync('animations/out/people-field', { recursive: true });
-for (const dark of [false, true]) {
-  const doc = build(dark);
-  const name = dark ? 'dark' : 'light';
-  writeFileSync(`${OUTDIR}/${name}.json`, JSON.stringify(doc));
-  writeFileSync(`animations/out/people-field/${name}.json`, JSON.stringify(doc));
-  console.log('wrote', name, (doc as { revision: string }).revision.slice(0, 16));
+for (const narrow of [false, true]) {
+  for (const dark of [false, true]) {
+    const doc = build(dark, narrow);
+    const name = `${dark ? 'dark' : 'light'}${narrow ? '-narrow' : ''}`;
+    writeFileSync(`${OUTDIR}/${name}.json`, JSON.stringify(doc));
+    writeFileSync(`animations/out/people-field/${name}.json`, JSON.stringify(doc));
+    console.log('wrote', name, (doc as { revision: string }).revision.slice(0, 16));
+  }
 }
