@@ -12,7 +12,8 @@ import { heroPartReady } from '../heroReady';
  * The hero backdrop (Clayzo, animations/hero-sky.ts): a painted sky whose
  * clouds drift and lean toward the cursor. Day and night switch instantly;
  * the page-wide wipe (theme.tsx) does the reveal. ?bg=india swaps in an
- * Udaipur-style lake palace (for fun).
+ * Udaipur-style lake palace (for fun). Both are painted in oil by the shader (a brush filter and a
+ * canvas weave).
  */
 const BACKDROPS = {
   sky: { scene: 'hero-sky', day: 'sky', night: 'sky-night' },

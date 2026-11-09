@@ -485,6 +485,11 @@ html[data-cos-theme='dark'] .cos-hero-copy::before {
   text-wrap: pretty;
 }
 
+/* keep an icon and its punctuation together */
+.cos-nowrap {
+  white-space: nowrap;
+}
+
 /* platforms as app icons on the text line (sizing matches the current site) */
 .cos-app-icon {
   display: inline-flex;

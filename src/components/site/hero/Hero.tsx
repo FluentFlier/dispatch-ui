@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ProductDemo } from "../demo/ProductDemo";
+import { PlatformIcon } from "../brand/Logos";
 import { SkyField } from "./SkyField";
 
 /** The hero's actions follow the nav: signed in, just the way back into the app; signed out, Get started (sign up) and Sign in. */
@@ -34,7 +35,14 @@ export function Hero({
 
           <p className="cos-hero-sub cos-rise" style={{ ["--d" as string]: 3 }}>
             Create and publish content in your voice, find potential customers,
-            and start conversations on LinkedIn, X and Threads.
+            and start conversations across{" "}
+            <span className="cos-nowrap">
+              <PlatformIcon name="linkedin" />,
+            </span>{" "}
+            <PlatformIcon name="x" /> and{" "}
+            <span className="cos-nowrap">
+              <PlatformIcon name="threads" />.
+            </span>
           </p>
 
           <div

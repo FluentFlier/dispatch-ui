@@ -36,7 +36,13 @@ const DAY_FILE = `${BG}.jpg`;
 const NIGHT_FILE = `${BG}-night.jpg`;
 const ASSET_W = BG === 'sky' ? 2304 : 1344;
 const ASSET_H = BG === 'sky' ? 1316 : 768;
-const OUT = BG === 'sky' ? 'hero-sky' : `hero-${BG}`;
+// the oil-painting pass (a Kuwahara brush filter and a still canvas weave) is the look; FX=grain builds
+// the earlier film-grain version instead, as hero-*-grain
+const PAINT = process.env.FX !== 'grain';
+const OUT = (BG === 'sky' ? 'hero-sky' : `hero-${BG}`) + (PAINT ? '' : '-grain');
+// the brush: each pixel takes the calmest of the four quadrants around it (4 x 4 samples each, out to
+// BRUSH design px), which flattens the painting into strokes while its edges stay put
+const BRUSH = 7;
 
 const W = 1600;
 const H = 914;
@@ -93,7 +99,34 @@ float fbm(float2 x) {
   return v;
 }
 
-half4 main(float2 p) {
+${PAINT ? `
+half4 quad(float2 p, float2 d, float st) {
+  half3 sum = half3(0.0);
+  half3 sq = half3(0.0);
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      half3 k = unpremul(inputImage.eval(p + d * float2(float(i), float(j)) * st)).rgb;
+      sum += k;
+      sq += k * k;
+    }
+  }
+  sum /= 16.0;
+  sq = sq / 16.0 - sum * sum;
+  return half4(sum, sq.r + sq.g + sq.b);
+}
+half3 brush(float2 p, float s) {
+  float st = ${f(BRUSH / 3)} * s;
+  half4 a = quad(p, float2(-1.0, -1.0), st);
+  half4 b = quad(p, float2(1.0, -1.0), st);
+  half4 c = quad(p, float2(-1.0, 1.0), st);
+  half4 d = quad(p, float2(1.0, 1.0), st);
+  half4 m = a;
+  if (b.a < m.a) { m = b; }
+  if (c.a < m.a) { m = c; }
+  if (d.a < m.a) { m = d; }
+  return m.rgb;
+}
+` : ''}half4 main(float2 p) {
   float s = renderScale.x;
   float2 u = p / s;
 
@@ -116,7 +149,7 @@ half4 main(float2 p) {
   float2 lean = (focus / s - float2(${f(W / 2)}, ${f(H / 2)})) / float2(${f(W / 2)}, ${f(H / 2)});
   off -= lean * presence * (3.0 + cloud * 22.0);
 
-  half4 c = unpremul(inputImage.eval((u + off) * s));
+  half4 c = ${PAINT ? 'half4(brush((u + off) * s, s), 1.0)' : 'unpremul(inputImage.eval((u + off) * s))'};
 
   // night is graded toward deep water: the painting's indigo turns a hue step toward teal
   // (CSS hue-rotate(-30deg), each row sums to 1 so brightness holds), and the violet leaves the
@@ -184,14 +217,20 @@ half4 main(float2 p) {
   deep = mix(half3(dl), deep, 1.12);
   rgb = mix(rgb, deep, top * 0.72);
 
-  // film grain: fine, animated, strongest in the midtones, a touch of chroma
+${PAINT ? `  // oil on canvas: a touch richer, then the weave and tooth of the canvas, still (no moving grain)
+  float luma = dot(rgb, half3(0.299, 0.587, 0.114));
+  rgb = mix(half3(luma), rgb, 1.1);
+  float weave = sin(u.x * 2.6) * sin(u.y * 2.6);
+  float tooth = noise(u * 0.55) - 0.5;
+  float relief = noise(u * 0.55 + float2(0.7, 0.7)) - noise(u * 0.55);
+  rgb *= 1.0 + weave * 0.014 + tooth * 0.035 + relief * 0.05;` : `  // film grain: fine, animated, strongest in the midtones, a touch of chroma
   float2 gp = floor(u * 1.25);
   float gt = floor(phase * 40.0);
   float gl = hash(gp + gt * 13.0) - 0.5;
   half3 gc = half3(hash(gp + gt * 7.0 + 3.0), hash(gp + gt * 5.0 + 11.0), hash(gp + gt * 3.0 + 29.0)) - 0.5;
   float luma = dot(rgb, half3(0.299, 0.587, 0.114));
   float mid = 1.0 - abs(luma - 0.5) * 1.2;
-  rgb += (gl * 0.75 + gc * 0.25) * mix(0.055, 0.07, night) * mid;
+  rgb += (gl * 0.75 + gc * 0.25) * mix(0.055, 0.07, night) * mid;`}
   return half4(saturate(rgb), 1.0);
 }
 `;
