@@ -117,15 +117,6 @@ half4 main(float2 p) {
   float glow = exp(-dot(g, g) * 1.6) * (0.06 + 0.03 * sin(phase * 2.0));
   half3 rgb = c.rgb + mix(half3(1.0, 0.72, 0.5), half3(0.42, 0.78, 0.98), night) * glow;
 
-  // stars come out with the night: sparse, soft, twinkling, only in clear sky
-  float2 sc = floor(u / 9.0);
-  float sh = hash(sc + 41.0);
-  if (night > 0.02 && sh > 0.985 && cloud < 0.2 && lum > 0.1 && base0.b > base0.r && u.y < ${f(H * 0.55)}) {
-    float2 sl = fract(u / 9.0) - 0.5;
-    float tw = 0.55 + 0.45 * sin(phase * 4.0 + sh * 80.0);
-    float star = (1.0 - smoothstep(0.0, 0.16, length(sl))) * tw * night * (1.0 - u.y / ${f(H)});
-    rgb += half3(0.85, 0.88, 1.0) * star;
-  }
 
   // shader-gradient wash: brand hues drift through a warped field, gathering at the edges
   float2 wl = float2(cos(phase), sin(phase)) * 0.75;
