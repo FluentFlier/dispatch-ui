@@ -5,6 +5,8 @@ import { ClayzoPlayer } from '@clayzo/webgl-player/react';
 import type { PlayerHandle } from '@clayzo/webgl-player';
 import { readClayzoBundle, type LoadedClayzo } from '@clayzo/animation/bundle';
 import { useTheme } from '../theme';
+import { useRenderScale } from '../useRenderScale';
+import { heroPartReady } from '../heroReady';
 
 /**
  * The hero backdrop (Clayzo, animations/hero-sky.ts): a painted sky whose
@@ -23,6 +25,11 @@ export function SkyField() {
   const { theme } = useTheme();
   const playerRef = useRef<PlayerHandle | null>(null);
   const night = theme === 'dark' ? 1 : 0;
+  // drawn at the stage's real pixel size, capped at 2x: it is full bleed and soft, so 3x buys nothing.
+  // On a phone the stage is ~1440 px wide with only a quarter on screen, and it redraws every frame
+  // while you scroll: 1.25x there keeps the clouds soft-sharp at a third of the pixels
+  const [phone] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 719px)').matches);
+  const [stageRef, scale] = useRenderScale(bundle?.document.canvas.width, phone ? 1.25 : 2);
 
   // layout effect so the sky has switched before the page's view transition captures it
   useLayoutEffect(() => {
@@ -51,17 +58,18 @@ export function SkyField() {
 
   return (
     <div className="cos-sky" data-bg={bd.scene}>
-      <div className="cos-sky-stage">
+      <div className="cos-sky-stage" ref={stageRef}>
         <ClayzoPlayer
-          document={bundle?.document ?? null}
-          options={{ loaders: bundle ?? undefined, interactive: true, loop: true }}
-          poster={night ? `/scene/${bd.night}.webp` : `/scene/${bd.scene}.poster.webp`}
+          document={scale ? (bundle?.document ?? null) : null}
+          options={{ loaders: bundle ?? undefined, interactive: true, loop: true, resolution: scale }}
           reducedMotion="still"
           decorative
           onReady={(p) => {
             playerRef.current = p;
             p.setInput('night', night);
+            heroPartReady('sky');
           }}
+          onPlayerError={() => heroPartReady('sky')}
           fallback={<img src={night ? `/scene/${bd.night}.webp` : `/scene/${bd.day}.webp`} alt="" />}
         />
       </div>

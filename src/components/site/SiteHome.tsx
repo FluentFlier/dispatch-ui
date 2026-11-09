@@ -5,6 +5,7 @@ import { SiteNav } from "./SiteNav";
 import { Hero } from "./hero/Hero";
 import { ActVoice } from "./sections/ActVoice";
 import { THEME_BOOT, ThemeProvider } from "./theme";
+import { HERO_BOOT } from "./heroReady";
 import "./site.css";
 import "./demo/demo.css";
 
@@ -21,7 +22,7 @@ export function SiteHome({ funnel }: { funnel: FunnelState }) {
   return (
     <ThemeProvider>
       <div className="cos">
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT + HERO_BOOT }} />
         <a href="#main" className="cos-skip">
           Skip to content
         </a>

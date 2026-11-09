@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type ComponentProps, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, type ComponentProps, type CSSProperties } from 'react';
 import { ClayzoPlayer } from '@clayzo/webgl-player/react';
 import { useTheme } from '../theme';
+import { useRenderScale } from '../useRenderScale';
 
 /**
  * A landing-page scene authored in Clayzo (animations/*.ts). It loads the light or dark
@@ -48,12 +49,13 @@ export function ClayzoScene({
   className?: string;
 }) {
   const { theme, ready } = useTheme();
-  const ref = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
   const [go, setGo] = useState(false);
   const [doc, setDoc] = useState<SceneDoc | null>(null);
   const [reduced, setReduced] = useState(false);
   const [small, setSmall] = useState(false);
+  // sharp on every screen: one canvas pixel per device pixel (see useRenderScale)
+  const [ref, scale] = useRenderScale(narrow && small ? narrow.width : width);
 
   useEffect(() => {
     if (!narrow) return;
@@ -78,7 +80,7 @@ export function ClayzoScene({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [playWhen]);
+  }, [playWhen, ref]);
 
   // the build for the current theme; fetched once the scene is near
   useEffect(() => {
@@ -113,10 +115,10 @@ export function ClayzoScene({
         } as CSSProperties
       }
     >
-      {doc && (
+      {doc && scale && (
         <ClayzoPlayer
           document={doc}
-          options={{ loaders, interactive: false, loop: true, maxPixelRatio: 3 }}
+          options={{ loaders, interactive: false, loop: true, resolution: scale }}
           // the player applies autoplay once it is shown and whenever it changes: holding it
           // false until the scene is fully seen is what makes it start on arrival
           autoplay={go}

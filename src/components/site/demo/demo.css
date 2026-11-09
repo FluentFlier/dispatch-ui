@@ -66,6 +66,13 @@
   backdrop-filter: blur(24px) saturate(1.5);
   border-right: 1px solid var(--dm-line);
 }
+/* phones: no frosted sidebar; blurring what moves behind it every frame cost smooth scrolling */
+@media (max-width: 719px) {
+  .dm-side {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
 .dm-brand {
   display: flex;
   align-items: center;
