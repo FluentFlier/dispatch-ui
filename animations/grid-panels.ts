@@ -129,6 +129,25 @@ function panel(name: string, Wd: number, END: number, marks: string[], draw: (k:
       copyFileSync(s, `${pub}/${f}`);
       copyFileSync(s, `${out}/${f}`);
     }
+    // the same panel over the India backdrop (?bg=india): the same document, the India painting
+    const ipub = `public/scene/${name}-india`;
+    const iout = `animations/out/${name}-india`;
+    if (!dark && !n) {
+      rmSync(ipub, { recursive: true, force: true });
+      rmSync(iout, { recursive: true, force: true });
+    }
+    mkdirSync(ipub, { recursive: true });
+    mkdirSync(iout, { recursive: true });
+    writeFileSync(`${ipub}/${file}`, JSON.stringify(doc));
+    writeFileSync(`${iout}/${file}`, JSON.stringify(doc));
+    const ifiles: [string, string][] = [
+      [dark ? 'ground-night.jpg' : 'ground-day.jpg', `animations/assets/panels/${key}-india-${dark ? 'night' : 'day'}-oil.jpg`],
+      ...marks.map((m) => [MARKS[m].file, MARKS[m].src] as [string, string]),
+    ];
+    for (const [f, src] of ifiles) {
+      copyFileSync(src, `${ipub}/${f}`);
+      copyFileSync(src, `${iout}/${f}`);
+    }
     console.log('wrote', name, file, (doc as { revision: string }).revision.slice(0, 14));
   }
 }

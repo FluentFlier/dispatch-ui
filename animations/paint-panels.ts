@@ -7,7 +7,7 @@
  * The crops are baked at 2x the panel's CSS size, so the brush and the canvas texture are scaled by
  * K = 2 to land on screen at the hero's size (its brush is ~7 CSS px).
  *
- *   pnpm tsx animations/paint-panels.ts   (writes animations/assets/panels/<name>-<day|night>-oil.jpg)
+ *   pnpm tsx animations/paint-panels.ts   (writes animations/assets/panels/<name>[-india]-<day|night>-oil.jpg)
  */
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -95,9 +95,10 @@ const work = join(tmpdir(), 'contentos-paint-panels');
 rmSync(work, { recursive: true, force: true });
 mkdirSync(work, { recursive: true });
 
-for (const [name, W, H] of PANELS) {
+// the default sky, and the India backdrop (?bg=india)
+for (const [name, W, H] of PANELS) for (const bg of ['', '-india']) {
   for (const tone of ['day', 'night']) {
-    const src = `animations/assets/panels/${name}-${tone}.jpg`;
+    const src = `animations/assets/panels/${name}${bg}-${tone}.jpg`;
     copyFileSync(src, join(work, 'src.jpg'));
     const nodes: Record<string, SceneNode> = {
       img: { ...base('img', { outTick: 4, x: W / 2, y: H / 2 }), type: 'image', assetId: 'src', size: constant({ width: W, height: H }), fit: 'cover' } as SceneNode,
@@ -132,8 +133,8 @@ for (const [name, W, H] of PANELS) {
     const png = join(work, 'out.png');
     writeFileSync(json, JSON.stringify(doc));
     execFileSync('pnpm', ['-s', 'clayzo', 'render-frame', json, png, '--tick', '0'], { stdio: 'ignore' });
-    const dst = resolve(`animations/assets/panels/${name}-${tone}-oil.jpg`);
+    const dst = resolve(`animations/assets/panels/${name}${bg}-${tone}-oil.jpg`);
     execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', png, '-q:v', '3', dst]);
-    console.log('painted', name, tone);
+    console.log('painted', name + bg, tone);
   }
 }

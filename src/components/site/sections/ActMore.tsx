@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { ClayzoScene } from "./ClayzoScene";
 
 /**
@@ -46,6 +49,11 @@ const ROWS: Box[][] = [
 ];
 
 export function ActMore() {
+  // the panels are crops of the hero's painting, so they follow its backdrop (?bg=india, SkyField)
+  const [bg, setBg] = useState("");
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("bg") === "india") setBg("-india");
+  }, []);
   return (
     <section className="cos-act cos-more" id="more" aria-labelledby="act-more-title">
       <div className="cos-act-inner">
@@ -68,7 +76,7 @@ export function ActMore() {
                   <p className="cos-more-body">{b.body}</p>
                   <div className="cos-more-panel">
                     <ClayzoScene
-                      name={b.scene}
+                      name={`${b.scene}${bg}`}
                       width={b.wide ? 640 : 440}
                       height={340}
                       narrow={{ width: 320, height: 300 }}
