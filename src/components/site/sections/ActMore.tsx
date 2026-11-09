@@ -2,38 +2,47 @@ import { ClayzoScene } from "./ClayzoScene";
 
 /**
  * After the three acts: what else ContentOS does, four live features from the product handover v2,
- * one Clayzo fragment each (animations/grid-boxes.ts). A grid this time, so the page changes shape
+ * each a card in the x.ai manner (animations/grid-panels.ts): its words on top, then a panel that runs
+ * off the card's bottom edge, a crop of the hero's painted sky with one real piece of the product on
+ * it, cut by the panel's edge, and one thing that moves. A grid this time, so the page changes shape
  * again after the split.
  */
-const BOXES = [
-  {
-    scene: "grid-autopilot",
-    title: "Autopilot",
-    body: "Posts in your voice, on your schedule. Nothing publishes until you switch it on.",
-    label:
-      "Maya Chen's Autopilot switches on, every day at 9:00 AM. Three posts line up under Coming up next for Tuesday, Wednesday and Thursday.",
-  },
-  {
-    scene: "grid-agents",
-    title: "Works inside your AI",
-    body: "Draft, schedule and check results from Claude, Codex, Cursor or VS Code. Publishing stays opt-in.",
-    label:
-      "The ContentOS MCP address, trycos.ai/api/mcp, is copied, and Claude, Codex, Cursor and VS Code connect in one click. Read and write are allowed; publish and outreach are left off.",
-  },
-  {
-    scene: "grid-breakout",
-    title: "Breakout tracker",
-    body: "See which posts beat your usual within 72 hours.",
-    label:
-      "Today's post runs to 3.4 times the usual post and is marked Breaking out. Two older posts sit at 1.2 and 0.8 times.",
-  },
-  {
-    scene: "grid-tools",
-    title: "Your sales tools",
-    body: "Leads go to HubSpot and Apollo, and Slack tells you when someone shows buying intent.",
-    label:
-      "HubSpot, Apollo and Slack connect in turn, then a Slack message arrives: a lead signal for Hannah Weiss.",
-  },
+type Box = { scene: string; wide: boolean; title: string; body: string; label: string };
+
+// two rows, wide then narrow, narrow then wide: the visuals are 640 and 440 units wide, all 300 tall
+const ROWS: Box[][] = [
+  [
+    {
+      scene: "panel-agents",
+      wide: true,
+      title: "Works inside your AI",
+      body: "Draft, schedule and check results from Claude, Codex, Cursor or VS Code. Publishing stays opt-in.",
+      label: "In Claude, with ContentOS connected: asked to schedule the Northwind post for Tuesday morning, ContentOS schedules it for Tuesday at 9:00 AM. Also works in Codex, Cursor and VS Code.",
+    },
+    {
+      scene: "panel-autopilot",
+      wide: false,
+      title: "Autopilot",
+      body: "Posts in your voice, on your schedule. Nothing publishes until you switch it on.",
+      label: "Maya Chen's Autopilot switches on, every weekday at 9:00 AM, and her next three posts line up for Tuesday, Wednesday and Thursday.",
+    },
+  ],
+  [
+    {
+      scene: "panel-tools",
+      wide: false,
+      title: "Your sales tools",
+      body: "Leads go to HubSpot and Apollo, and Slack tells you when someone shows buying intent.",
+      label: "Hannah Weiss, Founder at Parcelry, syncs into HubSpot as a lead, and a Slack message from ContentOS flags her as a new lead signal.",
+    },
+    {
+      scene: "panel-breakout",
+      wide: true,
+      title: "Breakout tracker",
+      body: "See which posts beat your usual within 72 hours.",
+      label: "The breakout tracker: the newest post, We almost lost Northwind in week two, reaches 3.4 times the usual post while recent posts sit near it.",
+    },
+  ],
 ];
 
 export function ActMore() {
@@ -42,29 +51,33 @@ export function ActMore() {
       <div className="cos-act-inner">
         <div className="cos-act-head">
           <h2 id="act-more-title" className="cos-act-title">
-            Everything around the post.
+            Keeps working when you're busy.
           </h2>
           <p className="cos-act-lede">
-            Schedule it, see how it did, run it from your AI, and send the
-            leads where your team already works.
+            It posts on your schedule, takes requests from your AI, tells
+            your sales tools about new leads, and shows which posts break out.
           </p>
         </div>
 
         <div className="cos-more-grid">
-          {BOXES.map((b) => (
-            <article key={b.scene} className="cos-more-box">
-              <div className="cos-more-scene">
-                <ClayzoScene
-                  name={b.scene}
-                  width={440}
-                  height={280}
-                  stillTick={1200}
-                  label={b.label}
-                />
-              </div>
-              <h3 className="cos-more-title">{b.title}</h3>
-              <p className="cos-more-body">{b.body}</p>
-            </article>
+          {ROWS.map((row, r) => (
+            <div key={r} className="cos-more-row" data-flip={r % 2 ? "" : undefined}>
+              {row.map((b) => (
+                <article key={b.scene} className="cos-more-box" data-narrow={b.wide ? undefined : ""}>
+                  <h3 className="cos-more-title">{b.title}</h3>
+                  <p className="cos-more-body">{b.body}</p>
+                  <div className="cos-more-panel">
+                    <ClayzoScene
+                      name={b.scene}
+                      width={b.wide ? 640 : 440}
+                      height={340}
+                      stillTick={864}
+                      label={b.label}
+                    />
+                  </div>
+                </article>
+              ))}
+            </div>
           ))}
         </div>
       </div>
