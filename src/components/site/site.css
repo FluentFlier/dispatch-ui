@@ -1343,10 +1343,26 @@ html[data-cos-theme='dark'] .cos-hero-demo::before {
 html[data-cos-theme='dark'] .cos-act-mark {
   opacity: 0.17;
 }
-/* on a phone the mark would only peek out from under the nav beside the heading */
+/* on a phone the big mark would only peek out from under the nav beside the heading; a flock
+   of small ones crosses a band above the heading instead (animations/plane-flock.ts) */
+.cos-act-flock {
+  display: none;
+}
 @media (max-width: 719px) {
+  .cos-act {
+    padding-top: 184px;
+  }
   .cos-act-mark {
     display: none;
+  }
+  .cos-act-flock {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 12px;
+    left: 0;
+    right: 0;
+    pointer-events: none;
   }
 }
 .cos-act-inner {

@@ -18,6 +18,17 @@ export function ActVoice() {
         />
       </div>
 
+      {/* phones have no room for the big plane: a small flock crosses the band above the heading */}
+      <div className="cos-act-flock" aria-hidden="true">
+        <ClayzoScene
+          name="plane-flock"
+          width={390}
+          height={160}
+          playWhen="visible"
+          stillTick={480}
+        />
+      </div>
+
       <div className="cos-act-inner">
         <h2 id="act-voice-title" className="cos-act-title">
           Drafts that sound like you.
