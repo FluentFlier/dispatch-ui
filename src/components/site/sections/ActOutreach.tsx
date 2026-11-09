@@ -23,6 +23,15 @@ export function ActOutreach() {
             DM, days apart. Nothing goes out until you approve it, and then it
             goes out at a human pace.
           </p>
+          {/* a conversation starting, in the halftone of Act 1's plane and Act 2's crowd (desktop) */}
+          <div className="cos-act-talk" aria-hidden="true">
+            <ClayzoScene
+              name="talk-mark"
+              width={520}
+              height={360}
+              playWhen="visible"
+            />
+          </div>
         </div>
 
         <ClayzoScene

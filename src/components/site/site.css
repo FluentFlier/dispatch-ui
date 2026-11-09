@@ -1489,6 +1489,15 @@ html[data-cos-theme='dark'] .cos-act-scene {
   .cos-act-thread {
     margin-top: 0;
   }
+  .cos-act-split .cos-act-talk {
+    display: block;
+    width: min(100%, 440px);
+    margin-top: clamp(44px, 7vh, 80px);
+  }
+}
+/* Act 3's halftone conversation, under the sentence on desktop only */
+.cos-act-talk {
+  display: none;
 }
 /* the lead sort's window: 22 of 1200 x 440 */
 .cos-act-scene-leads {
