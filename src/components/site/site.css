@@ -1019,6 +1019,31 @@ html[data-cos-theme='dark'] .cos-act-scene {
     pointer-events: none;
   }
 }
+/* the features section's phone strip: the halftone clock above the heading. Its canvas is 390 x 500
+   so the rings never meet an edge: the clock sits where a 390 x 212 strip would put it (144 of 390
+   units above that strip's top), the rings run up behind the section above and down behind the
+   heading, fading out before the canvas ends, and the section stops clipping vertically for it */
+.cos-act-clock {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .cos-act:has(.cos-act-clock) {
+    padding-top: calc(min(100vw, 520px) * 212 / 390 + 28px);
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+  .cos-act-clock {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: calc(10px - min(100vw, 520px) * 144 / 390);
+    left: 0;
+    right: 0;
+    width: min(100%, 520px);
+    margin: 0 auto;
+    pointer-events: none;
+  }
+}
 /* after the acts: four features in a grid (ActMore, animations/grid-panels.ts), cards in the x.ai
    manner: the card one step off the page with a hairline, its words on top, then its panel (a lit
    painting with the product on it) running off the card's bottom edge */
