@@ -71,6 +71,8 @@ export function ActMore() {
                       name={b.scene}
                       width={b.wide ? 640 : 440}
                       height={340}
+                      narrow={{ width: 320, height: 300 }}
+                      narrowBelow={860}
                       stillTick={864}
                       label={b.label}
                     />

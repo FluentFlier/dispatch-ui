@@ -1107,6 +1107,25 @@ html[data-cos-theme='dark'] .cos-more-box {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* the panels keep their desktop shape until the grid stacks, then take their phone composition
+   (320 x 300, the window centred and cut only by the bottom), so stacked cards are all one height */
+@media (min-width: 861px) and (max-width: 1023px) {
+  .cos-more-panel .cos-clayzo[data-narrow] {
+    aspect-ratio: var(--scene-ar);
+    max-width: none;
+  }
+}
+@media (max-width: 860px) {
+  .cos-more-panel .cos-clayzo[data-narrow] {
+    aspect-ratio: var(--scene-ar-narrow);
+    width: 100%;
+    max-width: none;
+  }
+  /* stacked, every card's sentence holds three lines, so the cards are one height */
+  .cos-more-body {
+    min-height: 72px;
+  }
+}
 @media (max-width: 639px) {
   .cos-more-box {
     --pad: 24px;

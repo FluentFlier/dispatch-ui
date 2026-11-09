@@ -33,6 +33,7 @@ export function ClayzoScene({
   stillTick = 0,
   playWhen = 'full',
   narrow,
+  narrowBelow = NARROW,
   label,
   className,
 }: {
@@ -41,6 +42,8 @@ export function ClayzoScene({
   height: number;
   /** size of the stacked phone composition, when the scene has one */
   narrow?: { width: number; height: number };
+  /** the widest screen (px) that gets the narrow composition; 1023 unless a layout stacks later */
+  narrowBelow?: number;
   /** the frame shown to readers who asked for less motion */
   stillTick?: number;
   /** 'full': start once fully seen (story scenes); 'visible': as soon as any of it shows (backgrounds) */
@@ -59,12 +62,12 @@ export function ClayzoScene({
 
   useEffect(() => {
     if (!narrow) return;
-    const mq = window.matchMedia(`(max-width: ${NARROW}px)`);
+    const mq = window.matchMedia(`(max-width: ${narrowBelow}px)`);
     const sync = () => setSmall(mq.matches);
     sync();
     mq.addEventListener('change', sync);
     return () => mq.removeEventListener('change', sync);
-  }, [narrow]);
+  }, [narrow, narrowBelow]);
 
   useEffect(() => {
     setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
