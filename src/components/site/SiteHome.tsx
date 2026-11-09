@@ -28,7 +28,7 @@ export function SiteHome({ funnel }: { funnel: FunnelState }) {
         </a>
         <SiteNav cta={cta} loggedIn={funnel.loggedIn} />
         <main id="main">
-          <Hero cta={cta} />
+          <Hero cta={cta} loggedIn={funnel.loggedIn} />
           <ActVoice />
         </main>
       </div>

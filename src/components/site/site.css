@@ -1066,7 +1066,8 @@ html[data-hero-wait] .cos-piece {
     width: 100%;
     gap: 10px;
   }
-  .cos-hero-actions .cos-btn {
+  /* a pair splits the row; a lone button (signed in: Open ContentOS) keeps its own width */
+  .cos-hero-actions .cos-btn:not(:only-child) {
     flex: 1;
     padding: 0 16px;
   }

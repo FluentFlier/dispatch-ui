@@ -4,7 +4,8 @@ import { PlatformIcon } from '../brand/Logos';
 import { HeroLoop } from './HeroLoop';
 import { SkyField } from './SkyField';
 
-export function Hero({ cta }: { cta: { href: string; label: string } }) {
+/** The hero's actions follow the nav: signed in, just the way back into the app; signed out, Get started (sign up) and Sign in. */
+export function Hero({ cta, loggedIn }: { cta: { href: string; label: string }; loggedIn: boolean }) {
   return (
     <section className="cos-hero" aria-labelledby="cos-hero-title">
       <div className="cos-panel" aria-hidden="true">
@@ -37,9 +38,11 @@ export function Hero({ cta }: { cta: { href: string; label: string } }) {
           <Link href={cta.href} className="cos-btn cos-btn-metal">
             <span>{cta.label}</span>
           </Link>
-          <Link href="/book-demo" className="cos-btn cos-btn-silver">
-            <span>Book a call</span>
-          </Link>
+          {!loggedIn && (
+            <Link href="/login" className="cos-btn cos-btn-silver">
+              <span>Sign in</span>
+            </Link>
+          )}
         </div>
       </div>
 
