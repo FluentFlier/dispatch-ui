@@ -64,11 +64,11 @@ const PAL = {
     edge: c('#FFFFFF'),
   },
   night: {
-    trough: c('#0E0E12'),
-    thumb: c('#26262D'),
+    trough: c('#0A1115'),
+    thumb: c('#222B31'),
     cell: c('#EEE8DA'),
-    rim: c('#8F9CFF'),
-    edge: c('#2A2A31'),
+    rim: c('#6CC6EB'),
+    edge: c('#26313A'),
   },
 };
 

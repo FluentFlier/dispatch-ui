@@ -75,8 +75,8 @@ function build(dark: boolean) {
       capability: { requires: ['runtime-effect'], fallback: 'passthrough', maxTemporarySurfaces: 1 },
       parameters: [
         { id: 'phase', name: 'phase', valueType: 'number', minimum: 0, maximum: 7, value: keyed('dots.phase', [[0, 0, 'linear'], [END, Math.PI * 2]]) },
-        { id: 'ink', name: 'ink', valueType: 'color', value: constant(dark ? hex('#E6E8F5') : hex('#101114')) },
-        { id: 'glint', name: 'glint', valueType: 'color', value: constant(dark ? hex('#94A1FF') : hex('#2F5BEA')) },
+        { id: 'ink', name: 'ink', valueType: 'color', value: constant(dark ? hex('#E4ECF0') : hex('#101114')) },
+        { id: 'glint', name: 'glint', valueType: 'color', value: constant(dark ? hex('#6CC6EB') : hex('#2F5BEA')) },
       ],
     } as SceneNode,
   };

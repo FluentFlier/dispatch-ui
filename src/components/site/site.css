@@ -1117,30 +1117,30 @@ html[data-hero-wait] .cos-piece {
 /* ------------------------------------------------------------- dark theme */
 
 html[data-cos-theme='dark'] body:has(.cos) {
-  background: #0b0c12;
+  background: #080f14;
 }
 html[data-cos-theme='dark'] .cos {
-  --cos-ground: #0b0c12;
-  --cos-ink: #f1f1f5;
-  --cos-ink-2: #aaacba;
-  --cos-ink-3: #7a7d8c;
-  --cos-ink-sky: #c4c6d2;
+  --cos-ground: #080f14;
+  --cos-ink: #eef2f4;
+  --cos-ink-2: #a7b1b8;
+  --cos-ink-3: #75818a;
+  --cos-ink-sky: #c1cbd1;
   --cos-line: rgba(255, 255, 255, 0.08);
-  --cos-blue: #94a1ff;
+  --cos-blue: #6cc6eb;
   color-scheme: dark;
 }
 html[data-cos-theme='dark'] .cos-panel {
-  background: #1c1f44;
+  background: #0e2a3b;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 html[data-cos-theme='dark'] .cos-nav[data-scrolled='true'] {
-  background: rgba(11, 12, 18, 0.98);
+  background: rgba(8, 15, 20, 0.98);
 }
 html[data-cos-theme='dark'] .cos-hero-title {
-  text-shadow: 0 2px 40px rgba(10, 12, 40, 0.5);
+  text-shadow: 0 2px 40px rgba(3, 20, 30, 0.5);
 }
 html[data-cos-theme='dark'] .cos-news {
-  background: rgba(16, 18, 40, 0.45);
+  background: rgba(8, 26, 36, 0.45);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.12),
     0 6px 18px -8px rgba(0, 0, 0, 0.5);
@@ -1158,7 +1158,7 @@ html[data-cos-theme='dark'] .cos-btn-metal {
     inset 0 1px 0 #fff,
     inset 0 -1px 0 rgba(0, 0, 0, 0.08),
     0 1px 2px rgba(0, 0, 0, 0.5),
-    0 10px 30px -10px rgba(148, 161, 255, 0.45);
+    0 10px 30px -10px rgba(108, 198, 235, 0.4);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 html[data-cos-theme='dark'] .cos-btn-metal::before {
@@ -1166,7 +1166,7 @@ html[data-cos-theme='dark'] .cos-btn-metal::before {
 }
 html[data-cos-theme='dark'] .cos-btn-silver {
   color: #f2f2f5;
-  background: linear-gradient(180deg, #3a3b45 0%, #23242b 46%, #15161b 54%, #1d1e24 100%);
+  background: linear-gradient(180deg, #37404a 0%, #222a31 46%, #141a1f 54%, #1b2228 100%);
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.8),
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
@@ -1183,11 +1183,11 @@ html[data-cos-theme='dark'] .cos-btn-silver::before {
 html[data-cos-theme='dark'] .cos-tile:not(.cos-tile-ink) {
   background:
     radial-gradient(120% 80% at 50% 0%, #fff, rgba(255, 255, 255, 0) 60%),
-    linear-gradient(180deg, rgba(246, 246, 250, 0.95), rgba(214, 216, 228, 0.92));
+    linear-gradient(180deg, rgba(246, 246, 250, 0.95), rgba(212, 222, 228, 0.92));
   box-shadow:
     inset 0 1px 0 #fff,
     0 0 0 1px rgba(255, 255, 255, 0.3),
-    0 22px 40px -18px rgba(148, 161, 255, 0.45);
+    0 22px 40px -18px rgba(108, 198, 235, 0.4);
 }
 html[data-cos-theme='dark'] .cos-tile-ink {
   background:
@@ -1196,32 +1196,32 @@ html[data-cos-theme='dark'] .cos-tile-ink {
   color: #0d0e11;
 }
 html[data-cos-theme='dark'] .cos-post {
-  background: linear-gradient(180deg, rgba(34, 37, 66, 0.82), rgba(18, 20, 40, 0.74));
+  background: linear-gradient(180deg, rgba(20, 44, 58, 0.82), rgba(9, 24, 32, 0.74));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 0 0 1px rgba(148, 161, 255, 0.14),
+    inset 0 0 0 1px rgba(120, 205, 240, 0.14),
     0 24px 48px -20px rgba(0, 0, 0, 0.7);
 }
 html[data-cos-theme='dark'] .cos-pill[data-tone='ink'] {
   background: rgba(255, 255, 255, 0.08);
 }
 html[data-cos-theme='dark'] .cos-pill[data-tone='blue'] {
-  background: rgba(148, 161, 255, 0.16);
-  color: #c3caff;
+  background: rgba(108, 198, 235, 0.16);
+  color: #b4e6f7;
 }
 html[data-cos-theme='dark'] .cos-pill[data-tone='blue'] .cos-pill-icon {
-  background: #6f7ff5;
+  background: #2b9ccf;
 }
 html[data-cos-theme='dark'] .cos-pill[data-tone='green'] {
   background: rgba(79, 209, 139, 0.14);
   color: #8ee6b4;
 }
 html[data-cos-theme='dark'] .cos-note {
-  background: linear-gradient(180deg, rgba(34, 37, 66, 0.78), rgba(18, 20, 40, 0.7));
+  background: linear-gradient(180deg, rgba(20, 44, 58, 0.78), rgba(9, 24, 32, 0.7));
   color: var(--cos-ink);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 0 0 1px rgba(148, 161, 255, 0.14),
+    inset 0 0 0 1px rgba(120, 205, 240, 0.14),
     0 20px 40px -18px rgba(0, 0, 0, 0.7);
 }
 
@@ -1264,9 +1264,9 @@ html[data-cos-theme='dark'] .cos {
 }
 html[data-cos-theme='dark'] .cos-hero-demo::before {
   background:
-    radial-gradient(40% 55% at 22% 50%, rgba(124, 92, 255, 0.4), transparent 70%),
-    radial-gradient(40% 55% at 78% 46%, rgba(40, 128, 255, 0.34), transparent 70%),
-    radial-gradient(45% 60% at 50% 62%, rgba(255, 106, 178, 0.22), transparent 72%);
+    radial-gradient(40% 55% at 22% 50%, rgba(24, 150, 190, 0.4), transparent 70%),
+    radial-gradient(40% 55% at 78% 46%, rgba(40, 110, 220, 0.34), transparent 70%),
+    radial-gradient(45% 60% at 50% 62%, rgba(70, 215, 185, 0.2), transparent 72%);
 }
 @media (prefers-reduced-motion: reduce) {
   .cos-hero-demo::before {

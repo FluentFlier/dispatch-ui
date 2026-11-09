@@ -825,21 +825,21 @@ img.dm-avatar {
 
 /* the app's dark theme */
 html[data-cos-theme='dark'] .dm {
-  --dm-bg: #0f1015;
-  --dm-side: rgba(20, 21, 28, 0.82);
-  --dm-panel: #17181f;
-  --dm-panel-2: #1e1f27;
+  --dm-bg: #0c1317;
+  --dm-side: rgba(17, 24, 29, 0.82);
+  --dm-panel: #141c21;
+  --dm-panel-2: #1a242a;
   --dm-line: rgba(255, 255, 255, 0.07);
   --dm-line-2: rgba(255, 255, 255, 0.12);
-  --dm-text: #ececf1;
-  --dm-text-2: #a3a5b3;
-  --dm-text-3: #6f7181;
-  --dm-blue: #94a1ff;
+  --dm-text: #ebf0f2;
+  --dm-text-2: #a1abb2;
+  --dm-text-3: #6b777f;
+  --dm-blue: #6cc6eb;
   --dm-tint: rgba(255, 255, 255, 0.035);
   --dm-tint-2: rgba(255, 255, 255, 0.07);
 }
 html[data-cos-theme='dark'] .dm-win {
-  background: rgba(15, 16, 21, 0.6);
+  background: rgba(12, 19, 23, 0.6);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08),
     0 0 0 2px rgba(0, 0, 0, 0.6),

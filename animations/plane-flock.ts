@@ -103,7 +103,7 @@ function build(dark: boolean) {
   const nodes: Record<string, SceneNode> = {};
   const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
   const roots: string[] = [];
-  const inkOf = (lead?: boolean): Color => (lead ? hex(dark ? '#94A1FF' : '#2F5BEA') : hex(dark ? '#E6E8F5' : '#101114'));
+  const inkOf = (lead?: boolean): Color => (lead ? hex(dark ? '#6CC6EB' : '#2F5BEA') : hex(dark ? '#E4ECF0' : '#101114'));
 
   FLOCK.forEach((b, n) => {
     const A = arc(b.path);

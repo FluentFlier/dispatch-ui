@@ -103,10 +103,19 @@ half4 main(float2 p) {
 
   half4 c = unpremul(inputImage.eval((u + off) * s));
 
+  // night is graded toward deep water: the painting's indigo turns a hue step toward teal
+  // (CSS hue-rotate(-30deg), each row sums to 1 so brightness holds), and the violet leaves the
+  // clouds and the horizon
+  half3 sea = half3(
+    dot(c.rgb, half3(1.001, 0.453, -0.454)),
+    dot(c.rgb, half3(-0.043, 0.892, 0.151)),
+    dot(c.rgb, half3(0.422, -0.262, 0.840)));
+  c.rgb = mix(c.rgb, saturate(sea), night);
+
   // a warm glow breathing at the horizon
   float2 g = (u - float2(${f(W / 2)}, ${f(H)})) / float2(${f(W * 0.5)}, ${f(H * 0.55)});
   float glow = exp(-dot(g, g) * 1.6) * (0.06 + 0.03 * sin(phase * 2.0));
-  half3 rgb = c.rgb + mix(half3(1.0, 0.72, 0.5), half3(0.55, 0.6, 1.0), night) * glow;
+  half3 rgb = c.rgb + mix(half3(1.0, 0.72, 0.5), half3(0.42, 0.78, 0.98), night) * glow;
 
   // stars come out with the night: sparse, soft, twinkling, only in clear sky
   float2 sc = floor(u / 9.0);
@@ -123,9 +132,9 @@ half4 main(float2 p) {
   float2 wq = u * 0.0012;
   float w1 = fbm(wq + wl + fbm(wq * 1.7 - wl) * 1.4);
   float w2 = fbm(wq * 1.35 - wl.yx + float2(3.1, 7.7));
-  half3 tA = mix(half3(1.0, 0.6, 0.38), half3(0.5, 0.33, 1.0), night);   // apricot / violet
-  half3 tB = mix(half3(0.78, 0.68, 1.0), half3(0.16, 0.5, 1.0), night);  // lilac / electric blue
-  half3 tC = mix(half3(0.3, 0.48, 1.0), half3(1.0, 0.42, 0.72), night);  // cobalt / rose
+  half3 tA = mix(half3(1.0, 0.6, 0.38), half3(0.16, 0.6, 0.86), night);  // apricot / sea teal
+  half3 tB = mix(half3(0.78, 0.68, 1.0), half3(0.12, 0.42, 0.92), night); // lilac / deep blue
+  half3 tC = mix(half3(0.3, 0.48, 1.0), half3(0.3, 0.86, 0.78), night);   // cobalt / seafoam
   half3 tint = mix(mix(tA, tB, smoothstep(0.32, 0.68, w1)), tC, smoothstep(0.5, 0.78, w2));
   float2 e = (u - float2(${f(W / 2)}, ${f(H * 0.42)})) / float2(${f(W / 2)}, ${f(H / 2)});
   float edge = smoothstep(0.2, 1.25, length(e * float2(0.85, 1.1)));

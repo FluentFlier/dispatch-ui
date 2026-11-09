@@ -93,23 +93,23 @@ function chrome(dark: boolean) {
   const c = (h: string, a = 1): Color => ({ ...hex(h), a });
   return dark
     ? {
-        win: c('#0F1015'),
+        win: c('#0C1317'),
         winLine: c('#FFFFFF', 0.08),
         winHi: c('#FFFFFF', 0),
-        card: c('#17181F'),
+        card: c('#141C21'),
         cardLine: c('#FFFFFF', 0.07),
         shadow: c('#000000', 0.5),
         tint: c('#FFFFFF', 0.03),
         tintLine: c('#FFFFFF', 0.06),
         tag: c('#FFFFFF', 0.07),
-        text: c('#ECECF1'),
-        text2: c('#A3A5B3'),
-        text3: c('#6F7181'),
+        text: c('#EBF0F2'),
+        text2: c('#A1ABB2'),
+        text3: c('#6B777F'),
         track: c('#FFFFFF', 0.08),
         pill: {
           apricot: { bg: c('#FFA774', 0.14), fg: c('#FFBE94'), icon: c('#F0804A') },
-          ink: { bg: c('#FFFFFF', 0.08), fg: c('#A3A5B3'), icon: c('#6F7181') },
-          blue: { bg: c('#94A1FF', 0.16), fg: c('#C3CAFF'), icon: c('#6F7FF5') },
+          ink: { bg: c('#FFFFFF', 0.08), fg: c('#A1ABB2'), icon: c('#6B777F') },
+          blue: { bg: c('#6CC6EB', 0.16), fg: c('#B4E6F7'), icon: c('#2B9CCF') },
           green: { bg: c('#4FD18B', 0.14), fg: c('#8EE6B4'), icon: c('#22A565') },
         },
       }
