@@ -2,6 +2,7 @@
 
 import { getFunnelCta, type FunnelState } from "@/lib/funnel-cta";
 import { SiteNav } from "./SiteNav";
+import { SiteFooter } from "./SiteFooter";
 import { Hero } from "./hero/Hero";
 import { ActVoice } from "./sections/ActVoice";
 import { ActLeads } from "./sections/ActLeads";
@@ -39,6 +40,7 @@ export function SiteHome({ funnel }: { funnel: FunnelState }) {
           <ActMore />
           <CtaBand cta={cta} loggedIn={funnel.loggedIn} />
         </main>
+        <SiteFooter />
       </div>
     </ThemeProvider>
   );
