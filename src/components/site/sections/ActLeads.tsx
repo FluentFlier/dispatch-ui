@@ -9,18 +9,30 @@ import { ClayzoScene } from "./ClayzoScene";
 export function ActLeads() {
   return (
     <section
-      className="cos-act"
+      className="cos-act cos-act-flip"
       id="customers"
       aria-labelledby="act-leads-title"
     >
+      {/* the audience as a halftone crowd, the buyers in it lighting up (animations/people-field.ts) */}
+      <div className="cos-act-field" aria-hidden="true">
+        <ClayzoScene
+          name="people-field"
+          width={1000}
+          height={700}
+          playWhen="visible"
+        />
+      </div>
+
       <div className="cos-act-inner">
-        <h2 id="act-leads-title" className="cos-act-title">
-          Find the buyers in your audience.
-        </h2>
-        <p className="cos-act-lede">
-          ContentOS sorts everyone who likes or comments on your posts against
-          your ideal customer, then tells you who to talk to first and why.
-        </p>
+        <div className="cos-act-head">
+          <h2 id="act-leads-title" className="cos-act-title">
+            Find the buyers in your audience.
+          </h2>
+          <p className="cos-act-lede">
+            ContentOS sorts everyone who likes or comments on your posts against
+            your ideal customer, then tells you who to talk to first and why.
+          </p>
+        </div>
 
         <ClayzoScene
           name="lead-sort"

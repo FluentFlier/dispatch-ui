@@ -1420,6 +1420,32 @@ html[data-cos-theme='dark'] .cos-act-mark {
 html[data-cos-theme='dark'] .cos-act-scene {
   box-shadow: 0 50px 100px -40px rgba(0, 0, 0, 0.7);
 }
+/* Act 2 mirrors Act 1 on desktop: the words take the right-hand column and the audience
+   field (a halftone crowd of people) sits on the left, tucked behind the window like Act 1's plane */
+.cos-act-field {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .cos-act-flip .cos-act-head {
+    width: min(600px, 52%);
+    margin-left: auto;
+  }
+  .cos-act-field {
+    --field: min(640px, 46vw);
+    display: block;
+    position: absolute;
+    z-index: 0;
+    left: calc(max(var(--cos-gutter), (100vw - var(--cos-max)) / 2) - 70px);
+    top: clamp(-40px, -2.5vw, -16px);
+    width: var(--field);
+    aspect-ratio: 10 / 7;
+    pointer-events: none;
+  }
+  .cos-act-field > div {
+    width: 100%;
+    height: 100%;
+  }
+}
 /* the lead sort's window: 22 of 1200 x 440 */
 .cos-act-scene-leads {
   border-radius: 1.833% / 5%;
