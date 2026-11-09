@@ -6,7 +6,8 @@
  *   mode      one object: the name, at full width, nothing else in the frame
  *   verb      take off: at rest every plane points where the mark points; a wave crosses the name and
  *             each plane loops the loop as it passes, catching the mark's own colours; on a desktop the
- *             planes near the cursor turn to fly away from it and grow
+ *             planes near the cursor turn to fly away from it and grow; a click (or a tap) sends the
+ *             planes around it flying out on a curve, and they glide home
  *   geometry  the mark simplified to its three pieces (top wing, lower wing, tail), on a square grid;
  *             a cell on a letter's edge carries a smaller plane, so the letters keep their shape
  *   palette   ink at rest (pale on dark), the top wing full, the lower wing and tail lighter, like a
@@ -42,6 +43,7 @@ const SKSL = (W: number, H: number, CELL: number) => `
 uniform shader inputImage;
 uniform float2 focus;
 uniform float strength;
+uniform float burst;
 uniform float phase;
 uniform half4 ink;
 uniform half4 blue;
@@ -66,23 +68,19 @@ float sdTri(float2 p, float2 p0, float2 p1, float2 p2) {
   return -sqrt(d.x) * sign(d.y);
 }
 
-half4 main(float2 q) {
-  float s = renderScale.x;
-  float2 u = q / s;
-  float CELL = ${CELL.toFixed(2)};
-  float2 cc = (floor(u / CELL) + 0.5) * CELL;
-
-  // how much of the cell is letter: four taps of the set word (drawn in red)
+// how much of the cell at cc is letter: four taps of the set word
+float coverage(float2 cc, float CELL, float s) {
   float h = CELL * 0.25;
   float cov = 0.0;
   for (int k = 0; k < 4; k++) {
     float2 o = float2((k == 0 || k == 2) ? -h : h, k < 2 ? -h : h);
-    half4 tp = inputImage.eval((cc + o) * s);
-    cov += tp.a;
+    cov += inputImage.eval((cc + o) * s).a;
   }
-  cov *= 0.25;
-  if (cov < 0.2) { return half4(0.0); }
+  return cov * 0.25;
+}
 
+// the plane that lives in the cell at cc, as seen from the point u (premultiplied)
+half4 plane(float2 u, float2 cc, float cov, float2 fc, float CELL, float s) {
   // the wave: a slanted front crossing left to right once per loop; each plane turns a full circle
   // as it passes and lights up in the mark's colours
   float front = mix(${(-0.3 * W).toFixed(1)}, ${(1.53 * W).toFixed(1)}, phase);
@@ -92,21 +90,29 @@ half4 main(float2 q) {
   float glint = sin(3.14159265 * lp);
 
   // the cursor: nearby planes turn to fly away from it and grow
-  float2 away = cc - focus / s;
-  float near = strength * exp(-dot(away, away) / ${((CELL * 16) ** 2).toFixed(1)});
-  float rest = -0.588;
-  float dA = atan(away.y, away.x) - rest;
-  dA = dA - 6.2831853 * floor((dA + 3.14159265) / 6.2831853);
-  float th = turn + near * dA;
+  float2 away = cc - fc;
+  float dd = dot(away, away);
+  float near = strength * exp(-dd / ${((CELL * 16) ** 2).toFixed(1)});
+  // a click: the planes around it take off along a curve, then glide home
+  float fly = clamp(burst, -0.5, 1.0) * exp(-dd / ${((CELL * 9) ** 2).toFixed(1)});
+  float2 dir = normalize(away + float2(0.013, -0.021));
+  float bend = fly * 0.9;
+  dir = float2(cos(bend) * dir.x - sin(bend) * dir.y, sin(bend) * dir.x + cos(bend) * dir.y);
+  float2 pos = cc + dir * fly * CELL * 2.1;
 
-  float size = (0.62 + 0.38 * smoothstep(0.2, 0.75, cov)) * (1.0 + 0.4 * near + 0.14 * glint);
+  float rest = -0.588;
+  float dA = atan(dir.y, dir.x) - rest;
+  dA = dA - 6.2831853 * floor((dA + 3.14159265) / 6.2831853);
+  float th = turn + clamp(max(near, abs(fly) * 1.4), 0.0, 1.0) * dA;
+
+  float size = (0.62 + 0.38 * smoothstep(0.2, 0.75, cov)) * (1.0 + 0.4 * near + 0.14 * glint + 0.3 * abs(fly));
   float R = CELL * 0.5 * size;
-  float2 v = (u - cc) / R;
+  float2 v = (u - pos) / R;
   float c0 = cos(th);
   float s0 = sin(th);
   v = float2(c0 * v.x + s0 * v.y, -s0 * v.x + c0 * v.y);
 
-  // the mark, centred on its cell: top wing, lower wing, tail
+  // the mark: top wing, lower wing, tail
   float dTop = sdTri(v, float2(0.93, -0.62), float2(-0.95, -0.18), float2(-0.2, 0.18));
   float dLow = sdTri(v, float2(0.93, -0.62), float2(-0.2, 0.18), float2(-0.05, 0.8));
   float dTail = sdTri(v, float2(-0.45, 0.1), float2(-0.52, 0.62), float2(-0.2, 0.46));
@@ -115,7 +121,7 @@ half4 main(float2 q) {
   float aLow = smoothstep(px, -px, dLow) * (1.0 - aTop);
   float aTail = smoothstep(px, -px, dTail) * (1.0 - aTop) * (1.0 - aLow);
 
-  float lit = clamp(max(glint, near), 0.0, 1.0);
+  float lit = clamp(max(max(glint, near), abs(fly) * 1.5), 0.0, 1.0);
   half3 cTop = mix(ink.rgb, blue.rgb, lit);
   half3 cLow = mix(ink.rgb, red.rgb, lit);
   half3 cTail = mix(ink.rgb, lilac.rgb, lit);
@@ -126,6 +132,36 @@ half4 main(float2 q) {
   half3 rgb = cTop * aTop * fTop + cLow * aLow * fLow + cTail * aTail * fTail;
   float a = aTop * fTop + aLow * fLow + aTail * fTail;
   return half4(rgb, a);
+}
+
+half4 main(float2 q) {
+  float s = renderScale.x;
+  float2 u = q / s;
+  float CELL = ${CELL.toFixed(2)};
+  float2 fc = focus / s;
+  float2 cell = floor(u / CELL);
+
+  // at rest each plane stays in its own cell; during a click the planes near it can fly up to two
+  // cells out, so a point there also looks at the planes around it
+  bool wide = abs(burst) > 0.004 && length(u - fc) < ${(CELL * 22).toFixed(1)};
+  if (!wide) {
+    float2 cc = (cell + 0.5) * CELL;
+    float cov = coverage(cc, CELL, s);
+    if (cov < 0.2) { return half4(0.0); }
+    return plane(u, cc, cov, fc, CELL, s);
+  }
+  half4 acc = half4(0.0);
+  for (int j = -2; j <= 2; j++) {
+    for (int i = -2; i <= 2; i++) {
+      float2 cc = (cell + float2(float(i), float(j)) + 0.5) * CELL;
+      float cov = coverage(cc, CELL, s);
+      if (cov >= 0.2) {
+        half4 pl = plane(u, cc, cov, fc, CELL, s);
+        acc = pl + acc * (1.0 - pl.a);
+      }
+    }
+  }
+  return acc;
 }
 `;
 
@@ -168,6 +204,7 @@ function build(dark: boolean, phone: boolean) {
     parameters: [
       { id: 'focus', name: 'focus', valueType: 'point', minimum: { x: -400, y: -400 }, maximum: { x: 1840, y: 700 }, value: constant({ x: W / 2, y: H / 2 }) },
       { id: 'strength', name: 'strength', valueType: 'number', minimum: 0, maximum: 1, value: constant(0) },
+      { id: 'burst', name: 'burst', valueType: 'number', minimum: -2, maximum: 3, value: constant(0) },
       { id: 'phase', name: 'phase', valueType: 'number', minimum: 0, maximum: 1, value: keyed('planes.phase', [[0, 0, 'linear'], [END, 1]]) },
       { id: 'ink', name: 'ink', valueType: 'color', value: constant(P.ink) },
       { id: 'blue', name: 'blue', valueType: 'color', value: constant(P.blue) },
@@ -213,6 +250,20 @@ function build(dark: boolean, phone: boolean) {
         { id: 'off', op: 'constant', value: 0 },
         { id: 'pick', op: 'select', inputs: ['in', 'on', 'off'] },
         { id: 'ease', op: 'damp', halfLife: 0.16 },
+      ],
+    },
+    // a press kicks a spring: a click sends the planes out and they swing home; held, they stay out
+    {
+      id: 'planes-burst',
+      target: { kind: 'effect-parameter', nodeId: 'planes', parameterId: 'burst' },
+      blend: 'set',
+      steps: [
+        { id: 'down', op: 'pointer-state', field: 'down' },
+        { id: 'on', op: 'constant', value: 1 },
+        { id: 'off', op: 'constant', value: 0 },
+        { id: 'pick', op: 'select', inputs: ['down', 'on', 'off'] },
+        { id: 'kick', op: 'spring', stiffness: 55, damping: 7.5 },
+        { id: 'gain', op: 'arithmetic', operation: 'multiply', operand: 1.7 },
       ],
     },
   ] as never);
