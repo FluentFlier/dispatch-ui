@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "geist",
+        "createdAt": "2026-11-09T07:05:14.071Z",
+        "reason": "Geist is the redesigned site's typeface (--cos-sans in src/components/site/site.css, Clayzo scenes load public/fonts/Geist); DESIGN.md predates the redesign"
+      }
+    ]
+  }
+}

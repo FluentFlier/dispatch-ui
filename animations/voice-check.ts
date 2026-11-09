@@ -33,6 +33,7 @@ import {
   type SceneNode,
 } from '@clayzo/animation/authoring';
 import { FPS, INOUT, OUT, TPS, fade, palette, scene, t, type K } from './lib/kit';
+import { chrome, yFor } from './lib/window';
 
 const END = t(11.2);
 
@@ -88,61 +89,11 @@ function layout(narrow: boolean) {
   };
 }
 
-/** the hero demo window's own colours (src/components/site/demo/demo.css), light and dark */
-function chrome(dark: boolean) {
-  const c = (h: string, a = 1): Color => ({ ...hex(h), a });
-  return dark
-    ? {
-        win: c('#0C1317'),
-        winLine: c('#FFFFFF', 0.08),
-        winHi: c('#FFFFFF', 0),
-        card: c('#141C21'),
-        cardLine: c('#FFFFFF', 0.07),
-        shadow: c('#000000', 0.5),
-        tint: c('#FFFFFF', 0.03),
-        tintLine: c('#FFFFFF', 0.06),
-        tag: c('#FFFFFF', 0.07),
-        text: c('#EBF0F2'),
-        text2: c('#A1ABB2'),
-        text3: c('#6B777F'),
-        track: c('#FFFFFF', 0.08),
-        pill: {
-          apricot: { bg: c('#FFA774', 0.14), fg: c('#FFBE94'), icon: c('#F0804A') },
-          ink: { bg: c('#FFFFFF', 0.08), fg: c('#A1ABB2'), icon: c('#6B777F') },
-          blue: { bg: c('#6CC6EB', 0.16), fg: c('#B4E6F7'), icon: c('#2B9CCF') },
-          green: { bg: c('#4FD18B', 0.14), fg: c('#8EE6B4'), icon: c('#22A565') },
-        },
-      }
-    : {
-        win: c('#FCFBF9'),
-        winLine: c('#101118', 0.09),
-        winHi: c('#FFFFFF', 0.9),
-        card: c('#FFFFFF'),
-        cardLine: c('#101118', 0.07),
-        shadow: c('#1E2850', 0.13),
-        tint: c('#101118', 0.03),
-        tintLine: c('#101118', 0.06),
-        tag: c('#101118', 0.05),
-        text: c('#16171B'),
-        text2: c('#565863'),
-        text3: c('#8C8E98'),
-        track: c('#101118', 0.07),
-        pill: {
-          apricot: { bg: c('#F0804A', 0.13), fg: c('#B4521C'), icon: c('#F0804A') },
-          ink: { bg: c('#101118', 0.07), fg: c('#4C4E58'), icon: c('#8C8E98') },
-          blue: { bg: c('#2F5BEA', 0.1), fg: c('#2445C4'), icon: c('#2F5BEA') },
-          green: { bg: c('#22A565', 0.12), fg: c('#157A49'), icon: c('#22A565') },
-        },
-      };
-}
-
 // widths of the pill labels, Geist 12 px / 550, measured in the browser
 const PILL_W = { below: 93.5, rewriting: 54.6, passed: 42.2 };
 // the draft card's badge, Geist 550 at 13 px (wide) and 12 px (narrow)
 const BADGE_W = { hidden: [130.7, 120.7], waiting: [125.4, 115.7] };
 
-// Geist's cap height is ~0.71 em; a text node's first baseline sits one line height below its y
-const yFor = (capMid: number, size: number, lh: number) => capMid + size * 0.355 - lh;
 
 const SKSL = `
 uniform shader inputImage;

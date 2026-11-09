@@ -1365,7 +1365,7 @@ html[data-cos-theme='dark'] .cos-act-mark {
   display: none;
 }
 @media (max-width: 719px) {
-  .cos-act {
+  .cos-act:has(.cos-act-flock) {
     padding-top: 184px;
   }
   .cos-act-mark {
@@ -1420,6 +1420,10 @@ html[data-cos-theme='dark'] .cos-act-mark {
 html[data-cos-theme='dark'] .cos-act-scene {
   box-shadow: 0 50px 100px -40px rgba(0, 0, 0, 0.7);
 }
+/* the lead sort's window: 22 of 1200 x 440 */
+.cos-act-scene-leads {
+  border-radius: 1.833% / 5%;
+}
 .cos-clayzo {
   aspect-ratio: var(--scene-ar);
 }
@@ -1432,6 +1436,9 @@ html[data-cos-theme='dark'] .cos-act-scene {
   }
   .cos-act-scene {
     border-radius: 5.747% / 3.546%;
+  }
+  .cos-act-scene-leads {
+    border-radius: 5.747% / 2.865%;
   }
 }
 .cos-act-scene canvas {
