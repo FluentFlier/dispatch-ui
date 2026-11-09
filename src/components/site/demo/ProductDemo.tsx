@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { LinkedInLogo, XLogo } from '../brand/Logos';
 import { Mark } from '../brand/Mark';
+import { StepSwitch } from './StepSwitch';
 
 /**
  * The product, working: a brief becomes a post in your voice, the post gets
@@ -397,28 +398,22 @@ export function ProductDemo({ wideFrom = 720 }: { wideFrom?: number } = {}) {
         </div>
       </div>
 
-      <div className="dm-steps" role="tablist" aria-label="Product walkthrough">
-        {STEPS.map((s, i) => (
-          <button
-            key={s.label}
-            type="button"
-            role="tab"
-            aria-selected={step === i}
-            className="dm-step"
-            onClick={() => jump(i as Step)}
-          >
-            <span className="dm-step-label">{s.label}</span>
-            <span className="dm-step-track">
-              <span
-                key={`${i}-${step === i ? stepStart : 'idle'}`}
-                className="dm-step-fill"
-                data-state={step === i ? (reduced ? 'full' : 'run') : i < step ? 'full' : 'empty'}
-                style={{ animationDuration: `${s.ms}ms` }}
-              />
-            </span>
-          </button>
-        ))}
-      </div>
+      <StepSwitch step={step} stepStart={stepStart} ms={STEPS[step].ms} running={visible && !reduced} still={reduced}>
+        <div className="dm-steps" role="tablist" aria-label="Product walkthrough">
+          {STEPS.map((s, i) => (
+            <button
+              key={s.label}
+              type="button"
+              role="tab"
+              aria-selected={step === i}
+              className="dm-step"
+              onClick={() => jump(i as Step)}
+            >
+              <span className="dm-step-label">{s.label}</span>
+            </button>
+          ))}
+        </div>
+      </StepSwitch>
     </div>
   );
 }

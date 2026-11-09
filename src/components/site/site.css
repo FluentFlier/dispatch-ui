@@ -566,10 +566,6 @@ html[data-hero-wait] .cos-rise {
   z-index: 2;
   margin-top: clamp(56px, 8vh, 84px);
 }
-/* the tabs' bar runs the window's full width */
-.cos-hero-demo .dm-steps {
-  width: 100%;
-}
 /* wide screens: one screen, the sky behind all of it, the words on the left and the whole app
    window on the right, reaching past the content edge to 40 px inside the sky so it is big enough
    to read and never cropped */
