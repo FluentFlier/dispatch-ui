@@ -1,6 +1,7 @@
 /**
- * The closing band (CtaBand): the page began on a painted morning sky and ends on the same sky at
- * sunset, and you hold the sun. It sits on the horizon; on a desktop it follows the cursor, and the
+ * The closing band (CtaBand): the page began on a painted morning sky and ends on the open sea at
+ * sunset (India: a riverside of stone steps), and you hold the sun. It sits half set on the horizon,
+ * a path of glitter on the water under it; drag it below the horizon and it sets; on a desktop it follows the cursor, and the
  * painting relights from wherever it is: shafts of light fan out through the gaps in the clouds and
  * the cloud edges facing it catch a warm rim. Toward every edge the painting breaks into the page's
  * halftone (the acts' strips), the dots shrinking to nothing; near the sun they swell back into paint.
@@ -8,8 +9,8 @@
  * Art direction
  *   verb      light: one point of light, and the whole sky answers it
  *   geometry  the painting; rays fanned from the sun; the band's edges in the square dot grid
- *   palette   the generated sunset (animations/assets/dusk*.jpg, from the hero's skies; at night in the
- *             site's ocean grade); sunlight apricot-white by day, a pale moon and sea-blue light at night
+ *   palette   the generated paintings (animations/assets/dusk*.jpg and india-dusk*.jpg, the hero's
+ *             brushwork, their own scenes; the night ones painted from the day ones); sunlight apricot-white by day, a pale moon and sea-blue light at night
  *   scale     1440 x 640 full bleed (the page keeps that shape, the faded sides run off), and 390 x 640
  *             for phones, where the sun sways on the horizon on its own
  *   words     none in the scene: the page sets the headline in the calm above the sun
@@ -38,7 +39,7 @@ const IMG = { width: 2880, height: 1280 };
 
 type Look = { ground: string; core: string; light: string; bright: number; rays: number; disc: number };
 
-const SKSL = (W: number, H: number, CELL: number, RX: number, RY: number, L: Look) => `
+const SKSL = (W: number, H: number, CELL: number, RX: number, RY: number, L: Look, HZ: number) => `
 uniform shader inputImage;
 uniform float2 sun;
 uniform float phase;
@@ -61,6 +62,15 @@ float vnoise(float x) {
   float f = fract(x);
   return mix(hash1(i), hash1(i + 1.0), f * f * (3.0 - 2.0 * f));
 }
+float hash2(float2 c) {
+  return fract(sin(dot(c, float2(127.1, 311.7))) * 43758.5453);
+}
+float vnoise2(float2 x) {
+  float2 i = floor(x);
+  float2 f = fract(x);
+  float2 w = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash2(i), hash2(i + float2(1.0, 0.0)), w.x), mix(hash2(i + float2(0.0, 1.0)), hash2(i + float2(1.0, 1.0)), w.x), w.y);
+}
 
 // the painting at p, lit from the sun at sn (composition units)
 half3 shade(float2 p, float2 sn, float s) {
@@ -68,6 +78,9 @@ half3 shade(float2 p, float2 sn, float s) {
   float2 d = sn - p;
   float dist = length(d);
   float near = exp(-dist / 300.0);
+  float HZ = ${HZ.toFixed(1)};
+  // how much of the sun is above the water: drag it down and it sets
+  float up = smoothstep(-4.0, 30.0, HZ - sn.y + ${L.disc.toFixed(1)});
 
   // the cloud edges facing the sun catch a rim
   float l0 = luma(c);
@@ -96,13 +109,24 @@ half3 shade(float2 p, float2 sn, float s) {
   // broken into fans that shimmer slowly
   float ang = atan(d.y, d.x);
   float fan = 0.72 + 0.28 * vnoise(ang * 6.0 + sin(phase) * 1.2) * vnoise(ang * 13.0 - cos(phase) * 0.9 + 7.0);
-  float rays = acc * fan * exp(-dist / 620.0) * ${L.rays.toFixed(2)};
+  float rays = acc * fan * exp(-dist / 620.0) * ${L.rays.toFixed(2)} * mix(0.2, 1.0, up);
 
   // the sun: a hard disc and two glows
   float disc = 1.0 - smoothstep(${L.disc - 1}.0, ${L.disc + 1}.0, dist);
-  float halo = exp(-dist / ${(L.disc * 1.6).toFixed(1)}) * 0.55 + exp(-dist / 240.0) * 0.4;
+  float halo = (exp(-dist / ${(L.disc * 1.6).toFixed(1)}) * 0.55 + exp(-dist / 240.0) * 0.4) * mix(0.3, 1.0, up);
+  // the water hides whatever of it is below the horizon
+  disc *= 1.0 - smoothstep(HZ - 0.8, HZ + 0.8, p.y);
 
-  half3 add = light.rgb * (rays + rim * 0.55 + halo * 0.6) + core.rgb * disc;
+  // a path of glitter on the water under it, widening toward you, its ripples drifting
+  float glit = 0.0;
+  float below = p.y - HZ;
+  if (below > 0.0) {
+    float lane = exp(-abs(p.x - sn.x) / (8.0 + below * 0.45));
+    float rip = vnoise2(float2(p.x * 0.05 + sin(phase) * 0.6, below * 0.42 + sin(phase) * 2.0 + cos(phase) * 1.3));
+    glit = lane * smoothstep(0.5, 0.85, rip) * up * exp(-below / 220.0) * 1.3;
+  }
+
+  half3 add = light.rgb * (rays + rim * 0.55 + halo * 0.6) + core.rgb * (disc + glit * 0.7);
   // screen, so light never clips to a flat white
   return 1.0 - (1.0 - c) * (1.0 - clamp(add, 0.0, 1.0));
 }
@@ -140,15 +164,16 @@ const hexC = (h: string): Color => {
   return { r: ((n >> 16) & 255) / 255, g: ((n >> 8) & 255) / 255, b: (n & 255) / 255, a: 1 };
 };
 
-function build(dark: boolean, phone: boolean, look: Look) {
+function build(dark: boolean, phone: boolean, look: Look, horizon: number) {
   const W = phone ? 390 : 1440;
   const H = 640;
   const CELL = phone ? 8 : 10;
   // the painting's whole region: an ellipse; on a phone it runs off the sides
   const RX = phone ? W * 0.62 : W * 0.53;
   const RY = H * 0.52;
-  // where the sun rests: on the horizon, under the words
-  const REST = { x: W / 2, y: H * 0.8 };
+  // where the sun rests: half set on the painting's horizon, under the words
+  const HZ = H * horizon;
+  const REST = { x: W / 2, y: HZ + 2 };
   const nodes: Record<string, SceneNode> = {};
   const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
 
@@ -160,7 +185,7 @@ function build(dark: boolean, phone: boolean, look: Look) {
     effect: 'custom-sksl',
     inputId: 'sky',
     // a phone's frame is a quarter as wide, so its sun is smaller
-    implementation: SKSL(W, H, CELL, RX, RY, phone ? { ...look, disc: Math.round(look.disc * 0.62) } : look),
+    implementation: SKSL(W, H, CELL, RX, RY, phone ? { ...look, disc: Math.round(look.disc * 0.62) } : look, HZ),
     capability: { requires: ['runtime-effect'], fallback: 'passthrough', maxTemporarySurfaces: 1 },
     parameters: [
       // driven by the bindings below; this is where it rests for stills and exports
@@ -203,7 +228,7 @@ function build(dark: boolean, phone: boolean, look: Look) {
         { id: 'px', op: 'arithmetic', operation: 'add', operand: REST.x },
         { id: 'ay', op: 'arithmetic', operation: 'multiply', operand: 2 * w, inputs: ['tm'] },
         { id: 'sy', op: 'unary', operation: 'sine' },
-        { id: 'dy', op: 'arithmetic', operation: 'multiply', operand: 8 },
+        { id: 'dy', op: 'arithmetic', operation: 'multiply', operand: 10 },
         { id: 'py', op: 'arithmetic', operation: 'add', operand: REST.y },
         { id: 'idle', op: 'vec2', inputs: ['px', 'py'] },
         { id: 'ptr', op: 'pointer', space: 'composition' },
@@ -222,6 +247,9 @@ function build(dark: boolean, phone: boolean, look: Look) {
   return final;
 }
 
+// where the sea meets the sky in each painting (measured), as a share of the height
+const HORIZON: Record<string, number> = { '': 0.753, '-india': 0.658 };
+
 const LOOKS: Record<'light' | 'dark', Look> = {
   light: { ground: '#FAF9F6', core: '#FFF6E6', light: '#FFB27A', bright: 0.72, rays: 0.95, disc: 22 },
   dark: { ground: '#080F14', core: '#EEF6F8', light: '#6CC6EB', bright: 0.36, rays: 0.6, disc: 16 },
@@ -236,7 +264,7 @@ for (const bg of ['', '-india']) {
   }
   for (const dark of [false, true]) {
     for (const phone of [false, true]) {
-      const doc = build(dark, phone, dark ? LOOKS.dark : LOOKS.light);
+      const doc = build(dark, phone, dark ? LOOKS.dark : LOOKS.light, HORIZON[bg]);
       const file = `${dark ? 'dark' : 'light'}${phone ? '-narrow' : ''}.json`;
       writeFileSync(`${pub}/${file}`, JSON.stringify(doc));
       writeFileSync(`${out}/${file}`, JSON.stringify(doc));
