@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans, Fraunces, Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import localFont from 'next/font/local';
 import { PRODUCT_NAME, SITE_TITLE } from '@/lib/brand';
 import './globals.css';
 
@@ -66,6 +67,15 @@ export const metadata: Metadata = {
   },
 };
 
+// Mona Sans (OFL, GitHub), the marketing site's face; latin, weight 200-900 and width 75-125%
+const mona = localFont({
+  src: './fonts/mona-sans-latin.woff2',
+  variable: '--font-mona',
+  weight: '200 900',
+  display: 'swap',
+  declarations: [{ prop: 'font-stretch', value: '75% 125%' }],
+});
+
 export default function RootLayout({
   children,
 }: {
@@ -75,7 +85,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`scroll-smooth ${dmSans.variable} ${fraunces.variable} ${hanken.variable} ${jetbrains.variable} ${instrument.variable} ${GeistSans.variable} ${GeistMono.variable}`}
+      className={`scroll-smooth ${dmSans.variable} ${fraunces.variable} ${hanken.variable} ${jetbrains.variable} ${instrument.variable} ${GeistSans.variable} ${GeistMono.variable} ${mona.variable}`}
     >
       <body className={dmSans.className}>{children}</body>
     </html>

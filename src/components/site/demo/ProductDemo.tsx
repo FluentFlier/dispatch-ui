@@ -65,7 +65,8 @@ const DESIGN_H = 640;
 
 class Cancelled extends Error {}
 
-export function ProductDemo() {
+/** `wideFrom`: the column width at which the window shows its sidebar (wide layout); below it the narrow one. */
+export function ProductDemo({ wideFrom = 720 }: { wideFrom?: number } = {}) {
   const frameRef = useRef<HTMLDivElement>(null);
   const winRef = useRef<HTMLDivElement>(null);
   const runId = useRef(0);
@@ -96,7 +97,7 @@ export function ProductDemo() {
     if (!el) return;
     const fit = () => {
       const w = el.clientWidth;
-      const n = w < 720;
+      const n = w < wideFrom;
       setNarrow(n);
       setScale(Math.min(1, w / (n ? DESIGN_W_NARROW : DESIGN_W)));
     };
@@ -104,7 +105,7 @@ export function ProductDemo() {
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [wideFrom]);
 
   // crossfade: when the screen changes, keep the old one for a moment while it fades out
   useLayoutEffect(() => {
@@ -123,11 +124,13 @@ export function ProductDemo() {
     setReduced(mq.matches);
     // play once the demo is (essentially) fully on screen; pause when it has mostly left.
     // If the demo is taller than the viewport, "fully" means it fills most of the screen.
+    // Measured on height only, so a window placed partly off to the side still plays.
     const io = new IntersectionObserver(
       ([e]) => {
         const shown = e.intersectionRect.height;
-        const full = e.intersectionRatio >= 0.92 || shown >= window.innerHeight * 0.85;
-        setVisible((v) => (full ? true : e.intersectionRatio < 0.3 ? false : v));
+        const ratio = e.isIntersecting ? shown / Math.max(1, e.boundingClientRect.height) : 0;
+        const full = ratio >= 0.92 || shown >= window.innerHeight * 0.85;
+        setVisible((v) => (full ? true : ratio < 0.3 ? false : v));
       },
       { threshold: [0, 0.1, 0.2, 0.3, 0.5, 0.7, 0.85, 0.92, 1] },
     );

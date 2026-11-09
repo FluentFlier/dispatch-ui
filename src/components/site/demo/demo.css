@@ -32,7 +32,8 @@
   transform-origin: 0 0;
   border-radius: 22px;
   color: var(--dm-text);
-  font-family: var(--cos-sans);
+  /* the app itself is set in Geist, as the real product is; the page around it is Mona Sans */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 14px;
   letter-spacing: -0.006em;
   box-shadow:
@@ -744,12 +745,21 @@ img.dm-avatar {
 }
 
 /* step tabs */
+/* the tabs sit on the sky, so they get a frosted bar of their own to stay readable */
 .dm-steps {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   width: min(720px, 100%);
-  margin: 28px auto 0;
+  margin: 24px auto 0;
+  padding: 6px 16px 8px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 10px 28px -16px rgba(30, 40, 80, 0.35);
 }
 .dm-step {
   display: grid;
@@ -757,7 +767,7 @@ img.dm-avatar {
   padding: 8px 4px;
   border-radius: 10px;
   text-align: left;
-  color: var(--cos-ink-3);
+  color: var(--cos-ink-2);
   transition: color 200ms ease;
 }
 .dm-step[aria-selected='true'] {
@@ -837,6 +847,15 @@ html[data-cos-theme='dark'] .dm {
   --dm-blue: #6cc6eb;
   --dm-tint: rgba(255, 255, 255, 0.035);
   --dm-tint-2: rgba(255, 255, 255, 0.07);
+}
+html[data-cos-theme='dark'] .dm-steps {
+  background: rgba(8, 24, 33, 0.62);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 10px 28px -16px rgba(0, 0, 0, 0.6);
+}
+html[data-cos-theme='dark'] .dm-step-track {
+  background: rgba(255, 255, 255, 0.14);
 }
 html[data-cos-theme='dark'] .dm-win {
   background: rgba(12, 19, 23, 0.6);
