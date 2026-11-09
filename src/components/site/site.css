@@ -1499,6 +1499,27 @@ html[data-cos-theme='dark'] .cos-act-scene {
 .cos-act-talk {
   display: none;
 }
+/* and under 1024 px, as a strip above the heading (the narrow talk-mark build), held to the
+   gutters rather than bleeding like Act 2's crowd, since it is two objects, not a field */
+.cos-act-chat {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .cos-act:has(.cos-act-chat) {
+    padding-top: calc(min(100vw - 2 * var(--cos-gutter), 420px) * 212 / 390 + 28px);
+  }
+  .cos-act-chat {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 10px;
+    left: 0;
+    right: 0;
+    width: min(calc(100% - 2 * var(--cos-gutter)), 420px);
+    margin: 0 auto;
+    pointer-events: none;
+  }
+}
 /* the lead sort's window: 22 of 1200 x 440 */
 .cos-act-scene-leads {
   border-radius: 1.833% / 5%;

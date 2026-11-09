@@ -13,6 +13,17 @@ export function ActOutreach() {
       id="conversations"
       aria-labelledby="act-outreach-title"
     >
+      {/* under 1024 px the conversation becomes a strip above the heading */}
+      <div className="cos-act-chat" aria-hidden="true">
+        <ClayzoScene
+          name="talk-mark"
+          width={390}
+          height={212}
+          narrow={{ width: 390, height: 212 }}
+          playWhen="visible"
+        />
+      </div>
+
       <div className="cos-act-inner">
         <div className="cos-act-head">
           <h2 id="act-outreach-title" className="cos-act-title">
