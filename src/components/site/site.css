@@ -1254,7 +1254,6 @@ html[data-cos-theme='dark'] .cos-more-box {
 .cos-foot {
   /* the closing band above already fades out into the page */
   margin-top: 0;
-  border-top: 1px solid var(--cos-line);
 }
 .cos-foot-inner {
   max-width: calc(var(--cos-max) + 2 * var(--cos-gutter));
