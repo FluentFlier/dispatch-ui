@@ -36,6 +36,7 @@ export function ClayzoScene({
   narrowBelow = NARROW,
   label,
   className,
+  interactive = false,
 }: {
   name: string;
   width: number;
@@ -50,6 +51,8 @@ export function ClayzoScene({
   playWhen?: 'full' | 'visible';
   label?: string;
   className?: string;
+  /** let the scene's own pointer bindings run (the cursor reaches the canvas) */
+  interactive?: boolean;
 }) {
   const { theme, ready } = useTheme();
   const [near, setNear] = useState(false);
@@ -121,7 +124,7 @@ export function ClayzoScene({
       {doc && scale && (
         <ClayzoPlayer
           document={doc}
-          options={{ loaders, interactive: false, loop: true, resolution: scale }}
+          options={{ loaders, interactive, loop: true, resolution: scale }}
           // the player applies autoplay once it is shown and whenever it changes: holding it
           // false until the scene is fully seen is what makes it start on arrival
           autoplay={go}

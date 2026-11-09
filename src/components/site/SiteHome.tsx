@@ -7,6 +7,7 @@ import { ActVoice } from "./sections/ActVoice";
 import { ActLeads } from "./sections/ActLeads";
 import { ActOutreach } from "./sections/ActOutreach";
 import { ActMore } from "./sections/ActMore";
+import { CtaBand } from "./sections/CtaBand";
 import { THEME_BOOT, ThemeProvider } from "./theme";
 import { HERO_BOOT } from "./heroReady";
 import "./site.css";
@@ -36,6 +37,7 @@ export function SiteHome({ funnel }: { funnel: FunnelState }) {
           <ActLeads />
           <ActOutreach />
           <ActMore />
+          <CtaBand cta={cta} loggedIn={funnel.loggedIn} />
         </main>
       </div>
     </ThemeProvider>

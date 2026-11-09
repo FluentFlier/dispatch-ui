@@ -7,7 +7,7 @@
  * The crops are baked at 2x the panel's CSS size, so the brush and the canvas texture are scaled by
  * K = 2 to land on screen at the hero's size (its brush is ~7 CSS px).
  *
- *   pnpm tsx animations/paint-panels.ts   (writes animations/assets/panels/<name>[-india]-<day|night>-oil.jpg)
+ *   pnpm tsx animations/paint-panels.ts [names…]   (writes animations/assets/panels/<name>[-india]-<day|night>-oil.jpg)
  */
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -89,7 +89,11 @@ const PANELS: [string, number, number][] = [
   ['autopilot', 880, 680],
   ['tools', 880, 680],
   ['breakout', 1280, 680],
+  // the closing band (animations/cta-field.ts): the sky's warm horizon, India's palaces and lake
+  ['cta', 2880, 1280],
 ];
+// `pnpm tsx animations/paint-panels.ts cta` paints only the named crops
+const ONLY = process.argv.slice(2);
 
 const work = join(tmpdir(), 'contentos-paint-panels');
 rmSync(work, { recursive: true, force: true });
@@ -97,6 +101,7 @@ mkdirSync(work, { recursive: true });
 
 // the default sky, and the India backdrop (?bg=india)
 for (const [name, W, H] of PANELS) for (const bg of ['', '-india']) {
+  if (ONLY.length && !ONLY.includes(name)) continue;
   for (const tone of ['day', 'night']) {
     const src = `animations/assets/panels/${name}${bg}-${tone}.jpg`;
     copyFileSync(src, join(work, 'src.jpg'));

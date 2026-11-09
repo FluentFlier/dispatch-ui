@@ -1103,7 +1103,7 @@ html[data-cos-theme='dark'] .cos-more-box {
   border-radius: 12px 12px 0 0;
 }
 /* in a row, the wide card's panel sets the height; the narrow card's panel fills the same height
-   and its picture keeps its shape, cut on the right like the fragment on it */
+   and its picture keeps its shape, centred, so a centred window stays centred */
 @media (min-width: 861px) {
   .cos-more-box[data-narrow] .cos-more-panel {
     flex: 1 1 auto;
@@ -1111,7 +1111,8 @@ html[data-cos-theme='dark'] .cos-more-box {
   .cos-more-box[data-narrow] .cos-more-panel > .cos-clayzo {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     height: 100%;
     width: auto;
   }
@@ -1155,6 +1156,96 @@ html[data-cos-theme='dark'] .cos-more-box {
   .cos-more-box {
     --pad: 24px;
     border-radius: 18px;
+  }
+}
+
+/* ------------------------------------------------------------ closing band */
+/* full bleed, in the scene's own shape (1440 x 640), never shorter than the words need: then the
+   scene keeps its height and its faded sides run off the screen. Phones get the 390 x 640 build */
+.cos-cta {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1440 / 640;
+  min-height: 560px;
+  max-height: 800px;
+  margin-top: clamp(56px, 7vw, 112px);
+  overflow: hidden;
+}
+.cos-cta-field {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  aspect-ratio: 1440 / 640;
+}
+.cos-cta-field > .cos-clayzo {
+  width: 100%;
+  height: 100%;
+}
+.cos-cta-field canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* the words let the cursor through to the sky; only the buttons take it */
+.cos-cta-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 760px;
+  padding: 0 var(--cos-gutter);
+  text-align: center;
+  pointer-events: none;
+}
+.cos-cta-title {
+  margin: 0;
+  font-size: clamp(2.5rem, 1.2rem + 3.4vw, 4.25rem);
+  font-weight: 500;
+  font-stretch: 104%;
+  line-height: 1.02;
+  letter-spacing: -0.036em;
+  color: var(--cos-ink);
+  text-wrap: balance;
+  /* a halo of the page's own ground lifts the words off the dots */
+  text-shadow: 0 0 28px var(--cos-ground), 0 0 10px var(--cos-ground);
+}
+.cos-cta-sub {
+  max-width: 40ch;
+  margin: 20px 0 0;
+  font-size: clamp(17px, 0.95rem + 0.3vw, 19px);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--cos-ink-sky);
+  text-wrap: balance;
+  text-shadow: 0 0 18px var(--cos-ground), 0 0 6px var(--cos-ground);
+}
+.cos-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+  pointer-events: auto;
+}
+@media (max-width: 719px) {
+  .cos-cta {
+    aspect-ratio: 390 / 640;
+    min-height: 0;
+    max-height: none;
+  }
+  .cos-cta-field {
+    left: 0;
+    right: 0;
+    transform: none;
+    aspect-ratio: auto;
+  }
+  .cos-cta-field > .cos-clayzo {
+    aspect-ratio: auto;
+    max-width: none;
   }
 }
 

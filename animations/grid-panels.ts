@@ -290,9 +290,10 @@ panel('panel-agents', 640, t(7.6), ['claude', 'plane', 'linkedin'], ({ S, U, P, 
 // ------------------------------------------------------------------------------------------ autopilot
 panel('panel-autopilot', 440, t(7.6), ['linkedin', 'x'], ({ P, say, frag, mark, stepIn, rule, krect, dot, dark, n, W, H }) => {
   const roots: string[] = [];
-  const X = n ? 18 : 32;
-  const Y = n ? 26 : 44;
+  // centred on both: the window sits in the middle of the panel, cut only by the bottom
   const FW = n ? W - 36 : 352;
+  const X = (W - FW) / 2;
+  const Y = n ? 26 : 44;
   const IN = n ? 16 : 18;
   const R = X + FW - IN;
   const ON = 1.1;
@@ -380,9 +381,10 @@ panel('panel-tools', 440, t(7.6), ['slack', 'plane', 'hubspot'], ({ S, P, say, f
 // ------------------------------------------------------------------------------------------ breakout
 panel('panel-breakout', 640, t(7.6), ['linkedin'], ({ P, say, frag, rule, krect, S, n, W, H }) => {
   const roots: string[] = [];
-  const X = n ? 18 : 40;
-  const Y = n ? 26 : 40;
+  // centred on both: the window sits in the middle of the panel, cut only by the bottom
   const FW = n ? W - 36 : 520;
+  const X = (W - FW) / 2;
+  const Y = n ? 26 : 40;
   const IN = n ? 16 : 20;
   const R = X + FW - IN;
   const RUN = [1.0, 2.4] as const;
