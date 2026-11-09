@@ -3,6 +3,7 @@
 import { getFunnelCta, type FunnelState } from "@/lib/funnel-cta";
 import { SiteNav } from "./SiteNav";
 import { Hero } from "./hero/Hero";
+import { ActVoice } from "./sections/ActVoice";
 import { THEME_BOOT, ThemeProvider } from "./theme";
 import "./site.css";
 import "./demo/demo.css";
@@ -27,6 +28,7 @@ export function SiteHome({ funnel }: { funnel: FunnelState }) {
         <SiteNav cta={cta} loggedIn={funnel.loggedIn} />
         <main id="main">
           <Hero cta={cta} />
+          <ActVoice />
         </main>
       </div>
     </ThemeProvider>

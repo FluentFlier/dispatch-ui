@@ -1313,3 +1313,97 @@ html[data-cos-theme='dark'] .cos-hero-demo::before {
     height: 33px;
   }
 }
+
+/* ------------------------------------------------------------ act 1: the voice check */
+
+.cos-act {
+  --act-gap: clamp(40px, 5.4vh, 64px);
+  position: relative;
+  overflow: hidden;
+  padding: clamp(96px, 13.4vh, 152px) var(--cos-gutter) clamp(88px, 12vh, 140px);
+}
+/* the plane mark in the halftone the rejected draft breaks into, top right, its tail tucked a
+   little behind the window. The artwork fills 18-82% of its box, so the box can ride above the
+   section's top edge without the nose being clipped */
+.cos-act-mark {
+  --mark: min(540px, 40vw);
+  position: absolute;
+  z-index: 0;
+  right: 1vw;
+  top: clamp(-72px, -4vw, -20px);
+  width: var(--mark);
+  aspect-ratio: 1;
+  opacity: 0.2;
+  pointer-events: none;
+}
+.cos-act-mark > div {
+  width: 100%;
+  height: 100%;
+}
+html[data-cos-theme='dark'] .cos-act-mark {
+  opacity: 0.17;
+}
+/* on a phone the mark would only peek out from under the nav beside the heading */
+@media (max-width: 719px) {
+  .cos-act-mark {
+    display: none;
+  }
+}
+.cos-act-inner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--cos-max);
+  margin: 0 auto;
+}
+/* the heading sits on the content's left edge, the same edge as the window under it */
+.cos-act-title {
+  max-width: 15em;
+  margin: 0;
+  font-size: clamp(2.5rem, 1.2rem + 3vw, 3.75rem);
+  font-weight: 560;
+  line-height: 1.02;
+  letter-spacing: -0.036em;
+  color: var(--cos-ink);
+  font-feature-settings: 'ss01', 'ss02';
+  text-wrap: balance;
+}
+.cos-act-lede {
+  max-width: 46ch;
+  margin: 24px 0 0;
+  font-size: clamp(17px, 0.95rem + 0.3vw, 19px);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  color: var(--cos-ink-2);
+  text-wrap: pretty;
+}
+.cos-act-scene {
+  margin-top: var(--act-gap);
+  /* the window is drawn edge to edge in the canvas: match its corner (22 of 1200 x 404) so the
+     shadow follows it at any width; the shadow is the hero demo window's */
+  border-radius: 1.833% / 5.446%;
+  box-shadow:
+    0 2px 6px rgba(30, 40, 80, 0.06),
+    0 50px 100px -40px rgba(30, 40, 80, 0.45);
+}
+html[data-cos-theme='dark'] .cos-act-scene {
+  box-shadow: 0 50px 100px -40px rgba(0, 0, 0, 0.7);
+}
+.cos-clayzo {
+  aspect-ratio: var(--scene-ar);
+}
+/* below 1024 px the wide window's type gets too small; scenes switch to their stacked
+   composition (ClayzoScene NARROW), held to a readable column */
+@media (max-width: 1023px) {
+  .cos-clayzo[data-narrow] {
+    aspect-ratio: var(--scene-ar-narrow);
+    max-width: 440px;
+  }
+  .cos-act-scene {
+    border-radius: 5.747% / 3.546%;
+  }
+}
+.cos-act-scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
