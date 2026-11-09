@@ -36,7 +36,7 @@ const LOOP = 12; // seconds; the idle sway and the shimmer of the rays repeat on
 const END = t(LOOP);
 const IMG = { width: 2880, height: 1280 };
 
-type Look = { ground: string; core: string; light: string; bright: number; rays: number };
+type Look = { ground: string; core: string; light: string; bright: number; rays: number; disc: number };
 
 const SKSL = (W: number, H: number, CELL: number, RX: number, RY: number, L: Look) => `
 uniform shader inputImage;
@@ -78,10 +78,13 @@ half3 shade(float2 p, float2 sn, float s) {
   // shafts: march toward the sun, gathering the bright gaps between the clouds and the disc itself
   float acc = 0.0;
   float wsum = 0.0;
-  float2 stepv = d / 18.0;
+  float2 stepv = d / 14.0;
   float2 sp = p;
   float w = 1.0;
-  for (int i = 0; i < 18; i++) {
+  // far from the sun the shafts have faded to nothing: skip the march there
+  int steps = dist < 1100.0 ? 14 : 0;
+  for (int i = 0; i < 14; i++) {
+    if (i >= steps) { break; }
     sp += stepv;
     float b = smoothstep(${L.bright.toFixed(3)}, ${(L.bright + 0.22).toFixed(3)}, luma(img(sp, s)));
     float disc = exp(-dot(sp - sn, sp - sn) / 2600.0);
@@ -92,12 +95,12 @@ half3 shade(float2 p, float2 sn, float s) {
   acc /= wsum;
   // broken into fans that shimmer slowly
   float ang = atan(d.y, d.x);
-  float fan = 0.55 + 0.45 * vnoise(ang * 11.0 + sin(phase) * 1.6) * vnoise(ang * 23.0 - cos(phase) * 1.1 + 7.0);
+  float fan = 0.72 + 0.28 * vnoise(ang * 6.0 + sin(phase) * 1.2) * vnoise(ang * 13.0 - cos(phase) * 0.9 + 7.0);
   float rays = acc * fan * exp(-dist / 620.0) * ${L.rays.toFixed(2)};
 
   // the sun: a hard disc and two glows
-  float disc = 1.0 - smoothstep(21.0, 23.0, dist);
-  float halo = exp(-dist / 34.0) * 0.7 + exp(-dist / 190.0) * 0.45;
+  float disc = 1.0 - smoothstep(${L.disc - 1}.0, ${L.disc + 1}.0, dist);
+  float halo = exp(-dist / ${(L.disc * 1.6).toFixed(1)}) * 0.55 + exp(-dist / 240.0) * 0.4;
 
   half3 add = light.rgb * (rays + rim * 0.55 + halo * 0.6) + core.rgb * disc;
   // screen, so light never clips to a flat white
@@ -114,17 +117,20 @@ half4 main(float2 q) {
   // how much of the painting stands here: whole in the middle, gone at the edges, a slow breath along
   // the boundary, and swelling back near the sun
   float2 e2 = (cc - float2(${(W / 2).toFixed(1)}, ${(H / 2).toFixed(1)})) / float2(${RX.toFixed(1)}, ${RY.toFixed(1)});
-  float e = length(e2) + 0.035 * sin(atan(e2.y, e2.x) * 5.0 + phase) + 0.02 * (hash1(dot(cc, float2(0.13, 0.71))) - 0.5);
-  float pres = 1.0 - smoothstep(0.5, 1.0, e);
-  pres = max(pres, 1.0 - smoothstep(70.0, 300.0, length(cc - sn)));
+  float2 a2 = abs(e2);
+  // a squared-off oval: the band, not a vignette
+  float e = pow(pow(a2.x, 5.0) + pow(a2.y, 3.2), 0.24) + 0.035 * sin(atan(e2.y, e2.x) * 5.0 + phase) + 0.02 * (hash1(dot(cc, float2(0.13, 0.71))) - 0.5);
+  float pres = 1.0 - smoothstep(0.62, 1.0, e);
+  pres = max(pres, 1.0 - smoothstep(34.0, 170.0, length(cc - sn)));
 
   if (pres > 0.985) {
     return half4(shade(u, sn, s), 1.0);
   }
-  // a dot of the lit painting, sized by how much of it stands; it fills its cell as it nears whole
+  // a dot of the lit painting (its colour per pixel, so nothing goes blocky), sized by how much of it
+  // stands; it fills its cell as it nears whole
   float r = CELL * 0.74 * pow(pres, 0.85);
   float cov = 1.0 - smoothstep(r - 0.6, r + 0.6, length(u - cc));
-  half3 col = shade(cc, sn, s);
+  half3 col = shade(u, sn, s);
   return half4(col * cov, cov);
 }
 `;
@@ -139,10 +145,10 @@ function build(dark: boolean, phone: boolean, look: Look) {
   const H = 640;
   const CELL = phone ? 8 : 10;
   // the painting's whole region: an ellipse; on a phone it runs off the sides
-  const RX = phone ? W * 0.8 : W * 0.5;
-  const RY = H * 0.5;
+  const RX = phone ? W * 0.62 : W * 0.53;
+  const RY = H * 0.52;
   // where the sun rests: on the horizon, under the words
-  const REST = { x: W / 2, y: H * 0.86 };
+  const REST = { x: W / 2, y: H * 0.8 };
   const nodes: Record<string, SceneNode> = {};
   const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
 
@@ -153,7 +159,8 @@ function build(dark: boolean, phone: boolean, look: Look) {
     type: 'effect',
     effect: 'custom-sksl',
     inputId: 'sky',
-    implementation: SKSL(W, H, CELL, RX, RY, look),
+    // a phone's frame is a quarter as wide, so its sun is smaller
+    implementation: SKSL(W, H, CELL, RX, RY, phone ? { ...look, disc: Math.round(look.disc * 0.62) } : look),
     capability: { requires: ['runtime-effect'], fallback: 'passthrough', maxTemporarySurfaces: 1 },
     parameters: [
       // driven by the bindings below; this is where it rests for stills and exports
@@ -216,8 +223,8 @@ function build(dark: boolean, phone: boolean, look: Look) {
 }
 
 const LOOKS: Record<'light' | 'dark', Look> = {
-  light: { ground: '#FAF9F6', core: '#FFF6E6', light: '#FFB27A', bright: 0.72, rays: 1.25 },
-  dark: { ground: '#080F14', core: '#EEF6F8', light: '#6CC6EB', bright: 0.36, rays: 1.1 },
+  light: { ground: '#FAF9F6', core: '#FFF6E6', light: '#FFB27A', bright: 0.72, rays: 0.95, disc: 22 },
+  dark: { ground: '#080F14', core: '#EEF6F8', light: '#6CC6EB', bright: 0.36, rays: 0.6, disc: 16 },
 };
 for (const bg of ['', '-india']) {
   const name = `cta-field${bg}`;
