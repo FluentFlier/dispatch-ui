@@ -437,6 +437,19 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
 .cos-hero-copy > * {
   pointer-events: auto;
 }
+/* a soft shade of the page's own light behind the words, so the line under the headline holds
+   over whatever the backdrop puts there (clouds, a fort, lit windows at night) */
+.cos-hero-copy::before {
+  content: '';
+  position: absolute;
+  inset: -14% -22% -16% -34%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(250, 247, 242, 0.66), rgba(250, 247, 242, 0.32) 55%, rgba(250, 247, 242, 0));
+  pointer-events: none;
+}
+html[data-cos-theme='dark'] .cos-hero-copy::before {
+  background: radial-gradient(closest-side, rgba(5, 20, 31, 0.62), rgba(5, 20, 31, 0.3) 55%, rgba(5, 20, 31, 0));
+}
 
 .cos-hero-title {
   display: flex;
@@ -466,6 +479,7 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
   margin: 24px 0 0;
   font-size: clamp(17px, 0.95rem + 0.3vw, 19px);
   line-height: 1.65;
+  font-weight: 450;
   letter-spacing: -0.01em;
   color: var(--cos-ink-sky);
   text-wrap: pretty;

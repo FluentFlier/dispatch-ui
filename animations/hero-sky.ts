@@ -46,6 +46,21 @@ const LOOP = 24 * TPS;
 
 const f = (x: number) => x.toFixed(2);
 
+// The India painting has buildings, hills and water under its sky, and the flow would bend them.
+// Only the sky above the skyline moves: the skyline sits at 47% of the height over the fort, dips to
+// 66% at the far hills and rises to 55% over the palace on the right. Below it nothing warps; the
+// cursor's lean still shifts it as one layer. (Empty for the default sky, whose shader is unchanged.)
+const INDIA_MASK =
+  BG === 'india'
+    ? `
+  float2 nrm = u / float2(${f(W)}, ${f(H)});
+  float land = 0.47 + 0.19 * smoothstep(0.36, 0.5, nrm.x) - 0.11 * smoothstep(0.68, 0.76, nrm.x);
+  float skyOnly = 1.0 - smoothstep(land - 0.07, land - 0.015, nrm.y);
+  cloud *= skyOnly;`
+    : '';
+const INDIA_HOLD = BG === 'india' ? `
+  off *= skyOnly;` : '';
+
 const SKSL = `
 uniform shader inputImage;
 uniform float phase;
@@ -87,14 +102,14 @@ half4 main(float2 p) {
   float lum = dot(base0.rgb, half3(0.299, 0.587, 0.114));
   float sat = max(base0.r, max(base0.g, base0.b)) - min(base0.r, min(base0.g, base0.b));
   float cloud = smoothstep(0.66, 0.9, lum) * (1.0 - smoothstep(0.32, 0.5, sat));
-  cloud = max(cloud, smoothstep(0.55, 0.8, lum) * smoothstep(0.55, 1.0, u.y / ${f(H)}));
+  cloud = max(cloud, smoothstep(0.55, 0.8, lum) * smoothstep(0.55, 1.0, u.y / ${f(H)}));${INDIA_MASK}
 
   // looping flow: walk a circle through the noise field
   float2 loop = float2(cos(phase), sin(phase)) * 1.6;
   float2 q = u * 0.0042;
   float2 flow = float2(fbm(q + loop), fbm(q + loop + float2(5.2, 1.3))) - 0.5;
   float2 off = flow * (6.0 + cloud * 26.0);
-  off.x += sin(phase + u.y * 0.004) * 5.0 * cloud;
+  off.x += sin(phase + u.y * 0.004) * 5.0 * cloud;${INDIA_HOLD}
 
   // depth parallax under the cursor
   float presence = clamp(focusRadius / 600.0, 0.0, 1.0);
