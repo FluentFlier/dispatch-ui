@@ -1466,6 +1466,30 @@ html[data-cos-theme='dark'] .cos-act-scene {
     pointer-events: none;
   }
 }
+/* Act 3 is a split on desktop: the words in the left column, the outreach timeline beside them
+   (drawn on the page, no window), so the third section changes shape again */
+.cos-act-thread {
+  margin-top: var(--act-gap);
+}
+.cos-act-thread canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@media (min-width: 1024px) {
+  .cos-act-split .cos-act-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 600px);
+    column-gap: clamp(48px, 6vw, 104px);
+    align-items: start;
+  }
+  .cos-act-split .cos-act-head {
+    padding-top: 8px;
+  }
+  .cos-act-thread {
+    margin-top: 0;
+  }
+}
 /* the lead sort's window: 22 of 1200 x 440 */
 .cos-act-scene-leads {
   border-radius: 1.833% / 5%;

@@ -5,6 +5,7 @@ import { SiteNav } from "./SiteNav";
 import { Hero } from "./hero/Hero";
 import { ActVoice } from "./sections/ActVoice";
 import { ActLeads } from "./sections/ActLeads";
+import { ActOutreach } from "./sections/ActOutreach";
 import { THEME_BOOT, ThemeProvider } from "./theme";
 import { HERO_BOOT } from "./heroReady";
 import "./site.css";
@@ -32,6 +33,7 @@ export function SiteHome({ funnel }: { funnel: FunnelState }) {
           <Hero cta={cta} loggedIn={funnel.loggedIn} />
           <ActVoice />
           <ActLeads />
+          <ActOutreach />
         </main>
       </div>
     </ThemeProvider>
