@@ -201,6 +201,7 @@ composition for phones.
 | Hero | `hero/Hero.tsx`, `hero/SkyField.tsx` | backdrop: sky, india | | | ready |
 | ProductDemo | `demo/ProductDemo.tsx`, `demo/StepSwitch.tsx` | | | screenshots of the app | ready |
 | Sections | `sections/ActVoice.tsx`, `ActLeads.tsx`, `ActOutreach.tsx`, `ActMore.tsx`, `CtaBand.tsx` | | | | ready |
+| FAQ | `sections/ActFaq.tsx`, `.cos-faq-*` | | per row: closed / open (several at once), hover, active, focus-visible, reduced motion; closed answers hidden from the tab order | a `<details>` list or a second accordion | experimental |
 | SiteFooter | `SiteFooter.tsx` | | | | ready |
 
 Rules:
@@ -251,5 +252,6 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
+- 2026-11-09 · FAQ section (`ActFaq`, experimental) before the closing band; answers from the product handover only.
 - 2026-11-09 · Seam onboarding: DESIGN.md rewritten for the new landing page (Mona Sans, painted sky, deep-ocean
   dark, Clayzo scenes); the earlier "Content Relay" direction is retired.

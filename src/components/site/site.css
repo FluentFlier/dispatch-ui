@@ -1070,6 +1070,99 @@ html[data-hero-wait] .cos-rise {
   background: #0e0e12;
 }
 
+/* ------------------------------------------------------------------- faq */
+/* sections/ActFaq.tsx: the heading holds the left column, the questions open in place on the right
+   (the phone menu's open-in-place rows). Tokens only, so dark needs no rules of its own */
+.cos-faq-inner {
+  display: grid;
+  gap: clamp(32px, 5vw, 56px);
+}
+@media (min-width: 1024px) {
+  .cos-faq-inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+  }
+}
+.cos-faq-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--cos-line);
+}
+.cos-faq-row {
+  border-top: 1px solid var(--cos-line);
+}
+.cos-faq-q {
+  margin: 0;
+  font: inherit;
+}
+.cos-faq-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  min-height: 72px;
+  padding: 18px 0;
+  font-size: clamp(18px, 1rem + 0.35vw, 21px);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-align: left;
+  color: var(--cos-ink);
+}
+.cos-faq-icon {
+  flex: none;
+  color: var(--cos-ink-2);
+  transition:
+    transform 260ms var(--cos-ease-out),
+    color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cos-faq-btn:hover .cos-faq-icon {
+    color: var(--cos-ink);
+  }
+}
+.cos-faq-btn:active .cos-faq-icon {
+  transform: scale(0.9);
+}
+/* open: the plus turns into a close mark */
+.cos-faq-row[data-open] .cos-faq-icon {
+  transform: rotate(45deg);
+  color: var(--cos-ink);
+}
+.cos-faq-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms var(--cos-ease-out);
+}
+.cos-faq-row[data-open] .cos-faq-body {
+  grid-template-rows: 1fr;
+}
+.cos-faq-inner-a {
+  min-height: 0;
+  overflow: hidden;
+}
+.cos-faq-row:not([data-open]) .cos-faq-inner-a {
+  visibility: hidden;
+  transition: visibility 0s linear 280ms;
+}
+.cos-faq-a {
+  max-width: 56ch;
+  margin: 0;
+  padding: 0 44px 26px 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--cos-ink-2);
+  text-wrap: pretty;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-faq-icon,
+  .cos-faq-body {
+    transition: none;
+  }
+}
+
 /* ------------------------------------------------------------- dark theme */
 
 html[data-cos-theme='dark'] body:has(.cos) {
