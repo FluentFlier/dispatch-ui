@@ -263,6 +263,7 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
+- 2026-11-10 · Hero demo: the Reply step is Autopilot answering several comments in your voice (written, not typed; the pricing question waits for you), and the Leads step updates itself and syncs to HubSpot. No cursor in either.
 - 2026-11-10 · The mark is recoloured to Ocean + coral (cyan to blue over apricot to coral); its colours now live in `animations/lib/mark.ts`, applied everywhere by `animations/apply-mark.ts`.
 - 2026-11-10 · `/pricing` rebuilt in the landing system: the word Pricing, then the $1,000 per account price with an account counter and what every account includes, from the live hosted page; no animation.
 - 2026-11-10 · India is the only backdrop: the `?bg` switch and the painted-sky assets are removed; the Grok Bot page's two panels get paintings of their own (Ladakh, Hampi).

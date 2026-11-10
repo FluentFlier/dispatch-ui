@@ -12,6 +12,7 @@ import {
   Plus,
   Repeat2,
   Search,
+  Sparkles,
   Target,
   Users,
   type LucideIcon,
@@ -22,8 +23,10 @@ import { StepSwitch } from './StepSwitch';
 
 /**
  * The product, working: a brief becomes a post in your voice, the post gets
- * scheduled, a reply comes in and is approved, the commenter becomes a warm
- * lead. A cursor drives it; the step tabs jump to any stage.
+ * scheduled, Autopilot answers the comments in your voice (and leaves the
+ * unclear one for you), and the leads board keeps itself up to date and in
+ * sync with HubSpot. A cursor drives the first two steps; the last two run on
+ * their own, which is the point. The step tabs jump to any stage.
  * Sample workspace: people and companies are fictional.
  */
 
@@ -38,7 +41,48 @@ const POST = [
   'They went live in nine days.',
 ];
 const POST_WORDS = POST.join(' \n ').split(' ');
-const REPLY = 'It did. The deck was for us, not them. Happy to share the call outline if it helps.';
+
+// Autopilot answers new comments in your voice; anything unclear waits for you
+type Commenter = { id: string; name: string; org: string; photo?: string; ago: string; comment: string };
+const REPLIES: (Commenter & { reply: string })[] = [
+  {
+    id: 'priya',
+    name: 'Priya Shah',
+    org: 'Lumen Health',
+    photo: '/people/priya.webp',
+    ago: '4m',
+    comment: 'Did the 20 minute call replace your kickoff deck entirely?',
+    reply: 'It did. The deck was for us, not them. Happy to send the call outline.',
+  },
+  {
+    id: 'diego',
+    name: 'Diego Alvarez',
+    org: 'Fieldwork',
+    photo: '/people/diego.webp',
+    ago: '9m',
+    comment: 'Nine days is fast. What did they bring to the call?',
+    reply: 'Their messiest spreadsheet. We built the first workflow from it, live.',
+  },
+  {
+    id: 'hana',
+    name: 'Hana Ito',
+    org: 'Kettle',
+    ago: '12m',
+    comment: 'Saving this for our next onboarding review.',
+    reply: 'Glad it helps, Hana. Tell me what your team changes.',
+  },
+];
+const HELD: Commenter & { why: string } = {
+  id: 'sam',
+  name: 'Sam Okafor',
+  org: 'Brightline',
+  ago: '15m',
+  comment: 'What would this cost for a team of 40?',
+  why: 'Pricing question',
+};
+const replyWords = (r: string) => r.split(' ');
+// each reply runs drafting (3i+1), drafted (3i+2), answered (3i+3); then the held one shows
+const HELD_PHASE = REPLIES.length * 3 + 1;
 
 // One clock for everything: fixed speeds, so each step's progress bar matches the step exactly.
 // Paced to be read, not skimmed.
@@ -48,15 +92,19 @@ const T = {
   click: 160,
   type: 46, // per prompt character
   word: 68, // per post word
-  reply: 30, // per two reply characters
   settle: 650, // a beat after a screen arrives, before anything happens on it
+  shimmer: 720, // a reply being written, before it appears
+  gen: 26, // between a generated reply's words appearing
+  read: 520, // after a reply is in, before it is answered
+  answered: 420,
+  event: 1900, // between the leads board's updates
 };
-const HOLD = { drafted: 1100, scheduled: 3200, sent: 3000, moved: 3400 };
+const HOLD = { drafted: 1100, scheduled: 3200, replies: 2800, leads: 2600 };
 const STEP_MS = [
   T.swap + T.point + PROMPT.length * T.type + T.point + T.click + 520 + POST_WORDS.filter((w) => w !== '\n').length * T.word + HOLD.drafted + T.point + T.click,
   T.swap + T.settle + T.point + HOLD.scheduled,
-  T.swap + T.settle + Math.ceil(REPLY.length / 2) * T.reply + T.point + T.click + HOLD.sent,
-  T.swap + T.settle + T.point + T.click + T.point + HOLD.moved,
+  T.swap + T.settle + REPLIES.reduce((a, r) => a + T.shimmer + replyWords(r.reply).length * T.gen + T.read + T.answered, 0) + HOLD.replies,
+  T.swap + T.settle + 3 * T.event + HOLD.leads,
 ];
 const STEPS = ['Write', 'Publish', 'Reply', 'Leads'].map((label, i) => ({ label, ms: STEP_MS[i] }));
 
@@ -84,9 +132,8 @@ export function ProductDemo({ wideFrom = 720 }: { wideFrom?: number } = {}) {
   const [typed, setTyped] = useState('');
   const [words, setWords] = useState(0);
   const [scheduled, setScheduled] = useState(false);
-  const [replyChars, setReplyChars] = useState(0);
-  const [approved, setApproved] = useState(false);
-  const [leadMoved, setLeadMoved] = useState(false);
+  const [replyPhase, setReplyPhase] = useState(0);
+  const [leadStage, setLeadStage] = useState(0);
   const [cursor, setCursor] = useState({ x: 560, y: 520, on: false, down: false, instant: false });
   const firstRun = useRef(true);
   const sideRef = useRef<HTMLElement>(null);
@@ -146,9 +193,8 @@ export function ProductDemo({ wideFrom = 720 }: { wideFrom?: number } = {}) {
     setTyped(PROMPT);
     setWords(POST_WORDS.length);
     setScheduled(s >= 1);
-    setReplyChars(s >= 2 ? REPLY.length : 0);
-    setApproved(s >= 2);
-    setLeadMoved(s >= 3);
+    setReplyPhase(s >= 2 ? HELD_PHASE : 0);
+    setLeadStage(s >= 3 ? 3 : 0);
     setCursor((c) => ({ ...c, on: false }));
   }, []);
 
@@ -199,9 +245,8 @@ export function ProductDemo({ wideFrom = 720 }: { wideFrom?: number } = {}) {
             setScene('home');
             await wait(T.swap);
             setScheduled(false);
-            setReplyChars(0);
-            setApproved(false);
-            setLeadMoved(false);
+            setReplyPhase(0);
+            setLeadStage(0);
             if (firstRun.current) {
               // first play: the cursor fades in already resting on the prompt box, no glide from below
               firstRun.current = false;
@@ -241,35 +286,36 @@ export function ProductDemo({ wideFrom = 720 }: { wideFrom?: number } = {}) {
             await wait(HOLD.scheduled);
             s = 2;
           } else if (s === 2) {
+            // Autopilot: no cursor, nobody types; each reply is written in your voice and answered
             begin(2);
-            setReplyChars(0);
-            setApproved(false);
+            setReplyPhase(0);
             setScene('reply');
+            setCursor((c) => ({ ...c, on: false }));
             await wait(T.swap + T.settle);
-            for (let i = 1; i <= REPLY.length; i += 2) {
-              setReplyChars(i + 1);
-              await wait(T.reply);
+            for (let i = 0; i < REPLIES.length; i += 1) {
+              setReplyPhase(3 * i + 1);
+              await wait(T.shimmer);
+              setReplyPhase(3 * i + 2);
+              await wait(replyWords(REPLIES[i].reply).length * T.gen + T.read);
+              setReplyPhase(3 * i + 3);
+              await wait(T.answered);
             }
-            await point('approve');
-            await click();
-            setApproved(true);
-            await wait(HOLD.sent);
+            setReplyPhase(HELD_PHASE);
+            await wait(HOLD.replies);
             s = 3;
           } else {
+            // the board updates itself: Priya warms up, a new lead arrives, Sam books a call;
+            // each change syncs to HubSpot
             begin(3);
-            setLeadMoved(false);
+            setLeadStage(0);
             setScene('leads');
+            setCursor((c) => ({ ...c, on: false }));
             await wait(T.swap + T.settle);
-            // pick Priya up and carry her card into Warm
-            await point('lead-priya');
-            const drop = measure('lead-drop');
-            setCursor((c) => ({ ...c, down: true }));
-            await wait(T.click);
-            setLeadMoved(true);
-            if (drop) setCursor((c) => ({ ...c, ...drop }));
-            await wait(T.point);
-            setCursor((c) => ({ ...c, down: false }));
-            await wait(HOLD.moved);
+            for (let st = 1; st <= 3; st += 1) {
+              setLeadStage(st);
+              await wait(T.event);
+            }
+            await wait(HOLD.leads);
             s = 0;
           }
         }
@@ -312,8 +358,8 @@ export function ProductDemo({ wideFrom = 720 }: { wideFrom?: number } = {}) {
     if (sc === 'home') return <HomeScene typed={typed} />;
     if (sc === 'draft') return <DraftScene words={words} />;
     if (sc === 'calendar') return <CalendarScene scheduled={scheduled} />;
-    if (sc === 'reply') return <ReplyScene chars={replyChars} approved={approved} />;
-    return <LeadsScene moved={leadMoved} />;
+    if (sc === 'reply') return <ReplyScene phase={replyPhase} />;
+    return <LeadsScene stage={leadStage} />;
   };
 
   const designW = narrow ? DESIGN_W_NARROW : DESIGN_W;
@@ -355,7 +401,7 @@ export function ProductDemo({ wideFrom = 720 }: { wideFrom?: number } = {}) {
               <nav className="dm-nav">
                 <NavItem icon={House} label="Home" on={nav === 'home'} />
                 <NavItem icon={CalendarDays} label="Calendar" on={nav === 'calendar'} />
-                <NavItem icon={Repeat2} label="Autopilot" on={nav === 'autopilot'} badge={scene === 'reply' && !approved ? '1' : undefined} />
+                <NavItem icon={Repeat2} label="Autopilot" on={nav === 'autopilot'} badge={scene === 'reply' && replyPhase >= HELD_PHASE ? '1' : undefined} />
                 <NavItem icon={BarChart3} label="Analytics" />
                 <NavItem icon={FileText} label="All posts" />
               </nav>
@@ -604,105 +650,167 @@ function Row({ time, r, scheduled }: { time: string; r: number; scheduled: boole
   );
 }
 
-function ReplyScene({ chars, approved }: { chars: number; approved: boolean }) {
+function Who({ c }: { c: Commenter }) {
+  return c.photo ? (
+    <img className="dm-avatar dm-avatar-sm" src={c.photo} alt="" />
+  ) : (
+    <span className="dm-avatar dm-avatar-sm dm-avatar-initials">
+      {c.name
+        .split(' ')
+        .map((w) => w[0])
+        .join('')}
+    </span>
+  );
+}
+
+/**
+ * Autopilot on the Northwind post, as one quiet thread: each new comment gets a reply in Maya's
+ * voice under it (a grey line of light while it is written, then the words fade in together, not
+ * typed), and is marked replied. The pricing question is not guessed at: it waits for her.
+ */
+function ReplyScene({ phase }: { phase: number }) {
+  const held = phase >= HELD_PHASE;
   return (
     <div className="dm-replies">
       <header className="dm-cal-head">
-        <p className="dm-title">Reply queue</p>
+        <p className="dm-title">Replies</p>
+        <span className="dm-sub">On: We almost lost Northwind in week two.</span>
         <span className="dm-push" />
-        <span className="dm-seg">
-          <span data-on="true">Needs you {approved ? '0' : '1'}</span>
-          <span>Sent</span>
+        <span className="dm-auto">
+          Autopilot
+          <span className="dm-mini-switch" aria-hidden="true" />
         </span>
       </header>
-      <p className="dm-context">On your post: We almost lost Northwind in week two.</p>
-      <article className="dm-comment" data-done={approved}>
-        <header className="dm-post-head">
-          <img className="dm-avatar" src="/people/priya.webp" alt="" />
-          <div>
-            <p className="dm-name">Priya Shah</p>
-            <p className="dm-sub">Head of Operations, Lumen Health</p>
+      <div className="dm-thread">
+        {REPLIES.map((r, i) => {
+          const drafting = phase >= 3 * i + 1;
+          const drafted = phase >= 3 * i + 2;
+          const answered = phase >= 3 * i + 3;
+          return (
+            <article key={r.id} className="dm-rp">
+              <Who c={r} />
+              <div className="dm-rp-body">
+                <p className="dm-rp-head">
+                  <span className="dm-name">{r.name}</span>
+                  <span className="dm-sub">
+                    {r.org} · {r.ago}
+                  </span>
+                  <span className="dm-rp-status" data-on={answered}>
+                    <Check size={12} strokeWidth={2.4} />
+                    Replied
+                  </span>
+                </p>
+                <p className="dm-rp-comment">{r.comment}</p>
+                <div className="dm-rp-reply" data-on={drafting}>
+                  <div>
+                    <div className="dm-rp-line">
+                      <img className="dm-rp-me" src="/people/maya.webp" alt="" />
+                      {drafted ? (
+                        <p className="dm-rp-text">
+                          {replyWords(r.reply).map((w, k) => (
+                            <span key={k} className="dm-gen" style={{ animationDelay: `${k * T.gen}ms` }}>
+                              {w}{' '}
+                            </span>
+                          ))}
+                        </p>
+                      ) : (
+                        <span className="dm-shim" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+        <article className="dm-rp dm-rp-held" data-on={held}>
+          <Who c={HELD} />
+          <div className="dm-rp-body">
+            <p className="dm-rp-head">
+              <span className="dm-name">{HELD.name}</span>
+              <span className="dm-sub">
+                {HELD.org} · {HELD.ago}
+              </span>
+              <span className="dm-rp-status dm-rp-wait" data-on={held}>
+                Needs you
+              </span>
+            </p>
+            <p className="dm-rp-comment">{HELD.comment}</p>
           </div>
-          <span className="dm-sub dm-push">2m</span>
-        </header>
-        <p className="dm-comment-text">
-          We hit the same wall rolling out to our clinics. Did the 20 minute call replace your kickoff deck entirely?
-        </p>
-        <div className="dm-draft">
-          <p className="dm-draft-label">Your reply</p>
-          <p className="dm-draft-text">
-            {REPLY.slice(0, chars)}
-            {chars > 0 && chars < REPLY.length && <i className="dm-caret" />}
-          </p>
-        </div>
-        <footer className="dm-comment-foot">
-          <span className="dm-sub">Nothing posts until you approve it.</span>
-          <span className="dm-push" />
-          <span className="dm-btn dm-btn-ghost">Edit</span>
-          <span className="dm-btn dm-btn-light" data-demo="approve" data-done={approved}>
-            {approved ? (
-              <>
-                <Check size={13} strokeWidth={2.6} /> Sent
-              </>
-            ) : (
-              'Approve and send'
-            )}
-          </span>
-        </footer>
-      </article>
+        </article>
+      </div>
     </div>
   );
 }
 
 const COLS = ['Engaged', 'Warm', 'Meeting booked'];
-type LeadCard = { id: string; name: string; org: string; photo?: string };
-const BOARD: LeadCard[][] = [
-  [
-    { id: 'diego', name: 'Diego Alvarez', org: 'Fieldwork', photo: '/people/diego.webp' },
-    { id: 'hana', name: 'Hana Ito', org: 'Kettle' },
-  ],
-  [{ id: 'sam', name: 'Sam Okafor', org: 'Brightline' }],
-  [{ id: 'lena', name: 'Lena Park', org: 'Harbor AI', photo: '/people/lena.webp' }],
+type LeadCard = { id: string; name: string; org: string; photo?: string; signal?: string; next?: string };
+const PEOPLE: Record<string, LeadCard> = {
+  priya: { id: 'priya', name: 'Priya Shah', org: 'Lumen Health', photo: '/people/priya.webp', signal: 'Replied and asked for the call outline', next: 'Next: send the outline' },
+  diego: { id: 'diego', name: 'Diego Alvarez', org: 'Fieldwork', photo: '/people/diego.webp' },
+  hana: { id: 'hana', name: 'Hana Ito', org: 'Kettle' },
+  arjun: { id: 'arjun', name: 'Arjun Mehta', org: 'Northbeam', signal: 'Commented on your Northwind post', next: 'Next: reply to his comment' },
+  sam: { id: 'sam', name: 'Sam Okafor', org: 'Brightline', signal: 'Booked a call for Thu, 2:00 PM', next: 'Call brief ready' },
+  lena: { id: 'lena', name: 'Lena Park', org: 'Harbor AI', photo: '/people/lena.webp' },
+};
+// the board after each update; who changed, and what the sync note says. When Priya leaves
+// Engaged her place stays open (SLOT), and Arjun arrives in it, so the cards under it never close
+// up and then open again
+const SLOT = 'slot';
+const STAGES: string[][][] = [
+  [['priya', 'diego', 'hana'], ['sam'], ['lena']],
+  [[SLOT, 'diego', 'hana'], ['priya', 'sam'], ['lena']],
+  [['arjun', 'diego', 'hana'], ['priya', 'sam'], ['lena']],
+  [['arjun', 'diego', 'hana'], ['priya'], ['sam', 'lena']],
 ];
+const CHANGED = [null, 'priya', 'arjun', 'sam'];
+const MOVES = new Set(['priya', 'sam']);
+const SYNC = ['', 'Priya Shah moved to Warm', 'New lead: Arjun Mehta', 'Sam Okafor booked a call'];
 const MOVE_EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
 /**
- * Priya warms up: her card sits in Engaged with everyone else, then lifts and
- * glides to the top of Warm while both columns close up and make room (FLIP:
- * measure, re-render in the new column, animate from the old spot).
+ * The board keeps itself current: Priya replies and warms up, a new commenter arrives as a lead,
+ * Sam books a call. Each change lands on the board (FLIP: measure, re-render in the new column,
+ * animate from the old spot), the card that changed takes the accent, its new note opens in
+ * place, and a note says it synced to HubSpot.
  */
-function LeadsScene({ moved }: { moved: boolean }) {
+function LeadsScene({ stage }: { stage: number }) {
   const boardRef = useRef<HTMLDivElement>(null);
   const rects = useRef(new Map<string, { left: number; top: number }>());
+  const hot = CHANGED[stage];
+
+  // a note opening in a card pushes the cards under it down after the render that placed them;
+  // remember where they settled, or the next update would slide them from their old spot
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+    const remember = () =>
+      board.querySelectorAll<HTMLElement>('[data-flip]').forEach((el) => rects.current.set(el.dataset.flip as string, { left: el.offsetLeft, top: el.offsetTop }));
+    board.addEventListener('animationend', remember);
+    return () => board.removeEventListener('animationend', remember);
+  }, []);
 
   useLayoutEffect(() => {
     const board = boardRef.current;
     if (!board) return;
-    // the whole demo is scaled to fit, so convert screen pixels back to layout pixels
-    const scale = board.getBoundingClientRect().width / board.offsetWidth || 1;
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // positions relative to the board, in layout pixels: the screen sliding in, or the demo
-    // being scaled, moves the board and every card together, so it never reads as a move
-    const b = board.getBoundingClientRect();
+    // layout positions in the board (the board is the cards' offset parent): unscaled, unmoved by
+    // the screen sliding in, and blind to a card's own transform while it is still gliding
     board.querySelectorAll<HTMLElement>('[data-flip]').forEach((el) => {
       const key = el.dataset.flip as string;
       const prev = rects.current.get(key);
-      const r = el.getBoundingClientRect();
-      const now = { left: (r.left - b.left) / scale, top: (r.top - b.top) / scale };
+      const now = { left: el.offsetLeft, top: el.offsetTop };
       rects.current.set(key, now);
       if (still || !prev || (Math.abs(prev.left - now.left) < 1 && Math.abs(prev.top - now.top) < 1)) return;
       const dx = prev.left - now.left;
       const dy = prev.top - now.top;
-      if (key === 'priya') {
+      if (key === hot && MOVES.has(key)) {
+        // the one that changed lifts, glides across and settles
         el.animate(
           [
-            { transform: `translate(${dx}px, ${dy}px)`, boxShadow: '0 0 0 1.5px rgba(47, 91, 234, 0.55), 0 8px 20px -12px rgba(30, 40, 80, 0.3)' },
-            {
-              transform: `translate(${dx * 0.5}px, ${dy * 0.5 - 8}px) scale(1.03)`,
-              boxShadow: '0 0 0 1.5px rgba(47, 91, 234, 0.7), 0 26px 44px -16px rgba(30, 40, 80, 0.45)',
-              offset: 0.5,
-            },
-            { transform: 'none', boxShadow: '0 0 0 1.5px rgba(47, 91, 234, 0.55), 0 8px 20px -12px rgba(30, 40, 80, 0.3)' },
+            { transform: `translate(${dx}px, ${dy}px)` },
+            { transform: `translate(${dx * 0.5}px, ${dy * 0.5 - 8}px) scale(1.03)`, offset: 0.5 },
+            { transform: 'none' },
           ],
           { duration: 950, easing: MOVE_EASE },
         );
@@ -713,61 +821,80 @@ function LeadsScene({ moved }: { moved: boolean }) {
     });
   });
 
-  const priyaCol = moved ? 1 : 0;
+  const updated = (id: string) => CHANGED.slice(1, stage + 1).includes(id);
   return (
     <div className="dm-leads">
       <header className="dm-cal-head">
         <p className="dm-title">Leads</p>
         <span className="dm-sub">From people who engaged with your posts</span>
+        <span className="dm-push" />
+        <span className="dm-synced" key={stage} data-pulse={stage > 0}>
+          <img src="/brand/logos/hubspot.png" alt="" width={14} height={14} />
+          Synced with HubSpot
+        </span>
       </header>
       <div className="dm-board" ref={boardRef}>
         {COLS.map((c, i) => (
           <section key={c} className="dm-col">
             <p className="dm-col-head">
               {c}
-              <span>{BOARD[i].length + (i === priyaCol ? 1 : 0)}</span>
+              <span>{STAGES[stage][i].filter((id) => id !== SLOT).length}</span>
             </p>
             <div className="dm-col-cards">
-              {i === priyaCol && (
-                <div className="dm-lead dm-lead-hot" data-flip="priya" data-moved={moved} data-demo="lead-priya">
-                  <div className="dm-post-head">
-                    <img className="dm-avatar dm-avatar-sm" src="/people/priya.webp" alt="" />
-                    <div>
-                      <p className="dm-name">Priya Shah</p>
-                      <p className="dm-sub">Lumen Health</p>
+              {STAGES[stage][i].map((id) => {
+                if (id === SLOT)
+                  return (
+                    // an empty place the size of a card, holding the column open
+                    <div key={id} className="dm-lead dm-lead-slot" aria-hidden="true">
+                      <div className="dm-post-head">
+                        <span className="dm-avatar dm-avatar-sm" />
+                        <div>
+                          <p className="dm-name">&nbsp;</p>
+                          <p className="dm-sub">&nbsp;</p>
+                        </div>
+                      </div>
                     </div>
+                  );
+                const o = PEOPLE[id];
+                const isNew = id === 'arjun' && stage === 2;
+                return (
+                  <div
+                    key={id}
+                    className="dm-lead"
+                    data-flip={id}
+                    data-hot={id === hot}
+                    data-new={isNew || undefined}
+                  >
+                    <div className="dm-post-head">
+                      <Who c={{ ...o, ago: '', comment: '' }} />
+                      <div>
+                        <p className="dm-name">{o.name}</p>
+                        <p className="dm-sub">{o.org}</p>
+                      </div>
+                    </div>
+                    {o.signal && updated(id) && (
+                      // a mover's note opens once it has landed; a new lead's once it has arrived
+                      <div className="dm-lead-more" data-open={id === hot ? (MOVES.has(id) ? 'landed' : 'arrived') : undefined}>
+                        <div>
+                          <p className="dm-signal">{o.signal}</p>
+                          {o.next && <p className="dm-next">{o.next}</p>}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <p className="dm-signal">Replied to your post and asked for the call outline</p>
-                  <p className="dm-next">Next: send the outline</p>
-                </div>
-              )}
-              {BOARD[i].map((o, k) => (
-                <div
-                  key={o.id}
-                  className="dm-lead dm-post-head"
-                  data-flip={o.id}
-                  data-demo={i === 1 && k === 0 && !moved ? 'lead-drop' : undefined}
-                >
-                  {o.photo ? (
-                    <img className="dm-avatar dm-avatar-sm" src={o.photo} alt="" />
-                  ) : (
-                    <span className="dm-avatar dm-avatar-sm dm-avatar-initials">
-                      {o.name
-                        .split(' ')
-                        .map((w) => w[0])
-                        .join('')}
-                    </span>
-                  )}
-                  <div>
-                    <p className="dm-name">{o.name}</p>
-                    <p className="dm-sub">{o.org}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         ))}
       </div>
+      {stage > 0 && (
+        <div className="dm-sync-note" key={stage}>
+          <img src="/brand/logos/hubspot.png" alt="" width={14} height={14} />
+          {SYNC[stage]}
+          <span className="dm-sync-dim">· Synced to HubSpot</span>
+        </div>
+      )}
     </div>
   );
 }
