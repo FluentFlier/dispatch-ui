@@ -263,6 +263,7 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
+- 2026-11-10 · Share card, into the sun (`animations/og-card.ts`, 5.6 s): the CTA band's riverside at sunset opens in its own halftone, the camera easing in; the plane sweeps in huge from the foreground and races away into the painting, painting its wake; it hits the sun, which flares into shafts, and a ring of paint blooms across the scene into the band's shape; the plane loops up and lands as the lockup's mark, centred in the frame, and Grow beyond word of mouth rises. `public/og.mp4` (og:video) and `public/og.jpg` (og:image, its last frame).
 - 2026-11-10 · Share card (`animations/og-card.ts`): the ContentOS plane skywrites the name in paper planes across the hero's oil-painted sky, settling on ink Content and coral OS over Grow beyond word of mouth. `public/og.mp4` (og:video) and `public/og.jpg` (og:image, its last frame) replace the old og.png.
 - 2026-11-10 · Hero demo: the Reply step is Autopilot answering several comments in your voice (written, not typed; the pricing question waits for you), and the Leads step updates itself and syncs to HubSpot. No cursor in either.
 - 2026-11-10 · The mark is recoloured to Ocean + coral (cyan to blue over apricot to coral); its colours now live in `animations/lib/mark.ts`, applied everywhere by `animations/apply-mark.ts`.

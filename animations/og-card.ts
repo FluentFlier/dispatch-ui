@@ -1,249 +1,265 @@
 /**
- * The share card: the OG video (public/og.mp4) and the OG image (public/og.png, one frame of it).
+ * The share card: the OG video (public/og.mp4) and the OG image (public/og.jpg, its last frame).
  *
  * Art direction
- *   mode      one object: the name, written across the site's own painted sky
- *   verb      skywrite: the ContentOS plane flies across the sky and the name forms in its wake, each
- *             letter made of the brand's paper planes, every one spinning into place as the plane
- *             passes, lit in the mark's colours and cooling to ink behind it; the plane climbs away,
- *             the promise rises under the name, and a second light crosses it
- *   geometry  the mark: the hero plane, and the same plane as the unit of every letter (the footer's
- *             wordmark system, animations/plane-wordmark.ts)
- *   palette   the hero's own sky, footage of its scene (the oil-painted Udaipur lake palace by day,
- *             clouds billowing); ink planes; lit, the mark's folds (blue through Content as the
- *             light passes); it settles on ink Content and coral OS
- *   scale     1200 x 630; the name spans 86 % of the width in the sky's calm band
- *   words     ContentOS, and the hero's headline under it
+ *   mode      the closing band's world (CtaBand, animations/cta-field.ts): the riverside of stone steps
+ *             at sunset, painted, and broken into the page's halftone
+ *   verb      into the sun: the card opens on the painting held in dots of its own colours, the camera
+ *             easing in; the ContentOS plane sweeps in huge from the foreground and races away into
+ *             the painting toward the sun, painting the river back to life in its wake; it hits the
+ *             sun, the sun flares and its shafts fan out, and a ring of paint blooms from it across
+ *             the whole scene, its front catching the light; the plane climbs out of the sun, loops up
+ *             above it and lands as the lockup's mark; the name and the promise rise
+ *   geometry  one square dot grid; the mark; the name in Geist; the promise in Mona Sans
+ *   palette   the painting's own (the closing band's India dusk); the sun's warm light; ink type
+ *   scale     1200 x 630; the lockup and the promise centred in the frame, in the sky above the sun
+ *   words     the lockup (the mark and ContentOS), and the hero's promise under it
+ *   time      5.6 s: the sun at 1.55 s, the bloom by 3 s, the landing at 2.95 s, the words by 3.9 s
  *
- *   clayzo export animations/out/hero-india.json animations/out/og/sky.mp4 --format mp4 --end 2064
- *     (the hero's painted sky, oil-paint pass and all, as footage; then clayzo import-video on it)
- *   pnpm tsx animations/og-card.ts      (writes animations/out/og/og.json)
- *   clayzo export animations/out/og/og.json public/og.mp4 --format mp4
- *   clayzo render-frame animations/out/og/og.json public/og.png --tick <OG_TICK> --full-resolution
+ *   pnpm tsx animations/og-card.ts      (writes animations/out/og/og.json, beside cta-day.jpg and plane.png)
+ *   clayzo export animations/out/og/og.json <master>.mp4 --format mp4, then x264 it to public/og.mp4
+ *   clayzo render-frame animations/out/og/og.json <frame>.png --tick <last> --full-resolution
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import {
   ANIMATION_DOCUMENT_VERSION,
   assertValidAnimationDocument,
   base,
   constant,
-  fill,
   keyed,
   validateAnimationDocument,
-  video,
-  videoAsset,
   withComputedRevision,
   type Color,
   type SceneNode,
 } from '@clayzo/animation/authoring';
 import { FPS, TPS, t } from './lib/kit';
-import { MARK } from './lib/mark';
 
 const W = 1200;
 const H = 630;
-const DUR = 8.6;
+const DUR = 5.6;
 const END = t(DUR);
+const CELL = 9;
+const HZ = H * 0.658; // the painting's horizon (the closing band's India value)
+const SUN = { x: W / 2, y: HZ + 2 };
 
-// the name, on the footer wordmark's measure (Geist 760, "ContentOS" 5.393 em of ink)
-const EM_W = 5.393;
-const INK_TOP = 0.273;
-const INK_H = 0.74;
-const INK_LEFT = 0.04;
-const SIZE = (W * 0.86) / EM_W;
-const NAME_TOP = 112;
-const MIDY = NAME_TOP + (SIZE * INK_H) / 2;
-const NAME_X0 = (W - SIZE * EM_W) / 2;
-const NAME_X1 = NAME_X0 + SIZE * EM_W;
-const CELL = 10;
-// "Content" alone is 3.95 em on this measure; the gap before the O sits just past it
-const SPLIT_X = NAME_X0 + SIZE * 3.97;
-
-// the writing front runs across the name at the plane's speed; the plane flies just ahead of it
-const SPEED = 330; // px per second
-const WRITE0 = 0.95; // s: the front reaches the name's left edge
-const WRITE1 = WRITE0 + (NAME_X1 - NAME_X0 + 40) / SPEED;
-const AHEAD = 78;
-const WAVE = [5.3, 7.7] as const; // the second light crossing the finished name
-const HEAD = [5.0, 5.9] as const; // the promise rising in
-export const OG_TICK = t(8.5); // the frame used as the OG image: the finished card
-
+// ------------------------------------------------------------------ the flight
+type V2 = { x: number; y: number };
 const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 const smooth = (x: number) => x * x * (3 - 2 * x);
-const front = (s: number) => NAME_X0 - 20 + (s - WRITE0) * SPEED;
-
-// where the plane is: in from the left at writing speed, a gentle swell as it writes, then a climb
-// away to the top right, faster
-function planeAt(s: number) {
-  const exitT = WRITE1 + 0.05;
-  if (s <= exitT) {
-    const x = front(s) + AHEAD;
-    const y = MIDY - 6 + 18 * Math.sin(((s - WRITE0) / 1.6) * 2 * Math.PI) * smooth(clamp((s - 0.4) / 0.8));
-    return { x, y };
-  }
-  const u = s - exitT;
-  const x0 = front(exitT) + AHEAD;
-  const y0 = MIDY - 6 + 18 * Math.sin(((exitT - WRITE0) / 1.6) * 2 * Math.PI);
-  return { x: x0 + SPEED * u + 160 * u * u, y: y0 - 60 * u - 260 * u * u };
+const seg = (s: number, a: number, b: number) => clamp((s - a) / (b - a));
+function bez(p0: V2, p1: V2, p2: V2, p3: V2, u: number): V2 {
+  const v = 1 - u;
+  return {
+    x: v * v * v * p0.x + 3 * v * v * u * p1.x + 3 * v * u * u * p2.x + u * u * u * p3.x,
+    y: v * v * v * p0.y + 3 * v * v * u * p1.y + 3 * v * u * u * p2.y + u * u * u * p3.y,
+  };
 }
-function planePose(s: number) {
+function hermite(p0: V2, m0: V2, p1: V2, m1: V2, u: number): V2 {
+  const u2 = u * u;
+  const u3 = u2 * u;
+  const a = 2 * u3 - 3 * u2 + 1;
+  const b = u3 - 2 * u2 + u;
+  const c = -2 * u3 + 3 * u2;
+  const d = u3 - u2;
+  return { x: a * p0.x + b * m0.x + c * p1.x + d * m1.x, y: a * p0.y + b * m0.y + c * p1.y + d * m1.y };
+}
+
+// leg A: in from the foreground (huge, bottom left), racing away into the painting to the sun; on
+// screen it slows as it recedes. Leg B: out of the sun, up and round, landing as the lockup's mark
+const A = { t0: 0.3, t1: 1.55, p0: { x: -160, y: 760 }, c1: { x: 120, y: 470 }, c2: { x: 430, y: 380 }, p1: SUN };
+const legAu = (s: number) => 1 - Math.pow(1 - seg(s, A.t0, A.t1), 1.7);
+const legA = (u: number) => bez(A.p0, A.c1, A.c2, A.p1, u);
+const SIZE_A = [360, 46] as const; // the drawing's size, foreground to the sun
+
+// the lockup: the mark, then ContentOS in Geist 600; with the promise, centred in the frame
+const WM = { size: 72, gap: 18, width: 5.2 * 72 };
+const MARK_DRAW = 86;
+const LOCK_W = MARK_DRAW + WM.gap + WM.width;
+const LOCK_Y = 278;
+const LAND = { x: W / 2 - LOCK_W / 2 + MARK_DRAW / 2, y: LOCK_Y };
+const B = { t1: 2.95 };
+
+function planeAt(s: number): V2 & { size: number } {
+  if (s <= A.t1) {
+    const u = legAu(s);
+    return { ...legA(u), size: SIZE_A[0] * Math.pow(SIZE_A[1] / SIZE_A[0], u) };
+  }
+  const T = B.t1 - A.t1;
+  const u = seg(s, A.t1, B.t1);
+  // leaving the sun the way it went in, then up and round and back to land, arriving slow
+  const e = 1e-3;
+  const a = legA(1 - e);
+  const vin = { x: ((A.p1.x - a.x) / e) * 0.0016, y: ((A.p1.y - a.y) / e) * 0.0016 };
+  const k = Math.hypot(vin.x, vin.y) || 1;
+  const m0 = { x: (vin.x / k) * 900, y: (vin.y / k) * 900 - 500 };
+  const p = hermite(SUN, m0, LAND, { x: -220, y: 140 }, u);
+  void T;
+  // it comes back toward the camera a little as it climbs to the lockup
+  return { ...p, size: SIZE_A[1] + (MARK_DRAW - SIZE_A[1]) * smooth(u) };
+}
+
+// heading from the path; heading left, the drawing is mirrored so it never flies upside down;
+// softened over a few frames so it rolls, and settled to the logo's own pose as it lands
+function rawPose(s: number) {
   const e = 1 / 120;
   const a = planeAt(s - e);
   const b = planeAt(s + e);
-  const heading = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
-  return { ...planeAt(s), rot: heading + 45 }; // the drawing's nose points 45 degrees up
+  const vx = b.x - a.x;
+  const vy = b.y - a.y;
+  const sp = Math.hypot(vx, vy) || 1;
+  const side = vx >= 0 ? 1 : -1;
+  const alpha = (Math.atan2(vy, Math.abs(vx)) * 180) / Math.PI;
+  let rot = side * (clamp(alpha, -75, 75) + 45);
+  let flip = side * smooth(clamp(Math.abs(vx) / sp / 0.35));
+  const land = smooth(seg(s, B.t1 - 0.45, B.t1));
+  rot *= 1 - land;
+  flip += (1 - flip) * land;
+  return { rot, flip };
 }
+const FRAMES: number[] = [];
+for (let i = 0; i * (1 / FPS) <= DUR + 1e-6; i += 1) FRAMES.push(i / FPS);
+const softened = (key: 'rot' | 'flip', s: number) => {
+  let acc = 0;
+  let ws = 0;
+  for (let k = -6; k <= 6; k += 1) {
+    const w = Math.exp(-(k * k) / 18);
+    acc += rawPose(s + k / FPS)[key] * w;
+    ws += w;
+  }
+  return acc / ws;
+};
+
+// ------------------------------------------------------------------ the painting, in dots
+const f = (x: number) => x.toFixed(3);
+// leg A's path, sampled for the wake: point and the time the plane passed it
+const WAKE = Array.from({ length: 14 }, (_, i) => {
+  const s = A.t0 + ((A.t1 - A.t0) * (i + 0.5)) / 14;
+  const p = planeAt(s);
+  return { x: p.x, y: p.y, s, r: p.size * 0.42 };
+});
+const FLASH_T = A.t1;
+const BLOOM = [A.t1 + 0.04, A.t1 + 1.45] as const;
 
 const SKSL = `
 uniform shader inputImage;
-uniform float write;
-uniform float wave;
-uniform half4 ink;
-uniform half4 topA;
-uniform half4 topB;
-uniform half4 lowA;
-uniform half4 lowB;
+uniform float time;
+uniform float2 plane;
+uniform float planeR;
 uniform float2 renderScale;
 
-float sdTri(float2 p, float2 p0, float2 p1, float2 p2) {
-  float2 e0 = p1 - p0;
-  float2 e1 = p2 - p1;
-  float2 e2 = p0 - p2;
-  float2 v0 = p - p0;
-  float2 v1 = p - p1;
-  float2 v2 = p - p2;
-  float2 q0 = v0 - e0 * clamp(dot(v0, e0) / dot(e0, e0), 0.0, 1.0);
-  float2 q1 = v1 - e1 * clamp(dot(v1, e1) / dot(e1, e1), 0.0, 1.0);
-  float2 q2 = v2 - e2 * clamp(dot(v2, e2) / dot(e2, e2), 0.0, 1.0);
-  float sg = sign(e0.x * e2.y - e0.y * e2.x);
-  float2 d = min(min(float2(dot(q0, q0), sg * (v0.x * e0.y - v0.y * e0.x)),
-                     float2(dot(q1, q1), sg * (v1.x * e1.y - v1.y * e1.x))),
-                     float2(dot(q2, q2), sg * (v2.x * e2.y - v2.y * e2.x)));
-  return -sqrt(d.x) * sign(d.y);
-}
-
-float coverage(float2 cc, float s) {
-  float h = ${(CELL * 0.25).toFixed(2)};
-  float cov = 0.0;
-  for (int k = 0; k < 4; k++) {
-    float2 o = float2((k == 0 || k == 2) ? -h : h, k < 2 ? -h : h);
-    cov += inputImage.eval((cc + o) * s).a;
-  }
-  return cov * 0.25;
+float hash1(float x) { return fract(sin(x * 127.1) * 43758.5453); }
+float vnoise(float x) {
+  float i = floor(x);
+  float g = fract(x);
+  return mix(hash1(i), hash1(i + 1.0), g * g * (3.0 - 2.0 * g));
 }
 
 half4 main(float2 q) {
   float s = renderScale.x;
   float2 u = q / s;
-  float CELL = ${CELL.toFixed(2)};
-  float2 cc = (floor(u / CELL) + 0.5) * CELL;
+  float tt = time;
+  float2 cc = (floor(u / ${f(CELL)}) + 0.5) * ${f(CELL)};
+  float2 SUN = float2(${f(SUN.x)}, ${f(SUN.y)});
 
-  // behind the front only; the front leans with the plane's dive so the letters fill from its tail
-  float d = write - cc.x + (cc.y - ${MIDY.toFixed(1)}) * 0.18;
-  if (d <= 0.0) { return half4(0.0); }
-  float cov = coverage(cc, s);
-  if (cov < 0.2) { return half4(0.0); }
+  // the closing band's shape: whole in the middle, gone at the edges (a squared-off oval)
+  float2 e2 = (cc - float2(${f(W / 2)}, ${f(H / 2)})) / float2(${f(W * 0.56)}, ${f(H * 0.56)});
+  float2 a2 = abs(e2);
+  float e = pow(pow(a2.x, 5.0) + pow(a2.y, 3.2), 0.24) + 0.03 * sin(atan(e2.y, e2.x) * 5.0 + tt * 1.2) + 0.02 * (hash1(dot(cc, float2(0.13, 0.71))) - 0.5);
+  float band = 1.0 - smoothstep(0.6, 1.0, e);
+  // held in dots to begin with: a dot of every colour, smaller toward the edges
+  float pres = 0.5 * smoothstep(1.25, 0.45, e);
 
-  // each plane pops in over a few cells behind the front, spinning once into the mark's heading
-  float ap = clamp(d / ${(CELL * 9).toFixed(1)}, 0.0, 1.0);
-  float e = 1.0 - (1.0 - ap) * (1.0 - ap) * (1.0 - ap);
-  float pop = e + 0.22 * sin(3.14159265 * ap);
-  // lit as it lands, cooling to ink over the next part of the name
-  float hot = exp(-d / ${(W * 0.22).toFixed(1)});
-  // the second light: a slanted front crossing the finished name
-  float wf = mix(${(-0.3 * W).toFixed(1)}, ${(1.45 * W).toFixed(1)}, wave);
-  float lp = clamp((wf - cc.x - (cc.y - ${MIDY.toFixed(1)}) * 0.35) / ${(0.2 * W).toFixed(1)}, 0.0, 1.0);
-  float glint = sin(3.14159265 * lp);
-  // the name's halves, split in the gap before the O
-  float k = cc.x > ${SPLIT_X.toFixed(1)} ? 1.0 : 0.0;
-  // the second light flashes through Content and leaves OS in coral, the mark's accent half: on the
-  // hero's cobalt sky, ink Content and coral OS is the lockup that holds
-  float lit = clamp(max(hot, mix(glint, lp, k)), 0.0, 1.0);
+  // the wake: painted where the plane has passed, the clear path widening as it ages
+  ${WAKE.map(
+    (w) => `{
+    float age = tt - ${f(w.s)};
+    float wd = ${f(w.r)} + max(age, 0.0) * 60.0;
+    pres = max(pres, step(0.0, age) * smoothstep(0.0, 0.2, age) * exp(-dot(cc - float2(${f(w.x)}, ${f(w.y)}), cc - float2(${f(w.x)}, ${f(w.y)})) / (wd * wd)));
+  }`,
+  ).join('\n  ')}
+  // and around the plane, the paint swells back as it passes
+  float2 pl = plane / s;
+  float near = 1.0 - smoothstep(planeR * 0.5, planeR * 1.4, length(cc - pl));
+  pres = max(pres, near * step(${f(A.t0)}, tt) * (1.0 - step(${f(A.t1)}, tt)));
 
-  float th = (1.0 - e) * -6.2831853 + 6.2831853 * (lp * lp * (3.0 - 2.0 * lp));
-  float size = (0.8 + 0.34 * smoothstep(0.2, 0.75, cov)) * pop * (1.0 + 0.22 * glint);
-  float R = CELL * 0.5 * max(size, 0.001);
-  float2 v = (u - cc) / R;
-  float c0 = cos(th);
-  float s0 = sin(th);
-  v = float2(c0 * v.x + s0 * v.y, -s0 * v.x + c0 * v.y);
+  // the bloom: a ring of paint out from the sun, leaving the band's shape behind it
+  float sd = length(cc - SUN);
+  float bk = clamp((tt - ${f(BLOOM[0])}) / ${f(BLOOM[1] - BLOOM[0])}, 0.0, 1.0);
+  float R = 1500.0 * (1.0 - pow(1.0 - bk, 2.4));
+  float inside = smoothstep(R + 10.0, R - 150.0, sd) * step(${f(BLOOM[0])}, tt);
+  pres = mix(pres, max(band, pres * (1.0 - band * 0.0)), inside);
+  pres = max(pres * (1.0 - inside), mix(pres, band, inside));
+  float front = exp(-pow((sd - R + 40.0) / 34.0, 2.0)) * step(${f(BLOOM[0])}, tt) * (1.0 - bk);
 
-  float dTop = sdTri(v, float2(0.929, -0.934), float2(-0.931, -0.171), float2(-0.164, 0.156));
-  float dLow = sdTri(v, float2(0.929, -0.934), float2(-0.164, 0.156), float2(0.162, 0.932));
-  float px = 1.0 / (s * R);
-  float aTop = smoothstep(px, -px, dTop);
-  float aLow = smoothstep(px, -px, dLow) * (1.0 - aTop);
+  // the dots breathe, a little, out of step with each other
+  pres *= 1.0 + 0.06 * sin(tt * 2.2 + hash1(dot(cc, float2(0.31, 0.17))) * 6.2831853) * (1.0 - smoothstep(0.85, 1.0, pres));
 
-  // lit, Content takes the blue fold and OS the coral one; each plane's crease a lighter shade of
-  // its fold (OS's held halfway to coral, so it keeps its weight over the pink clouds)
-  half3 cTop = mix(ink.rgb, mix(topB.rgb, lowB.rgb, k), lit);
-  half3 cLow = mix(ink.rgb, mix(topA.rgb, mix(lowA.rgb, lowB.rgb, 0.55), k), lit);
-  float fLow = mix(0.66, 1.0, lit);
-  float a = clamp(e * 3.0, 0.0, 1.0);
-  half3 rgb = (cTop * aTop + cLow * aLow * fLow) * a;
-  return half4(rgb, (aTop + aLow * fLow) * a);
+  half3 col = unpremul(inputImage.eval(q)).rgb;
+  float2 dv = u - SUN;
+  float dist = length(dv);
+  // the flash as the plane hits the sun, then the sun's warm light, breathing
+  float flash = step(${f(FLASH_T)}, tt) * exp(-max(tt - ${f(FLASH_T)}, 0.0) * 3.2) + smoothstep(${f(FLASH_T - 0.25)}, ${f(FLASH_T)}, tt) * (1.0 - step(${f(FLASH_T)}, tt)) * 0.6;
+  float halo = exp(-dist / 34.0) * 0.6 + exp(-dist / 200.0) * 0.3 + exp(-dist / 120.0) * flash * 0.9;
+  // shafts fanning from the sun across the sky, flaring with it
+  float ang = atan(dv.y, dv.x);
+  float fan = vnoise(ang * 7.0 + tt * 0.35) * vnoise(ang * 15.0 - tt * 0.22 + 7.0);
+  float rays = fan * exp(-dist / 430.0) * smoothstep(40.0, -60.0, dv.y) * (0.22 + 1.1 * flash);
+  half3 light = half3(1.0, 0.86, 0.66) * (halo * (0.94 + 0.06 * sin(tt * 2.4)) + rays) + half3(1.0, 0.9, 0.75) * front * 0.5;
+  col = 1.0 - (1.0 - col) * (1.0 - clamp(light, 0.0, 1.0));
+
+  if (pres > 0.985) { return half4(col, 1.0); }
+  float r = ${f(CELL)} * 0.74 * pow(clamp(pres, 0.0, 1.0), 0.85);
+  float cov = 1.0 - smoothstep(r - 0.6, r + 0.6, length(u - cc));
+  half3 ground = half3(0.98, 0.976, 0.965);
+  return half4(mix(ground, col, cov), 1.0);
 }
 `;
 
-const hexC = (h: string, a = 1): Color => {
-  const n = Number.parseInt(h.slice(1), 16);
-  return { r: ((n >> 16) & 255) / 255, g: ((n >> 8) & 255) / 255, b: (n & 255) / 255, a };
-};
-const pair = (f: string | readonly string[]) => (typeof f === 'string' ? [f, f] : [f[0], f[1]]);
-const [TOP_A, TOP_B] = pair(MARK.upper);
-const [LOW_A, LOW_B] = pair(MARK.lower);
-const INK = hexC('#101114');
-
-const times: number[] = [];
-for (let i = 0; i * (1 / FPS) <= DUR + 1e-6; i += 1) times.push(i / FPS);
-const sampled = <T>(id: string, f: (s: number) => T) =>
-  keyed(id, times.map((s, i) => [t(s), f(s), i === times.length - 1 ? 'hold' : 'linear']) as never) as never;
-
 const nodes: Record<string, SceneNode> = {};
 const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
+const sampled = <T>(id: string, fn: (s: number) => T) =>
+  keyed(id, FRAMES.map((s, i) => [t(s), fn(s), i === FRAMES.length - 1 ? 'hold' : 'linear']) as never) as never;
 
-// the hero's sky, as footage of its own scene (oil-paint pass, cloud flow and grade included): its box
-// keeps the painting's shape at the card's width (1200 x 686), so the card trims it, mostly from the lake
-const SKY = videoAsset('sky', 'sky.mp4', readFileSync('animations/out/og/sky.mp4'));
-const paint = add(video('paint', { asset: SKY, inTick: 0, outTick: END, x: W / 2, y: H / 2 + 18, width: W, height: (W * 914) / 1600, fit: 'cover' }) as SceneNode);
-
+// the painting, cover-fit (2880 x 1280 at 630 tall is 1418 wide), the camera easing in on it the
+// whole time: the dot grid holds still while the painting moves under it
+const PW = (2880 * H) / 1280;
 add({
-  ...base('word', { outTick: END, x: NAME_X0 - SIZE * INK_LEFT, y: NAME_TOP - SIZE * INK_TOP }),
-  type: 'text',
-  runs: constant([{ text: 'ContentOS', fontFamily: 'Geist', fontSize: SIZE, fontWeight: 760, letterSpacing: -SIZE / 30, lineHeight: SIZE, color: { r: 1, g: 0, b: 0, a: 1 } }]),
-  box: { width: W * 1.1, height: SIZE * 1.2 },
-  wrap: 'none',
-  align: 'left',
-  verticalAlign: 'top',
+  ...base('paint', {
+    outTick: END,
+    x: W / 2,
+    y: H / 2,
+    scale: keyed('paint.s', [[0, { x: 1.12, y: 1.12, z: 1 }, { x1: 0.25, y1: 0.4, x2: 0.3, y2: 1 }], [END, { x: 1, y: 1, z: 1 }]]),
+  }),
+  type: 'image',
+  assetId: 'paint',
+  size: constant({ width: PW, height: H }),
+  fit: 'cover',
 } as SceneNode);
-const planes = add({
-  ...base('planes', { outTick: END }),
+const field = add({
+  ...base('field', { outTick: END }),
   type: 'effect',
   effect: 'custom-sksl',
-  inputId: 'word',
+  inputId: 'paint',
   implementation: SKSL,
   capability: { requires: ['runtime-effect'], fallback: 'passthrough', maxTemporarySurfaces: 1 },
   parameters: [
-    { id: 'write', name: 'write', valueType: 'number', minimum: -2000, maximum: 4000, value: sampled('planes.write', (s) => Math.min(front(s), W + 400)) },
-    { id: 'wave', name: 'wave', valueType: 'number', minimum: 0, maximum: 1, value: keyed('planes.wave', [[0, 0, 'hold'], [t(WAVE[0]), 0, { x1: 0.45, y1: 0, x2: 0.55, y2: 1 }], [t(WAVE[1]), 1]]) },
-    { id: 'ink', name: 'ink', valueType: 'color', value: constant(INK) },
-    { id: 'topA', name: 'topA', valueType: 'color', value: constant(hexC(TOP_A)) },
-    { id: 'topB', name: 'topB', valueType: 'color', value: constant(hexC(TOP_B)) },
-    { id: 'lowA', name: 'lowA', valueType: 'color', value: constant(hexC(LOW_A)) },
-    { id: 'lowB', name: 'lowB', valueType: 'color', value: constant(hexC(LOW_B)) },
+    { id: 'time', name: 'time', valueType: 'number', minimum: 0, maximum: 10, value: keyed('field.time', [[0, 0, 'linear'], [END, DUR]]) },
+    { id: 'plane', name: 'plane', valueType: 'point', minimum: { x: -4000, y: -4000 }, maximum: { x: 4000, y: 4000 }, value: sampled('field.plane', (s) => ({ x: planeAt(s).x, y: planeAt(s).y })) },
+    { id: 'planeR', name: 'planeR', valueType: 'number', minimum: 0, maximum: 1000, value: sampled('field.planeR', (s) => planeAt(s).size) },
   ],
 } as SceneNode);
 
-// the plane itself (the mark, 512 px, its drawing 0.861 of the box)
-const PLANE_BOX = 150;
+// the plane (the mark's drawing fills 0.861 of plane.png)
 const plane = add({
   ...base('plane', {
     outTick: END,
-    position: sampled('plane.p', (s) => {
-      const p = planePose(s);
-      return { x: p.x, y: p.y, z: 0 };
+    position: sampled('plane.p', (s) => ({ x: planeAt(s).x, y: planeAt(s).y, z: 0 })),
+    rotation: sampled('plane.r', (s) => ({ x: 0, y: 0, z: softened('rot', s) })),
+    scale: sampled('plane.s', (s) => {
+      const k = planeAt(s).size / 0.861 / 512;
+      const visible = s >= A.t0;
+      return { x: visible ? k * softened('flip', s) : 0.0001, y: visible ? k : 0.0001, z: 1 };
     }),
-    rotation: sampled('plane.r', (s) => ({ x: 0, y: 0, z: planePose(s).rot })),
-    scale: constant({ x: PLANE_BOX / 512, y: PLANE_BOX / 512, z: 1 }),
   }),
   type: 'image',
   assetId: 'plane',
@@ -251,21 +267,45 @@ const plane = add({
   fit: 'contain',
 } as SceneNode);
 
-// the promise, rising in under the name
-const HEAD_SIZE = 42;
-const headline = add({
-  ...base('headline', {
+// the name, rising in beside the landed mark
+const INK: Color = { r: 0.063, g: 0.067, b: 0.078, a: 1 };
+const NAME_IN = [2.75, 3.35] as const;
+const textX = LAND.x + MARK_DRAW / 2 + WM.gap;
+const textTop = LOCK_Y - 0.643 * WM.size;
+const wordmark = add({
+  ...base('wordmark', {
     outTick: END,
-    position: keyed('headline.p', [
-      [0, { x: W / 2 - 500, y: NAME_TOP + SIZE * INK_H + 52 + 16, z: 0 }, 'hold'],
-      [t(HEAD[0]), { x: W / 2 - 500, y: NAME_TOP + SIZE * INK_H + 52 + 16, z: 0 }, { x1: 0.2, y1: 0.8, x2: 0.3, y2: 1 }],
-      [t(HEAD[1]), { x: W / 2 - 500, y: NAME_TOP + SIZE * INK_H + 52, z: 0 }],
+    position: keyed('wordmark.p', [
+      [0, { x: textX - 16, y: textTop, z: 0 }, 'hold'],
+      [t(NAME_IN[0]), { x: textX - 16, y: textTop, z: 0 }, { x1: 0.16, y1: 1, x2: 0.3, y2: 1 }],
+      [t(NAME_IN[1]), { x: textX, y: textTop, z: 0 }],
     ]),
-    opacity: keyed('headline.o', [[0, 0, 'hold'], [t(HEAD[0]), 0, { x1: 0.3, y1: 0, x2: 0.4, y2: 1 }], [t(HEAD[1]), 1]]),
+    opacity: keyed('wordmark.o', [[0, 0, 'hold'], [t(NAME_IN[0]), 0, { x1: 0.3, y1: 0, x2: 0.4, y2: 1 }], [t(NAME_IN[1]), 1]]),
   }),
   type: 'text',
-  runs: constant([{ text: 'Grow beyond word of mouth.', fontFamily: 'Geist', fontSize: HEAD_SIZE, fontWeight: 500, letterSpacing: -0.025 * HEAD_SIZE, lineHeight: HEAD_SIZE * 1.2, color: INK }]),
-  box: { width: 1000, height: HEAD_SIZE * 1.4 },
+  runs: constant([{ text: 'ContentOS', fontFamily: 'Geist', fontSize: WM.size, fontWeight: 600, letterSpacing: 0, lineHeight: WM.size, color: INK }]),
+  box: { width: 600, height: WM.size * 1.3 },
+  wrap: 'none',
+  align: 'left',
+  verticalAlign: 'top',
+} as SceneNode);
+
+// the promise, in the page's face (Mona Sans 500), in the ink the page sets on its sky
+const TAG = { size: 34, in: [3.25, 3.9] as const };
+const tagTop = LOCK_Y + 0.36 * WM.size + 26;
+const tagline = add({
+  ...base('tagline', {
+    outTick: END,
+    position: keyed('tagline.p', [
+      [0, { x: 0, y: tagTop + 10, z: 0 }, 'hold'],
+      [t(TAG.in[0]), { x: 0, y: tagTop + 10, z: 0 }, { x1: 0.16, y1: 1, x2: 0.3, y2: 1 }],
+      [t(TAG.in[1]), { x: 0, y: tagTop, z: 0 }],
+    ]),
+    opacity: keyed('tagline.o', [[0, 0, 'hold'], [t(TAG.in[0]), 0, { x1: 0.3, y1: 0, x2: 0.4, y2: 1 }], [t(TAG.in[1]), 1]]),
+  }),
+  type: 'text',
+  runs: constant([{ text: 'Grow beyond word of mouth.', fontFamily: 'Mona Sans', fontSize: TAG.size, fontWeight: 500, letterSpacing: 0, lineHeight: TAG.size * 1.2, color: { r: 0.173, g: 0.18, b: 0.212, a: 1 } }]),
+  box: { width: W, height: TAG.size * 1.4 },
   wrap: 'none',
   align: 'center',
   verticalAlign: 'top',
@@ -274,22 +314,22 @@ const headline = add({
 const doc = withComputedRevision({
   version: ANIMATION_DOCUMENT_VERSION,
   id: 'contentos-og-card',
-  name: 'ContentOS share card',
-  canvas: { width: W, height: H, pixelAspectRatio: 1, backgroundColor: { r: 0.62, g: 0.74, b: 0.9, a: 1 } },
+  name: 'ContentOS share card: into the sun',
+  canvas: { width: W, height: H, pixelAspectRatio: 1, backgroundColor: { r: 0.98, g: 0.976, b: 0.965, a: 1 } },
   timing: { ticksPerSecond: TPS, frameRate: { numerator: FPS, denominator: 1 }, durationTicks: END, displayStartTick: 0 },
   assets: {
-    sky: SKY,
+    paint: { id: 'paint', type: 'image', uri: 'cta-day.jpg', width: 2880, height: 1280, mimeType: 'image/jpeg' },
     plane: { id: 'plane', type: 'image', uri: 'plane.png', width: 512, height: 512, mimeType: 'image/png' },
   },
   rootCompositionId: 'main',
   components: {},
-  compositions: { main: { id: 'main', name: 'Main', width: W, height: H, durationTicks: END, nodes, rootNodeIds: [paint, planes, plane, headline] } },
+  compositions: { main: { id: 'main', name: 'Main', width: W, height: H, durationTicks: END, nodes, rootNodeIds: [field, plane, wordmark, tagline] } },
   markers: [],
   design: { tokens: { looping: false } },
   capabilities: { required: [], optional: [], unsupportedPolicy: 'warn' },
 } as never);
 assertValidAnimationDocument(doc);
 const diags = validateAnimationDocument(doc).diagnostics;
-if (diags.length) console.warn(JSON.stringify(diags).slice(0, 800));
+if (diags.length) console.warn(JSON.stringify(diags).slice(0, 900));
 writeFileSync('animations/out/og/og.json', JSON.stringify(doc));
-console.log('wrote animations/out/og/og.json', `${W}x${H}`, `${DUR}s`, 'og frame tick', OG_TICK, 'write', WRITE0.toFixed(2), '->', WRITE1.toFixed(2));
+console.log('wrote animations/out/og/og.json', `${W}x${H}`, `${DUR}s`, 'last tick', END - 4, 'land', LAND, 'text block', Math.round(LOCK_Y - 0.36 * WM.size), '-', Math.round(tagTop + TAG.size * 1.05));

@@ -50,14 +50,15 @@ export const metadata: Metadata = {
     url: '/',
     siteName: PRODUCT_NAME,
     type: 'website',
-    // the share card: ContentOS written in paper planes across the hero's painted sky
+    // the share card, in the closing band's world: the plane races into the painted riverside, hits
+    // the sun, paint blooms back across the scene, and it lands as the lockup's mark over the promise
     // (animations/og-card.ts); the image is the video's last frame
     images: [
       {
         url: '/og.jpg',
         width: 1200,
         height: 630,
-        alt: 'ContentOS written in paper planes across a painted sky over a lake palace, above the line Grow beyond word of mouth.',
+        alt: 'The ContentOS mark and name over a painted riverside of stone steps at sunset, its edges breaking into halftone dots, above the line Grow beyond word of mouth.',
       },
     ],
     // Next leaves video URLs as given, and crawlers need them absolute
