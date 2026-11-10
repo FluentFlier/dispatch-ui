@@ -1,23 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Wordmark } from './brand/Mark';
 import { ThemeToggle } from './ThemeToggle';
 import { MegaNav } from './nav/MegaNav';
-
-const LINKS = [
-  { label: 'Product', href: '#product' },
-  { label: 'Integrations', href: '/integrations' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Compare', href: '/compare' },
-  { label: 'Resources', href: '/blog' },
-];
+import { MobileNav } from './nav/MobileNav';
 
 /** Signed in: just the way back into the app. Signed out: Sign in and Get started. */
 export function SiteNav({ cta, loggedIn }: { cta: { href: string; label: string }; loggedIn: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const closeMenu = useCallback(() => setOpen(false), []);
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -27,7 +22,7 @@ export function SiteNav({ cta, loggedIn }: { cta: { href: string; label: string 
   }, []);
 
   return (
-    <header className="cos-nav" data-scrolled={scrolled || open} data-open={open}>
+    <header className="cos-nav" data-scrolled={scrolled}>
       <div className="cos-nav-inner">
         <Link href="/" className="cos-nav-brand" aria-label="ContentOS home">
           <Wordmark />
@@ -46,33 +41,20 @@ export function SiteNav({ cta, loggedIn }: { cta: { href: string; label: string 
             <span>{cta.label}</span>
           </Link>
           <button
+            ref={menuButton}
             type="button"
             className="cos-nav-menu"
             aria-expanded={open}
             aria-controls="cos-mobile-menu"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setOpen(true)}
           >
-            <span className="sr-only">{open ? 'Close menu' : 'Open menu'}</span>
+            <span className="sr-only">Open menu</span>
             <span aria-hidden="true" className="cos-nav-menu-bars" />
           </button>
         </div>
       </div>
 
-      <div id="cos-mobile-menu" className="cos-nav-sheet" hidden={!open}>
-        {LINKS.map((l) => (
-          <a key={l.label} href={l.href} className="cos-nav-sheet-link" onClick={() => setOpen(false)}>
-            {l.label}
-          </a>
-        ))}
-        {!loggedIn && (
-          <Link href="/login" className="cos-nav-sheet-link">
-            Sign in
-          </Link>
-        )}
-        <Link href={cta.href} className="cos-nav-sheet-link">
-          {cta.label}
-        </Link>
-      </div>
+      <MobileNav open={open} onClose={closeMenu} cta={cta} loggedIn={loggedIn} menuButton={menuButton} />
     </header>
   );
 }

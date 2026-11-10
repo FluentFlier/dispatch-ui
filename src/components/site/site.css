@@ -337,27 +337,192 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
   position: absolute;
   top: 6px;
 }
-.cos-nav[data-open='true'] .cos-nav-menu-bars {
-  transform: translateY(0) rotate(45deg);
-}
-.cos-nav[data-open='true'] .cos-nav-menu-bars::before {
-  transform: translateY(-6px) rotate(-90deg);
-}
-.cos-nav-sheet {
-  display: grid;
-  padding: 4px var(--cos-gutter) 20px;
-}
-.cos-nav-sheet[hidden] {
+/* ------------------------------------------------------- the phone menu */
+/* nav/MobileNav.tsx, after Amplitude: a full-screen ink sheet, the menus as large rows that open in
+   place, the actions held at the bottom. Ink in both themes, so it reads as one surface over the page */
+.cos-msheet {
+  --ms-ink: #f3f5f6;
+  --ms-dim: #8d979e;
+  --ms-line: rgba(255, 255, 255, 0.16);
+  position: fixed;
+  inset: 0;
+  z-index: 60;
   display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #0b1014;
+  color: var(--ms-ink);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 160ms ease,
+    visibility 0s linear 160ms;
 }
-.cos-nav-sheet-link {
+.cos-msheet[data-open] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 220ms var(--cos-ease-out),
+    visibility 0s linear 0s;
+}
+.cos-msheet-top {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
-  min-height: 52px;
-  font-size: 20px;
+  justify-content: space-between;
+  flex: none;
+  height: 76px;
+  padding: 0 var(--cos-gutter);
+  background: #0b1014;
+}
+.cos-msheet .cos-wordmark {
+  color: var(--ms-ink);
+}
+.cos-msheet-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  border-radius: 10px;
+  color: var(--ms-ink);
+  transition: transform 160ms var(--cos-ease-out);
+}
+.cos-msheet-close:active {
+  transform: scale(0.94);
+}
+.cos-msheet-list {
+  flex: 1 0 auto;
+  padding: 8px var(--cos-gutter) 24px;
+  transform: translateY(8px);
+  transition: transform 160ms ease;
+}
+.cos-msheet[data-open] .cos-msheet-list {
+  transform: none;
+  transition: transform 320ms var(--cos-ease-out);
+}
+.cos-msheet-row + .cos-msheet-row {
+  border-top: 1px solid var(--ms-line);
+}
+.cos-msheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 78px;
+  font-size: 30px;
   font-weight: 500;
-  letter-spacing: -0.025em;
-  border-bottom: 1px solid var(--cos-line);
+  letter-spacing: -0.03em;
+  text-align: left;
+  color: var(--ms-ink);
+}
+.cos-msheet-chev {
+  flex: none;
+  transition: transform 260ms var(--cos-ease-out);
+}
+.cos-msheet-row[data-open] .cos-msheet-chev {
+  transform: rotate(180deg);
+}
+/* the pages open in place: the row grows to what it holds */
+.cos-msheet-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms var(--cos-ease-out);
+}
+.cos-msheet-row[data-open] .cos-msheet-body {
+  grid-template-rows: 1fr;
+}
+.cos-msheet-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+.cos-msheet-row:not([data-open]) .cos-msheet-inner {
+  visibility: hidden;
+  transition: visibility 0s linear 280ms;
+}
+.cos-msheet-group {
+  padding-bottom: 22px;
+}
+.cos-msheet-group:last-child {
+  padding-bottom: 28px;
+}
+.cos-msheet-label {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 450;
+  color: var(--ms-dim);
+}
+.cos-msheet-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  font-size: 17px;
+  font-weight: 450;
+  letter-spacing: -0.015em;
+  color: var(--ms-ink);
+}
+.cos-msheet-link:active {
+  opacity: 0.6;
+}
+.cos-msheet-logo {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.cos-msheet-logo img {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+}
+.cos-msheet-logo img[data-mono] {
+  filter: invert(1);
+}
+.cos-msheet-actions {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 10px;
+  flex: none;
+  padding: 16px var(--cos-gutter) max(16px, env(safe-area-inset-bottom));
+  background: #0b1014;
+  border-top: 1px solid var(--ms-line);
+}
+.cos-msheet-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  color: var(--ms-ink);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  transition: transform 160ms var(--cos-ease-out);
+}
+.cos-msheet-btn[data-primary] {
+  background: var(--ms-ink);
+  color: #0b1014;
+  box-shadow: none;
+}
+.cos-msheet-btn:active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-msheet,
+  .cos-msheet-list,
+  .cos-msheet-body,
+  .cos-msheet-chev {
+    transition: none;
+  }
 }
 
 @media (max-width: 900px) {
@@ -370,6 +535,9 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
   }
   .cos-nav-menu {
     display: grid;
+  }
+  .cos-msheet {
+    display: flex;
   }
 }
 
