@@ -50,12 +50,6 @@ const ROWS: Box[][] = [
 export function ActMore() {
   return (
     <section className="cos-act cos-more" id="more" aria-labelledby="act-more-title">
-      {/* under 1024 px: a halftone clock above the heading, rings going out as it keeps time
-          (animations/clock-mark.ts), the strip the other sections have in this place */}
-      <div className="cos-act-clock" aria-hidden="true">
-        <ClayzoScene name="clock-mark" width={390} height={500} playWhen="visible" />
-      </div>
-
       <div className="cos-act-inner">
         <div className="cos-act-head">
           <h2 id="act-more-title" className="cos-act-title">

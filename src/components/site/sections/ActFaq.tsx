@@ -49,10 +49,6 @@ export function ActFaq() {
   return (
     <section className="cos-act cos-faq" id="faq" aria-labelledby="act-faq-title">
       {/* under 1024 px the mark becomes a strip above the heading, as in the other sections */}
-      <div className="cos-faq-strip" aria-hidden="true">
-        <ClayzoScene name="ask-mark" width={390} height={212} narrow={{ width: 390, height: 212 }} playWhen="visible" />
-      </div>
-
       <div className="cos-act-inner cos-faq-inner">
         <div className="cos-faq-head">
           <h2 id="act-faq-title" className="cos-act-title">
