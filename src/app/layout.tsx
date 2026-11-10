@@ -50,20 +50,24 @@ export const metadata: Metadata = {
     url: '/',
     siteName: PRODUCT_NAME,
     type: 'website',
+    // the share card: ContentOS written in paper planes across the hero's painted sky
+    // (animations/og-card.ts); the image is the video's last frame
     images: [
       {
-        url: '/og.png',
+        url: '/og.jpg',
         width: 1200,
         height: 630,
-        alt: 'Content OS turns content and leads into one connected loop.',
+        alt: 'ContentOS written in paper planes across a painted sky over a lake palace, above the line Grow beyond word of mouth.',
       },
     ],
+    // Next leaves video URLs as given, and crawlers need them absolute
+    videos: [{ url: new URL('/og.mp4', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'), width: 1200, height: 630, type: 'video/mp4' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_TITLE,
     description: SITE_DESC,
-    images: ['/og.png'],
+    images: ['/og.jpg'],
   },
 };
 

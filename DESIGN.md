@@ -263,6 +263,7 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
+- 2026-11-10 · Share card (`animations/og-card.ts`): the ContentOS plane skywrites the name in paper planes across the hero's oil-painted sky, settling on ink Content and coral OS over Grow beyond word of mouth. `public/og.mp4` (og:video) and `public/og.jpg` (og:image, its last frame) replace the old og.png.
 - 2026-11-10 · Hero demo: the Reply step is Autopilot answering several comments in your voice (written, not typed; the pricing question waits for you), and the Leads step updates itself and syncs to HubSpot. No cursor in either.
 - 2026-11-10 · The mark is recoloured to Ocean + coral (cyan to blue over apricot to coral); its colours now live in `animations/lib/mark.ts`, applied everywhere by `animations/apply-mark.ts`.
 - 2026-11-10 · `/pricing` rebuilt in the landing system: the word Pricing, then the $1,000 per account price with an account counter and what every account includes, from the live hosted page; no animation.
