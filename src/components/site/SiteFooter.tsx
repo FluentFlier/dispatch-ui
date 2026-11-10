@@ -76,7 +76,7 @@ export function SiteFooter() {
           name="plane-wordmark"
           width={1440}
           height={242}
-          narrow={{ width: 390, height: 62 }}
+          narrow={{ width: 390, height: 174 }}
           narrowBelow={719}
           playWhen="visible"
           interactive

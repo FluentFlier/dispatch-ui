@@ -12,7 +12,8 @@
  *             a cell on a letter's edge carries a smaller plane, so the letters keep their shape
  *   palette   ink at rest (pale on dark), the blue fold full and the vermilion fold lighter, like a
  *             crease; lit, the mark's blue and vermilion
- *   scale     1440 x 248: the name spans 94 % of the width; phones get 390 x 72 with a finer grid
+ *   scale     1440 x 248: the name spans 94 % of the width; phones set it on two lines, Content over
+ *             OS, so the letters stay big enough for every plane to read as one
  *
  *   pnpm tsx animations/plane-wordmark.ts   (writes public/scene/plane-wordmark/{light,dark}[-narrow].json)
  */
@@ -39,6 +40,9 @@ const EM_W = 5.393;
 const INK_TOP = 0.273;
 const INK_H = 0.74;
 const INK_LEFT = 0.04; // the C's side bearing, in em
+// "Content" alone, on the same measure (phones set the name on two lines)
+const EM_W_CONTENT = 3.95;
+const PHONE_LH = 0.9; // the phone lines' spacing, in em: tight, a poster's
 
 const SKSL = (W: number, H: number, CELL: number) => `
 uniform shader inputImage;
@@ -173,10 +177,10 @@ const PALETTE = {
 
 function build(dark: boolean, phone: boolean) {
   const W = phone ? 390 : 1440;
-  const SIZE = (W * 0.94) / EM_W;
-  const MARGIN = phone ? 6 : 26; // above the letters' ink, room for planes to grow
-  const H = Math.round(MARGIN + SIZE * INK_H + (phone ? 6 : 30));
-  const CELL = phone ? 4.6 : 11.5;
+  const SIZE = (W * 0.94) / (phone ? EM_W_CONTENT : EM_W);
+  const MARGIN = phone ? 12 : 26; // above the letters' ink, room for planes to grow
+  const H = Math.round(MARGIN + (phone ? SIZE * PHONE_LH : 0) + SIZE * INK_H + (phone ? 10 : 30));
+  const CELL = phone ? 6.2 : 11.5;
   const P = dark ? PALETTE.dark : PALETTE.light;
   const nodes: Record<string, SceneNode> = {};
   const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
@@ -184,8 +188,19 @@ function build(dark: boolean, phone: boolean) {
   add({
     ...base('word', { outTick: END, x: W * 0.03 - SIZE * INK_LEFT, y: MARGIN - SIZE * INK_TOP }),
     type: 'text',
-    runs: constant([{ text: 'ContentOS', fontFamily: 'Geist', fontSize: SIZE, fontWeight: 760, letterSpacing: -SIZE / 30, lineHeight: SIZE, color: { r: 1, g: 0, b: 0, a: 1 } }]),
-    box: { width: W * 1.1, height: SIZE * 1.2 },
+    // each run sets its own line
+    runs: constant(
+      (phone ? ['Content', 'OS'] : ['ContentOS']).map((text) => ({
+        text,
+        fontFamily: 'Geist',
+        fontSize: SIZE,
+        fontWeight: 760,
+        letterSpacing: -SIZE / 30,
+        lineHeight: phone ? SIZE * PHONE_LH : SIZE,
+        color: { r: 1, g: 0, b: 0, a: 1 },
+      })),
+    ),
+    box: { width: W * 1.1, height: SIZE * (phone ? 2.2 : 1.2) },
     wrap: 'none',
     align: 'left',
     verticalAlign: 'top',

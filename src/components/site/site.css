@@ -2389,10 +2389,42 @@ html[data-cos-theme='dark'] .cos-more-box {
     aspect-ratio: var(--scene-ar-narrow);
   }
 }
+/* phones: the promise at a size that holds the screen, Product and Explore side by side, Company
+   as one row of links across both, and the name on two lines (the narrow build), big enough that
+   every plane reads as one */
 @media (max-width: 520px) {
+  .cos-foot-promise {
+    font-size: 2.125rem;
+    line-height: 1.06;
+  }
   .cos-foot-cols {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 36px;
+  }
+  .cos-foot-col:last-child {
+    grid-column: 1 / -1;
+  }
+  .cos-foot-col:last-child ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+  }
+}
+/* under 720 px the name is the two-line build: held to the text column's edge (its ink starts 3 % in),
+   with the year in the empty corner beside OS, on its baseline */
+@media (max-width: 719px) {
+  .cos-foot {
+    position: relative;
+  }
+  .cos-foot-word {
+    margin-top: 48px;
+    padding: 0 calc(var(--cos-gutter) - 3vw) 10px;
+  }
+  .cos-foot-base {
+    position: absolute;
+    right: var(--cos-gutter);
+    bottom: calc(10px + (100vw - 2 * (var(--cos-gutter) - 3vw)) * 10 / 390);
+    margin: 0;
   }
 }
 
