@@ -1,242 +1,255 @@
 ---
-name: Content OS
-description: A kinetic content relay that turns founder knowledge into published work and warm conversations.
-colors:
-  canvas: "oklch(99.2% 0.002 85)"
-  canvas-soft: "oklch(97.5% 0.004 85)"
-  bright-surface: "oklch(100% 0 0)"
-  ink: "oklch(18% 0.012 55)"
-  ink-soft: "oklch(43% 0.014 65)"
-  ink-muted: "oklch(49% 0.014 65)"
-  construction-line: "oklch(18% 0.012 55 / 0.11)"
-  cobalt: "oklch(57% 0.24 260)"
-  cobalt-dark: "oklch(47% 0.22 260)"
-  vermilion: "oklch(62% 0.20 35)"
-  relay-lime: "oklch(84% 0.20 125)"
-  conversation-lilac: "oklch(76% 0.12 305)"
+version: alpha
+name: ContentOS
+description: The marketing site for ContentOS, a system that writes in your voice, posts on your schedule and finds the people ready to talk. Calm, painted, quietly technical.
+
+colors:                       # hex of the values in src/components/site/site.css (source wins)
+  ground: "#faf9f6"
+  ink: "#101114"
+  ink-2: "#4c4e57"
+  ink-3: "#7e808a"
+  ink-sky: "#2c2e36"
+  line: "#10111414"
+  blue: "#2f5bea"
+  apricot: "#f08a4b"
+  peach: "#fbd3b2"
+  sky: "#8fb3e2"
+  lilac: "#b9b3e0"
+  dark-ground: "#080f14"
+  dark-ink: "#eef2f4"
+  dark-ink-2: "#a7b1b8"
+  dark-ink-3: "#75818a"
+  dark-ink-sky: "#c1cbd1"
+  dark-line: "#ffffff14"
+  dark-blue: "#6cc6eb"
+  sheet: "#0b1014"
 typography:
-  display:
-    fontFamily: "Hanken Grotesk, system-ui, sans-serif"
-    fontSize: "clamp(3.25rem, 7.8vw, 7rem)"
-    fontWeight: 700
-    lineHeight: 0.88
-    letterSpacing: "-0.065em"
-  poster-headline:
-    fontFamily: "Hanken Grotesk, system-ui, sans-serif"
-    fontSize: "clamp(2.7rem, 8.5vw, 9.5rem)"
-    fontWeight: 700
-    lineHeight: 0.88
-    letterSpacing: "-0.05em"
-  title:
-    fontFamily: "Hanken Grotesk, system-ui, sans-serif"
-    fontSize: "1.25rem"
-    fontWeight: 700
-    lineHeight: 1.15
-  body:
-    fontFamily: "Hanken Grotesk, system-ui, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 400
-    lineHeight: 1.75
-  label:
-    fontFamily: "Hanken Grotesk, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "0.02em"
+  display: { fontFamily: Mona Sans, fontSize: "clamp(2.75rem, 1.2rem + 3.4vw, 4rem)", fontWeight: 500, lineHeight: 1, letterSpacing: -0.035em, fontStretch: 104% }
+  section-title: { fontFamily: Mona Sans, fontSize: "clamp(2.5rem, 1.2rem + 3vw, 3.75rem)", fontWeight: 500, lineHeight: 1.02, fontStretch: 104% }
+  lead: { fontFamily: Mona Sans, fontSize: "clamp(17px, 0.95rem + 0.3vw, 19px)", fontWeight: 450, lineHeight: 1.65 }
+  body: { fontFamily: Mona Sans, fontSize: 16px, fontWeight: 400, lineHeight: 1.5 }
+  label: { fontFamily: Mona Sans, fontSize: 12.5px, fontWeight: 550, lineHeight: 1.3 }
+  wordmark: { fontFamily: Geist, fontSize: 19px, fontWeight: 600, letterSpacing: -0.035em }
 rounded:
-  chip: "8px"
-  control: "10px"
-  compact-card: "14px"
-  surface: "18px"
-  poster: "22px"
-  pill: "999px"
+  control-sm: 10px
+  control: 12px
+  card: 12px
+  panel: 18px
 spacing:
-  xs: "4px"
-  sm: "8px"
-  md: "16px"
-  lg: "24px"
-  xl: "48px"
-  section-mobile: "96px"
-  section-desktop: "128px"
+  gutter: "clamp(20px, 4vw, 48px)"
+  max: 1200px
 components:
-  button-primary:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.canvas}"
-    typography: "{typography.body}"
-    rounded: "{rounded.control}"
-    padding: "14px 22px"
-    height: "48px"
-  navigation-wordmark:
-    textColor: "{colors.ink}"
-    typography: "{typography.title}"
-    height: "72px"
-  product-proof:
-    backgroundColor: "{colors.bright-surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.poster}"
-    width: "1120px"
-  poster-card:
-    backgroundColor: "{colors.bright-surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.surface}"
-    padding: "20px"
-  signal-card:
-    backgroundColor: "{colors.conversation-lilac}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.surface}"
-    padding: "20px"
+  button-primary: { backgroundColor: "{colors.ink}", textColor: "{colors.ground}", rounded: "{rounded.control}", height: 52px }
+  button-secondary: { backgroundColor: "#ffffff", textColor: "{colors.ink}", rounded: "{rounded.control}", height: 52px }
+
+seam:
+  index: .seam/design-index.json
+  sources: [src/components/site/site.css, src/app/layout.tsx]
+  maturity: partial
+  surfaces:
+    marketing: ["src/components/site/**", "src/components/landing/**", "animations/**", "public/scene/**", "public/brand/**"]
+    product: ["src/app/**", "src/components/**"]   # the app; not covered by this document
+    other: ["**/*.test.tsx", "**/*.stories.tsx"]
+  owners: ["Purav Patel"]
 ---
 
-# Design System: Content OS
+# ContentOS landing page design system
 
-## 1. Overview
+This document covers the marketing site only: the landing page under `src/components/site/`, its Clayzo scenes under
+`animations/` and `public/scene/`, and its brand files under `public/brand/`. The product app has its own styles
+and is out of scope here.
 
-**Creative North Star: "The Content Relay"**
+## Overview
 
-Content OS is experienced by a founder planning the week on a bright monitor, moving quickly between ideas, publishing, replies, and warm relationships. The interface should feel like a crafted creative instrument that is already in motion: precise product evidence sits inside an illustrated world of handoffs, routes, operating panels, and a paper airplane that represents shipped work.
+Founders and B2B creators deciding, on a laptop or a phone, whether ContentOS can run their LinkedIn and X for them.
+Calm, painted, quietly technical. Comfortable density: one idea per screen.
 
-The landing page uses a Full Palette strategy with strict semantic roles. It opens on a compact white stage with the illustrated relay, a two-line promise, one action, and an illustrated command center. Three kinetic poster scenes then make voice, distribution, and leads feel materially different without breaking the shared visual language. Motion rewards scrolling, but no transition carries information that is absent from the resting composition.
+The page opens on a painted sky (an oil-painted dusk, or an Indian landscape with `?bg=india`) with one promise and
+two metal buttons. Below it, each section shows one part of the product working, drawn live with Clayzo: real
+product windows, halftone and dither fields, paper planes. The paper plane is the brand's recurring object, from the
+nav mark to the footer wordmark.
 
-**Key Characteristics:**
-- A compact first viewport with illustration, promise, CTA, and product proof.
-- The lowercase `content os.` wordmark with a cobalt period and paper-airplane favicon.
-- An illustrated command center that shows signals, drafts, Voice QA, scheduled content, replies, Creator Brain learning, and warm conversations.
-- Three distinct poster scenes: vermilion voice, cobalt distribution, and ink-black leads.
-- Sentence-case display typography with heavy scale, tight tracking, and no generic all-caps poster voice.
-- Hard construction outlines and offset shadows paired with one soft product shadow.
-- Desktop choreography that reduces to stable, simplified mobile compositions.
+Principles:
+1. **Compose, don't invent.** A new section reuses the page's type scale, buttons, ground and Clayzo scene frame. A
+   new kind of object is a reviewed decision (rulebook `40-evolve`).
+2. **Tokens, not values.** Colours come from the `--cos-*` tokens; eases from `--cos-ease-*`; widths from
+   `--cos-gutter` and `--cos-max`.
+3. **Every state ships.** Hover, active, focus-visible and reduced motion for every control; light and dark for every
+   surface and picture.
+4. **Show the product, never a stand-in.** Motion is a live Clayzo scene, never a poster image or a static
+   screenshot in its place. Product claims come from the product handover and the redesign pack only.
+5. **Dark is the reference.** The deep-ocean dark theme is signed off; light-mode tuning is gated with
+   `html:not([data-cos-theme='dark'])` so dark stays identical.
 
-## 2. Colors
+Code layers:
 
-The palette is energetic and operational. Every saturated color names a stage in the loop; neutral space keeps the full palette legible.
+| Layer | Path | Rule |
+|---|---|---|
+| Tokens | `src/components/site/site.css` (`.cos` and `html[data-cos-theme='dark'] .cos`) | The only place colours, eases and widths are defined |
+| Fonts | `src/app/layout.tsx` (`--font-mona`, `--font-geist-sans`) | Loaded once; referenced as `--cos-sans` and `--cos-geist` |
+| Page shell | `SiteHome.tsx`, `SiteNav.tsx`, `SiteFooter.tsx`, `theme.tsx`, `ThemeToggle.tsx` | One of each per page |
+| Shared pieces | `nav/`, `brand/`, `sections/ClayzoScene.tsx` | Used by 2+ sections |
+| Sections | `hero/`, `sections/Act*.tsx`, `sections/CtaBand.tsx`, `demo/` | Compose the shared pieces; each section looks different |
+| Scenes | `animations/*.ts` → `public/scene/<name>/` | Authored with Clayzo; built JSON plus painted assets |
 
-### Primary
-- **Signal Cobalt:** Carries the hero highlight, focus rings, publishing surfaces, scheduled states, and the paper airplane's primary wing.
+## Colors
 
-### Secondary
-- **Route Vermilion:** Represents the incoming idea, source material, active voice scene, and the signal being handed through the system.
+| Role | Token | Use for | Never for |
+|---|---|---|---|
+| Page | `--cos-ground`, `--cos-ink` | page background and primary text | |
+| Secondary text | `--cos-ink-2` | supporting copy, sub-lines | text on the sky |
+| Tertiary text | `--cos-ink-3` | quiet metadata | text under 14px in light mode (fails AA, see Known debt) |
+| Text on the sky | `--cos-ink-sky` | sub-lines over the hero painting | plain ground |
+| Lines | `--cos-line` | hairlines, dividers, scrolled-nav border | |
+| Focus and links | `--cos-blue` | focus ring (2px, 3px offset) | large fills |
+| Painted accents | `--cos-apricot`, `--cos-peach`, `--cos-sky`, `--cos-lilac` | the hero aura and scene palettes | UI chrome, text |
+| Phone menu | `#0b1014` (sheet) | the full-screen phone menu, both themes | anything else |
 
-### Tertiary
-- **Relay Lime:** Marks creation, Voice QA success, Creator Brain learning, and kinetic connector energy.
-- **Conversation Lilac:** Marks replies, warm contacts, researched context, and conversation outcomes.
+Dark mode: `data-cos-theme="dark"` on `<html>`, set by `theme.tsx`; the toggle wipes the page with a view
+transition. Dark redefines the same `--cos-*` tokens (deep-ocean ground, cool ink, sky-blue accent). Components never
+hard-code a second colour for dark; they read the token or add one `html[data-cos-theme='dark']` rule next to the
+light rule.
 
-### Neutral
-- **Studio Canvas:** The dominant warm near-white stage.
-- **Soft Canvas:** Secondary neutral panels and quiet separation.
-- **Bright Product Surface:** High-clarity product UI and poster-card interiors.
-- **Soft Ink:** Primary type, outlines, controls, and the leads poster field.
-- **Muted Ink:** Supporting copy and metadata at AA-compliant sizes.
-- **Construction Line:** Hairlines, dividers, and quiet borders.
+Contrast (measured with Seam `contrast.mjs`, WCAG 2.2):
 
-### Named Rules
-**The Color Has a Job Rule.** Cobalt publishes, vermilion signals, lime learns, and lilac converses. Never scatter these colors as decoration.
+| Pair | Light | Dark |
+|---|---|---|
+| ink on ground | 17.93 | 17.12 |
+| ink-2 on ground | 7.87 | 8.84 |
+| ink-3 on ground | **3.73** | 4.83 |
+| blue (focus) on ground | 5.24 | 10.03 |
+| phone menu label `#8d979e` on sheet | 6.42 | 6.42 |
 
-**The White Stage Rule.** The hero and distribution scene preserve enough neutral space for the characters and product proof to remain readable.
+## Typography
 
-**The Ink Field Exception.** Full-bleed Soft Ink is reserved for the leads poster and footer contrast moments. It is not a default dark theme.
+| Role | Selector | Use |
+|---|---|---|
+| Display | `.cos-hero-title` | the hero promise only |
+| Section title | `.cos-act-title`, `.cos-cta-title` | one per section; `font-stretch: 104%` |
+| Card title | `.cos-more-title` (20px) | feature cards |
+| Lead | `.cos-hero-sub`, section sub-lines | 17 to 19px, `max-width: 38ch` |
+| Body | `.cos` default | 16px / 1.5 |
+| Label | `.cos-mega-label`, `.cos-foot-title` | 12.5 to 13px group labels |
+| Wordmark | `.cos-wordmark` | Geist 600; the nav and the phone menu |
 
-## 3. Typography
+Families: `--cos-sans` (Mona Sans, variable weight 200 to 900, width 75 to 125%) for the page; `--cos-geist`
+(Geist) for the wordmark and the product windows in `demo/`. Weights: 400 body, 450 leads and links, 500 titles and
+buttons, 550 labels. Headings are sentence case. The brand is written "ContentOS".
 
-**Display Font:** Hanken Grotesk (with system-ui fallback)  
-**Body Font:** Hanken Grotesk (with system-ui fallback)
+## Layout
 
-**Character:** One warm grotesk unifies marketing copy, illustrated labels, and product UI. Personality comes from decisive scale, tight optical spacing, sentence case, and hard contrast rather than decorative font pairing.
+Width: content sits inside `max-width: calc(var(--cos-max) + 2 * var(--cos-gutter))` with `--cos-gutter` padding.
+One section per screen at 1440×900, never two section headings on one screen. Equal left and right content edges.
 
-### Hierarchy
-- **Display** (700, `clamp(3.25rem, 7.8vw, 7rem)`, 0.88): The two-line hero promise only.
-- **Poster Headline** (700, `clamp(2.7rem, 8.5vw, 9.5rem)`, 0.85 to 0.9): Large sentence-case statements in the three kinetic sections.
-- **Title** (700, `1.25rem`, 1.15): Product panels, footer mark, and strong interface labels.
-- **Body** (400 to 500, `1rem`, 1.75): Founder-direct explanation, capped near 65ch and usually narrower.
-- **Label** (600, `0.75rem`, 0.02em tracking): Workflow states, calendar metadata, and compact system labels in sentence case.
+Breakpoints (provisional, from the code): 900px swaps the desktop menus for the phone menu; 719px swaps each Clayzo
+scene to its narrow composition (`narrowBelow={719}`). Touch targets are at least 44px (menu button, close button,
+phone menu rows).
 
-### Named Rules
-**The Sentence-Case Rule.** Headlines and interface labels use natural capitalization. All-caps is forbidden outside unavoidable platform or acronym names.
+## Elevation & Depth
 
-**The One Voice Rule.** Hanken Grotesk carries both brand and product. Do not add serif or monospace type to manufacture personality.
+| Level | Where | Use |
+|---|---|---|
+| 0 | the ground with its navy (light) or white (dark) grain, `--cos-noise` | the page |
+| 1 | metal and silver button shadows | buttons only |
+| 2 | `.cos-mega-panel` (ring plus a 60px soft shadow) | the desktop menu |
+| 3 | the scrolled nav (solid, no blur) | sticky header |
 
-**The Tight-at-Scale Rule.** Tracking becomes more negative as headlines grow, but body copy remains normally spaced and readable.
+No backdrop blur over animated scenes (Chrome flickered). Layers in use (provisional): 0 to 3 for stacking inside a
+section, 50 nav, 60 phone menu sheet, 100 skip link. No other z-index values.
 
-## 4. Elevation
+## Shapes
 
-The system uses two distinct depth languages. The hero command center receives a soft, physically plausible product shadow. Illustrated panels use crisp offset shadows that behave like printed pieces lifted from the page. Flat surfaces remain flat when neither treatment communicates hierarchy.
+Radii: 10px small controls (`.cos-btn-sm`, nav links, close button), 12px buttons and nav cards, 18px the desktop
+menu panel. Focus ring radius follows the control (10px default, 6px on nav triggers).
 
-### Shadow Vocabulary
-- **Command Center Lift** (`0 48px 96px -34px rgb(24 22 20 / 0.42), 0 18px 38px -24px rgb(24 22 20 / 0.26)`): The desktop hero product proof only.
-- **Poster Offset** (`14px 16px 0 oklch(18% 0.012 55)`): Large illustrated product panels on light or colored fields.
-- **Compact Offset** (`7px 8px 0 oklch(18% 0.012 55)`): Distribution outputs and small evidence cards.
-- **Inverse Offset** (`8px 9px 0 oklch(99.2% 0.002 85)`): Signal cards on the dark leads field.
+### Icons
 
-### Named Rules
-**The Two Shadow Languages Rule.** Software floats softly; illustrated evidence lifts with a hard offset. Never combine both treatments on one object.
+Interface icons: `@tabler/icons-react` (chevrons, close), stroke 1.6 to 1.8. The product windows in `demo/` use
+`lucide-react`, as the app does. Platform logos (LinkedIn, X, Threads) are components in `brand/Logos.tsx`.
+Third-party marks (Claude, Claude Code, Codex, Cursor, Grok Bot, Muse, Dots, HubSpot, Apollo, Slack) are the makers'
+real logos as 128px PNGs in `public/brand/logos/`; single-colour black marks carry `data-mono` and invert on dark.
+Icon-only buttons carry an `sr-only` name.
 
-**The Flat-Until-Lifted Rule.** Shadows identify the dominant proof or a physically lifted poster piece. They are never ambient fog.
+## Motion
 
-## 5. Components
+| Token | Value | Use |
+|---|---|---|
+| `--cos-ease-out` | cubic-bezier(0.23, 1, 0.32, 1) | default: anything entering, leaving or pressed |
+| `--cos-ease-expo` | cubic-bezier(0.16, 1, 0.3, 1) | long reveals |
 
-### Buttons
-- **Shape:** Compact squared controls with gently rounded corners (10px), never default pills.
-- **Primary:** Soft Ink fill, Studio Canvas text, 48px minimum height, and 14px by 22px internal spacing.
-- **Hover / Focus:** Translate upward by at most 1px. Use a visible 3px cobalt focus ring with a 3px canvas offset.
-- **Secondary:** Bright Product Surface with one Construction Line border. No glass or decorative blur.
+Durations are not tokens yet; the code uses (provisional) 140 to 160ms press and close, 180 to 240ms menus and
+panels, 280ms the phone menu rows opening, 500ms card image zoom, 900ms the button shine. Animate `transform` and
+`opacity` (the phone menu rows animate `grid-template-rows`). Buttons press to `scale(0.97)`. Menus close faster than
+they open. Every transition has a `prefers-reduced-motion: reduce` rule that turns it off.
 
-### Chips
-- **Style:** Compact 8px corners, short sentence-case labels, and explicit status meaning.
-- **State:** Selected or successful states include a non-color cue such as an icon, check, or border.
+Scenes: every animated picture is a Clayzo scene in `animations/<name>.ts`, built to `public/scene/<name>/`, mounted
+with `ClayzoScene`, playing only when visible (`playWhen="visible"`), with a light and a dark build and a narrow
+composition for phones.
 
-### Cards / Containers
-- **Corner Style:** 14px for compact evidence, 18px for poster cards, and 22px for the hero command center.
-- **Background:** Use Bright Product Surface, Relay Lime, Conversation Lilac, or Signal Cobalt according to workflow meaning.
-- **Shadow Strategy:** Choose exactly one shadow language from Elevation.
-- **Border:** Poster pieces use 3px Soft Ink construction outlines. Product UI uses one quiet Construction Line.
-- **Internal Padding:** 16px to 24px.
+## Components
 
-### Inputs / Fields
-- **Style:** Bright Product Surface, one Construction Line, 10px corners, and at least 48px height.
-- **Focus:** Cobalt border plus a 3px external cobalt ring.
-- **Error / Disabled:** Pair state color with an icon and specific text. Disabled content remains legible.
+| Component | Path | Variants | States | Use instead of | Status |
+|---|---|---|---|---|---|
+| Button | `.cos-btn` in `site.css` | `.cos-btn-metal` (primary), `.cos-btn-silver` (secondary) · size: default 52px, `.cos-btn-sm` 38px | hover (shine sweep), active (scale 0.97), focus-visible; metal and silver swap roles in dark | a hand-styled `<a>` or `<button>` | ready |
+| Wordmark, Mark | `brand/Mark.tsx` | | | the plane image on its own in the nav | ready |
+| Platform logos | `brand/Logos.tsx` | size | | inline SVG copies | ready |
+| SiteNav | `SiteNav.tsx` | scrolled / at top | links hidden over the hero until scroll | | ready |
+| MegaNav | `nav/MegaNav.tsx`, items in `nav/menus.tsx` | | hover intent (80ms in, 160ms out), click, keyboard (focus moves in, Escape returns), resizes between menus | other dropdowns | ready |
+| MobileNav | `nav/MobileNav.tsx` | | open / closed (inert), one row open at a time, Escape, focus returns to the menu button, page scroll locked | inline expanding lists | ready |
+| ThemeToggle | `ThemeToggle.tsx` | | | a second toggle (shares a view-transition name) | ready, one per page |
+| ClayzoScene | `sections/ClayzoScene.tsx` | `name`, `width`/`height`, `narrow`, `narrowBelow`, `playWhen`, `interactive`, `label` | visible / hidden, reduced motion | `<video>`, GIFs, poster images | ready |
+| Hero | `hero/Hero.tsx`, `hero/SkyField.tsx` | backdrop: sky, india | | | ready |
+| ProductDemo | `demo/ProductDemo.tsx`, `demo/StepSwitch.tsx` | | | screenshots of the app | ready |
+| Sections | `sections/ActVoice.tsx`, `ActLeads.tsx`, `ActOutreach.tsx`, `ActMore.tsx`, `CtaBand.tsx` | | | | ready |
+| SiteFooter | `SiteFooter.tsx` | | | | ready |
 
-### Navigation
-- The desktop navigation is 72px tall and sparse. The lowercase `content os.` wordmark anchors the left; its period is cobalt. Product, The loop, Pricing, and Sign in remain quieter than the trial action.
-- Mobile uses a 44px menu control and an inline expanding panel, never a modal.
-- The paper airplane is the favicon and compact brand mark. Do not put it inside a generated square tile when used on a surface.
+Rules:
+- Menu content lives in `nav/menus.tsx` and feeds both MegaNav and MobileNav; never write menu links in two places.
+- Every picture that follows the backdrop reads `?bg=india` the same way (`ActMore`, `CtaBand`, `MegaNav`) and has
+  `-india` assets beside the default ones.
 
-### Content Relay Illustration
-The hero cast is a static raster illustration. Poses, dashed paths, the machine, and paper airplane communicate motion without requiring animation. It remains subordinate to the headline.
+## Patterns
 
-### Illustrated Command Center
-The 16:9 command center is direct product proof, not a generic analytics dashboard. It shows the operating relay and concrete values: signals, drafts, Voice QA, scheduled posts, replies, Creator Brain learning, and warm conversations. On desktop it rises, scales, settles, then exits symmetrically with scroll using damped springs. It carries the Command Center Lift and disappears below the 768px breakpoint.
+**section**: one `<section>` per product idea, its own `h2` (`.cos-act-title` or `.cos-cta-title`), one sub-line,
+one Clayzo scene or product window. No two sections share a layout; no template eyebrow labels above headings.
 
-### Kinetic Poster Sections
-- **Voice:** A vermilion field with Creator Brain, Voice QA, an oversized composer, and one character. The right-side composition grows and spreads vertically on desktop.
-- **Distribution:** A neutral stage dominated by a rotated cobalt calendar, one source, and separate LinkedIn and X outputs connected by flowing routes.
-- **Leads:** A Soft Ink field with lilac and lime signal cards connected by curved dashed routes. Mobile replaces the desktop route map with two stacked groups and one vertical squiggle.
-- Characters disappear below 768px. Headline sizes clamp down and diagrams become width-safe, deliberate vertical compositions.
+**painted picture**: generated with a style reference, cropped to 2× its CSS size, baked through the hero's oil-paint
+pass (`animations/paint-panels.ts`), in day and night, and in `-india` when it follows the backdrop.
 
-### Motion and Cursor
-Use the shared exponential ease `cubic-bezier(0.16, 1, 0.3, 1)` for reveals. Scroll-linked movement animates transforms and opacity only. Kinetic connectors use a 1.15-second linear dash flow. The smooth custom cursor is desktop-only. Reduced motion disables connector flow, cursor choreography, hover lifts, and scroll transforms.
+**menu** (desktop and phone): grouped links under labels in `--cos-ink`; real logos only where a page is about a
+product; a group with logos keeps an empty logo slot for items without one, so the words line up.
 
-### Footer Mark
-`content os.` is assembled from compact outlined letter pieces using the relay palette. Each letter may lift independently on hover; the period remains still and optically separated.
+## Do's and Don'ts
 
-## 6. Do's and Don'ts
+- MUST read colours from `--cos-*` tokens in `src/components/site/`; a dark value goes in the dark token block or one
+  `html[data-cos-theme='dark']` rule.
+- MUST gate light-only tuning with `html:not([data-cos-theme='dark'])` so the dark theme does not change.
+- MUST give every transition a `prefers-reduced-motion: reduce` rule.
+- MUST mount animation through `ClayzoScene`; NEVER ship a poster image, video or screenshot in place of a scene.
+- MUST keep one ThemeToggle on the page.
+- NEVER use em dashes or the word "viral" in page copy; write "ContentOS" as one word.
+- NEVER put a caption under an image or scene.
+- NEVER add a z-index outside the layers in Elevation.
+- SHOULD keep copy short and plain: one sentence per sub-line.
 
-### Do:
-- **Do** make the entire loop visible through real states and handoffs.
-- **Do** use one dominant visual idea per viewport.
-- **Do** let the illustrated command center prove product depth before feature explanation.
-- **Do** assign every saturated color its documented workflow role.
-- **Do** use sentence-case headlines with Hanken Grotesk, bold weight, and tight tracking.
-- **Do** vary composition across voice, distribution, and leads.
-- **Do** remove characters and the large dashboard on narrow screens when they compete with understanding.
-- **Do** preserve WCAG 2.2 AA contrast, semantic landmarks, 44px touch targets, keyboard focus, and complete reduced-motion states.
+Known debt (recorded at detect time; not reviewed per PR):
+- Light `--cos-ink-3` measures 3.73:1 on the ground, under AA for small text; used by `.cos-foot-title` and the footer
+  base line at 13px. Proposed: `#6b6d77` (4.89:1, same hue).
+- `.cos-mega-soon` and `.cos-mega-link[data-soon]` styles remain with no item using them.
+- Durations and z-index values are literals, not tokens.
 
-### Don't:
-- **Don't** resemble generic AI SaaS marketing, a Linear clone, a caption generator, or a writer's portfolio.
-- **Don't** use blue or purple gradient atmospheres, floating glow orbs, decorative glass-card grids, vague automation claims, dense enterprise martech language, or fabricated social proof.
-- **Don't** use a generic analytics dashboard, traffic chart, or interchangeable stat-card row as product proof.
-- **Don't** repeat identical feature-card grids or give every section the same background and structure.
-- **Don't** copy Notion's illustration style, monochrome identity, page structure, or components.
-- **Don't** use beige graph paper, long empty MacBook scrolls, sparse edge sketches, typewriters, pens, or loose manuscript pages.
-- **Don't** use gradient text, side-stripe accents, nested cards, or decorative glassmorphism.
-- **Don't** make every headline uppercase.
-- **Don't** use pure black as Soft Ink or introduce unassigned accent colors.
+## Migration
+
+| Kind | Old | New | Until | Status | Notes |
+|---|---|---|---|---|---|
+| token | `--cos-ink-3` | `--cos-ink-2` | | planned | for text under 14px in light mode, until ink-3 is darkened |
+
+## Overrides
+
+| Rule | Change | Scope | Reason | Owner | Date |
+|---|---|---|---|---|---|
+
+## Changelog
+
+- 2026-11-09 · Seam onboarding: DESIGN.md rewritten for the new landing page (Mona Sans, painted sky, deep-ocean
+  dark, Clayzo scenes); the earlier "Content Relay" direction is retired.
