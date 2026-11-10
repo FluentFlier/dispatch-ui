@@ -789,13 +789,15 @@ html[data-cos-theme='dark'] .cos-mega-card-line {
   padding-bottom: clamp(48px, 7vh, 88px);
 }
 
-/* the sky lives in a rounded panel inset from the page edge */
+/* the sky lives in a rounded panel inset from the page edge. Under 1200 px it runs past the product
+   window and its step bar, ending as far below the bar (22 px) as the bar sits below the window:
+   the hero's bottom padding, less that gap */
 .cos-panel {
   position: absolute;
   top: 10px;
   left: 10px;
   right: 10px;
-  bottom: clamp(260px, 30vw, 380px);
+  bottom: calc(clamp(48px, 7vh, 88px) - 22px);
   z-index: 0;
   overflow: hidden;
   border-radius: 28px;
@@ -1019,7 +1021,6 @@ html[data-hero-wait] .cos-rise {
     left: 6px;
     right: 6px;
     border-radius: 22px;
-    bottom: 120px;
   }
   .cos-hero-actions {
     width: 100%;
