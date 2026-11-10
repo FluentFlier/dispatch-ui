@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { ClayzoScene } from "./sections/ClayzoScene";
-import { ThemeToggle } from "./ThemeToggle";
 
 /**
- * The page's last word: the promise, the way around the site (the nav's pages, the sections of this
+ * The page's last word (the theme toggle stays in the nav: two would share its view-transition
+ * name and break the theme change): the promise, the way around the site (the nav's pages, the sections of this
  * page, and the brief's Company links), then ContentOS across the full width, drawn in the brand's
  * own paper planes (animations/plane-wordmark.ts). A wave loops the planes through the mark's
  * colours; on a desktop they turn away from the cursor.
@@ -69,7 +69,6 @@ export function SiteFooter() {
         </div>
         <div className="cos-foot-base">
           <span>© {new Date().getFullYear()} ContentOS</span>
-          <ThemeToggle />
         </div>
       </div>
       <div className="cos-foot-word">

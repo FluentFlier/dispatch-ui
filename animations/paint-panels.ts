@@ -10,7 +10,7 @@
  *   pnpm tsx animations/paint-panels.ts [names…]   (writes animations/assets/panels/<name>[-india]-<day|night>-oil.jpg)
  */
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import {
@@ -91,6 +91,11 @@ const PANELS: [string, number, number][] = [
   ['breakout', 1280, 680],
   // the closing band (animations/cta-field.ts): the sky's warm horizon, India's palaces and lake
   ['cta', 2880, 1280],
+  // the nav menus' cards on the India backdrop (nav/MegaNav.tsx): four more places, painted for them
+  ['nav-product', 1120, 864],
+  ['nav-solutions', 1120, 864],
+  ['nav-compare', 1120, 864],
+  ['nav-resources', 1120, 864],
 ];
 // `pnpm tsx animations/paint-panels.ts cta` paints only the named crops
 const ONLY = process.argv.slice(2);
@@ -104,6 +109,7 @@ for (const [name, W, H] of PANELS) for (const bg of ['', '-india']) {
   if (ONLY.length && !ONLY.includes(name)) continue;
   for (const tone of ['day', 'night']) {
     const src = `animations/assets/panels/${name}${bg}-${tone}.jpg`;
+    if (!existsSync(src)) continue; // a crop made for one backdrop only
     copyFileSync(src, join(work, 'src.jpg'));
     const nodes: Record<string, SceneNode> = {
       img: { ...base('img', { outTick: 4, x: W / 2, y: H / 2 }), type: 'image', assetId: 'src', size: constant({ width: W, height: H }), fit: 'cover' } as SceneNode,

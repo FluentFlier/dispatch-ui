@@ -373,6 +373,246 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
   }
 }
 
+/* ------------------------------------------------------------- nav menus */
+/* one panel for every menu (nav/MegaNav.tsx): it slides under the trigger and eases to the size of
+   what it holds. Inside, the page's own quiet type: link columns under small labels, real logos
+   where a page is about a product, and one card on a crop of the painted sky */
+.cos-mega {
+  position: relative;
+}
+.cos-mega-trigger {
+  gap: 4px;
+}
+.cos-mega-chev {
+  margin-right: -5px;
+  opacity: 0.45;
+  transition: transform 200ms var(--cos-ease-out), opacity 160ms ease;
+}
+.cos-mega-trigger[data-open] {
+  color: var(--cos-ink);
+}
+.cos-mega-trigger[data-open] .cos-mega-chev {
+  transform: rotate(180deg);
+  opacity: 0.75;
+}
+.cos-mega-panel {
+  position: absolute;
+  top: calc(100% + 21px);
+  left: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(16, 17, 24, 0.08),
+    0 24px 60px -24px rgba(16, 17, 24, 0.22),
+    0 2px 6px -2px rgba(16, 17, 24, 0.06);
+  transform-origin: top center;
+  transition:
+    transform 240ms var(--cos-ease-out),
+    width 240ms var(--cos-ease-out),
+    height 240ms var(--cos-ease-out),
+    opacity 180ms ease,
+    translate 200ms var(--cos-ease-out),
+    scale 200ms var(--cos-ease-out),
+    visibility 0s linear 0s;
+}
+.cos-mega-panel[data-state='closed'] {
+  opacity: 0;
+  translate: 0 -6px;
+  scale: 0.985;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 140ms ease,
+    translate 140ms ease,
+    scale 140ms ease,
+    visibility 0s linear 140ms;
+}
+/* opening from closed: appear where it belongs, no slide in from the last place it was */
+.cos-mega-panel[data-fresh] {
+  transition:
+    opacity 180ms ease,
+    translate 200ms var(--cos-ease-out),
+    scale 200ms var(--cos-ease-out),
+    visibility 0s linear 0s;
+}
+.cos-mega-content {
+  width: max-content;
+}
+.cos-mega-content[data-dir='right'] {
+  animation: cos-mega-from-right 240ms var(--cos-ease-out);
+}
+.cos-mega-content[data-dir='left'] {
+  animation: cos-mega-from-left 240ms var(--cos-ease-out);
+}
+@keyframes cos-mega-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+@keyframes cos-mega-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+}
+.cos-mega-body {
+  display: flex;
+  gap: 40px;
+  padding: 10px 10px 10px 30px;
+}
+.cos-mega-col {
+  display: grid;
+  align-content: start;
+  gap: 26px;
+  padding: 20px 0 22px;
+}
+.cos-mega-label {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--cos-ink-3);
+}
+.cos-mega-group ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cos-mega-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 32px;
+  font-size: 14.5px;
+  font-weight: 450;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--cos-ink-2);
+  transition: color 160ms ease;
+}
+.cos-mega-logo {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cos-mega-logo img {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
+/* the underline draws from the left on hover */
+.cos-mega-word {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  padding-bottom: 1px;
+  transition: background-size 220ms var(--cos-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  a.cos-mega-link:hover {
+    color: var(--cos-ink);
+  }
+  a.cos-mega-link:hover .cos-mega-word {
+    background-size: 100% 1px;
+  }
+}
+.cos-mega-link:focus-visible,
+.cos-mega-card:focus-visible,
+.cos-mega-trigger:focus-visible {
+  outline: 2px solid var(--cos-blue);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.cos-mega-link[data-soon] {
+  color: var(--cos-ink-3);
+  cursor: default;
+}
+.cos-mega-link[data-soon] .cos-mega-logo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+.cos-mega-soon {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--cos-ink-3);
+}
+/* the card: a crop of the painted sky, its words on the sky's calm top */
+.cos-mega-card {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 232px;
+  min-height: 236px;
+  overflow: hidden;
+  border-radius: 12px;
+  isolation: isolate;
+}
+.cos-mega-card-img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 500ms var(--cos-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cos-mega-card:hover .cos-mega-card-img {
+    transform: scale(1.03);
+  }
+}
+.cos-mega-card-text {
+  display: grid;
+  gap: 4px;
+  padding: 16px 16px 0;
+}
+.cos-mega-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: #101114;
+}
+.cos-mega-card-line {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #2c2e36;
+  text-wrap: pretty;
+}
+html[data-cos-theme='dark'] .cos-mega-panel {
+  background: #0f171c;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 28px 64px -20px rgba(0, 0, 0, 0.7);
+}
+html[data-cos-theme='dark'] .cos-mega-logo img[data-mono] {
+  filter: invert(1);
+}
+html[data-cos-theme='dark'] .cos-mega-card-title {
+  color: #eef2f4;
+}
+html[data-cos-theme='dark'] .cos-mega-card-line {
+  color: #c1cbd1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-mega-panel,
+  .cos-mega-content,
+  .cos-mega-word,
+  .cos-mega-card-img {
+    transition: none;
+    animation: none;
+  }
+}
+/* phones and tablets use the sheet (SiteNav): the whole bar of menus leaves the grid, or it takes
+   the middle cell and pushes the buttons onto a second row */
+@media (max-width: 900px) {
+  .cos-mega {
+    display: none;
+  }
+}
+
 /* --------------------------------------------------------------------- hero */
 
 .cos-hero {

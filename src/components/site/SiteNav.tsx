@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Wordmark } from './brand/Mark';
 import { ThemeToggle } from './ThemeToggle';
+import { MegaNav } from './nav/MegaNav';
 
 const LINKS = [
   { label: 'Product', href: '#product' },
@@ -32,13 +33,7 @@ export function SiteNav({ cta, loggedIn }: { cta: { href: string; label: string 
           <Wordmark />
         </Link>
 
-        <nav className="cos-nav-links" aria-label="Main">
-          {LINKS.map((l) => (
-            <a key={l.label} href={l.href} className="cos-nav-link">
-              {l.label}
-            </a>
-          ))}
-        </nav>
+        <MegaNav extra={[{ label: 'Pricing', href: '/pricing' }]} />
 
         <div className="cos-nav-actions">
           <ThemeToggle />
