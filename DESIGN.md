@@ -201,6 +201,8 @@ composition for phones.
 | Hero | `hero/Hero.tsx`, `hero/SkyField.tsx` | backdrop: sky, india | | | ready |
 | ProductDemo | `demo/ProductDemo.tsx`, `demo/StepSwitch.tsx` | | | screenshots of the app | ready |
 | Sections | `sections/ActVoice.tsx`, `ActLeads.tsx`, `ActOutreach.tsx`, `ActMore.tsx`, `CtaBand.tsx` | | | | ready |
+| Integration page | `pages/ForGrokBot.tsx` (route `src/app/for/grok-bot`), `.cos-for-*`, scene `animations/grok-hero.ts` | | hero scene plays its intro once then idles (state machine); nav links show from the top (`data-page="sub"`) | a landing section reused as a page hero | experimental |
+| CopyField | `pages/CopyField.tsx`, `.cos-copy*` | | idle / copied / manual (clipboard refused: text selected, "Press ⌘C"); hover, active, focus-visible; announced in an `aria-live` region | a raw `<code>` with no way to copy | experimental |
 | FAQ | `sections/ActFaq.tsx`, `.cos-faq-*` | | per row: closed / open (several at once), hover, active, focus-visible, reduced motion; closed answers hidden from the tab order | a `<details>` list or a second accordion | experimental |
 | SiteFooter | `SiteFooter.tsx` | | | | ready |
 
@@ -252,6 +254,7 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
+- 2026-11-10 · `/for/grok-bot`: integration page (hero scene, connect steps with CopyField, key scopes, closing band); experimental.
 - 2026-11-09 · FAQ section (`ActFaq`, experimental) before the closing band; answers from the product handover only.
 - 2026-11-09 · Seam onboarding: DESIGN.md rewritten for the new landing page (Mona Sans, painted sky, deep-ocean
   dark, Clayzo scenes); the earlier "Content Relay" direction is retired.
