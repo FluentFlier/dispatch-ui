@@ -32,13 +32,7 @@ export const COLOURWAYS = {
     lit: { light: '#23407E', dark: '#D6ECF8' },
     wordmark: { light: ['#0F1D3A', '#8DB4D6'], dark: ['#5B7DBF', '#D6ECF8'] },
   },
-  // gradients: a fold given as [tail, nose] shades along the plane, tail to nose
-  tropical: {
-    upper: ['#00E0A8', '#00A3FF'],
-    lower: ['#FFD23F', '#FF5A3D'],
-    lit: { light: '#0096E0', dark: '#00E0A8' },
-    wordmark: { light: ['#00B8C8', '#FF8A2E'], dark: ['#00E0A8', '#FFC23F'] },
-  },
+  // a fold given as [tail, nose] is a gradient that shades along the plane, tail to nose
   ocean: {
     upper: ['#1ED2FF', '#0A5CFF'],
     lower: ['#FFB04A', '#FF3D6E'],

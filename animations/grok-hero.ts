@@ -36,6 +36,7 @@ import {
   type SceneNode,
 } from '@clayzo/animation/authoring';
 import { FPS, TPS, t } from './lib/kit';
+import { MARK } from './lib/mark';
 
 // ------------------------------------------------------------------ time
 const INTRO = 7.8; // the intro ends on the lockup
@@ -46,8 +47,10 @@ const TOTAL = INTRO + IDLE;
 const S0 = 0.9;
 const END = t(TOTAL - S0);
 const ORB = [2.0, 6.0] as const; // the plane's orbit
-const LOCK = [6.3, 7.35] as const; // into the lockup
-const STEP = 1 / 30;
+// into the lockup, straight out of the orbit: the plane never stops until it lands
+const LOCK = [6.0, 7.3] as const;
+const STEP = 1 / 60; // sampled every frame, then thinned where a straight line between keys is exact
+const FINE = 1 / 240; // the grid the smoothed channels are computed on
 
 const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
@@ -67,6 +70,65 @@ function track(keys: [number, number][], s: number, ease = inOut) {
   for (let i = 1; i < keys.length; i += 1)
     if (s <= keys[i][0]) return lerp(keys[i - 1][1], keys[i][1], ease(seg(s, keys[i - 1][0], keys[i][0])));
   return keys[keys.length - 1][1];
+}
+
+// cubic Hermite from p0 (velocity m0) to p1 (velocity m1), all over one unit of u: the pieces of the
+// plane's flight meet with the same speed and heading, so it never lurches or stops dead
+type V2 = { x: number; y: number };
+function hermite(p0: V2, m0: V2, p1: V2, m1: V2, u: number): V2 {
+  const u2 = u * u;
+  const u3 = u2 * u;
+  const a = 2 * u3 - 3 * u2 + 1;
+  const b = u3 - 2 * u2 + u;
+  const c = -2 * u3 + 3 * u2;
+  const d = u3 - u2;
+  return { x: a * p0.x + b * m0.x + c * p1.x + d * m1.x, y: a * p0.y + b * m0.y + c * p1.y + d * m1.y };
+}
+
+// a channel over the intro, computed on a fine grid and softened with a Gaussian (sigma in seconds), so
+// a heading flip becomes a roll; the idle segment, which loops, reads the function itself
+function softened(f: (s: number) => number, sigma: number) {
+  const n = Math.ceil((INTRO - S0) / FINE) + 1;
+  const raw = Array.from({ length: n }, (_, i) => f(S0 + i * FINE));
+  const r = Math.max(1, Math.round((3 * sigma) / FINE));
+  const w = Array.from({ length: 2 * r + 1 }, (_, j) => Math.exp(-(((j - r) * FINE) ** 2) / (2 * sigma * sigma)));
+  const sm = raw.map((_, i) => {
+    let acc = 0;
+    let ws = 0;
+    for (let j = -r; j <= r; j += 1) {
+      acc += raw[Math.min(n - 1, Math.max(0, i + j))] * w[j + r];
+      ws += w[j + r];
+    }
+    return acc / ws;
+  });
+  return (s: number) => {
+    if (s >= INTRO) return f(s);
+    const x = (Math.max(s, S0) - S0) / FINE;
+    const i = Math.min(n - 2, Math.floor(x));
+    return lerp(sm[i], sm[i + 1], x - i);
+  };
+}
+
+// a channel that follows its target on a critically damped spring (omega in rad/s), the way eyes
+// trail what they watch; it hands back to the function itself over the intro's last quarter second
+function sprung(f: (s: number) => number, omega: number) {
+  const n = Math.ceil((INTRO - S0) / FINE) + 1;
+  const out: number[] = [];
+  let x = f(S0);
+  let v = 0;
+  for (let i = 0; i < n; i += 1) {
+    const s = S0 + i * FINE;
+    const a = omega * omega * (f(s) - x) - 2 * omega * v;
+    v += a * FINE;
+    x += v * FINE;
+    out.push(lerp(x, f(s), smooth(seg(s, INTRO - 0.25, INTRO))));
+  }
+  return (s: number) => {
+    if (s >= INTRO) return f(s);
+    const k = (Math.max(s, S0) - S0) / FINE;
+    const i = Math.min(n - 2, Math.floor(k));
+    return lerp(out[i], out[i + 1], k - i);
+  };
 }
 
 // ------------------------------------------------------------------ layout
@@ -98,12 +160,15 @@ function layout(narrow: boolean) {
 }
 
 // ------------------------------------------------------------------ the plane's path
-// the orbit runs from the left end, through the front (bottom), round the back (top) and on, two and
-// a half half-turns, slowing into the front at the end
+// the orbit runs from the left end, through the front (bottom), round the right end and the back
+// (top), and ends behind the bot's left side, heading left and clear of it: it enters quick and eases
+// off, so the landing carries straight on from it and curls round into the lockup without crossing
+// the bot's face
+const SWEEP = 1.8 * Math.PI;
 const orbitPhi = (s: number) => {
   const u = seg(s, ORB[0], ORB[1]);
-  const e = 0.72 * u + 0.28 * (1 - (1 - u) ** 2);
-  return Math.PI - 2.5 * Math.PI * e;
+  const e = u + 0.75 * u * (1 - u);
+  return Math.PI - SWEEP * e;
 };
 
 function build(dark: boolean, narrow: boolean) {
@@ -119,35 +184,44 @@ function build(dark: boolean, narrow: boolean) {
   };
   const start = orbitAt(Math.PI);
   const frontEnd = orbitAt(orbitPhi(ORB[1]));
+  // the orbit's velocity (px per second) where the swoop joins it and where the landing leaves it
+  const orbitVel = (s: number) => {
+    const e = 1e-3;
+    const a = orbitAt(orbitPhi(s - e));
+    const b = orbitAt(orbitPhi(s + e));
+    return { x: (b.x - a.x) / (2 * e), y: (b.y - a.y) / (2 * e) };
+  };
+  const vIn = orbitVel(ORB[0] + 1e-3);
+  const vOut = orbitVel(ORB[1] - 1e-3);
+  const SWOOP = [1.3, ORB[0]] as const;
+  const frontSize = L.plane * (0.84 + 0.28 * frontEnd.z);
   // where the plane is, its depth (+ in front of the bot) and size
   const planeAt = (s: number) => {
     if (s < ORB[0]) {
-      // it swoops in from off the left edge, up and over into the orbit's left end
-      const u = out(seg(s, 1.35, ORB[0]));
+      // it glides in from off the left edge, rising a little, and meets the orbit's left end at the
+      // orbit's own speed and heading
+      const T = SWOOP[1] - SWOOP[0];
+      const u = seg(s, SWOOP[0], SWOOP[1]);
       const p0 = { x: -L.plane, y: cy - 150 * k };
       const c = { x: start.x - 40 * k, y: cy - 190 * k };
-      const x = (1 - u) ** 2 * p0.x + 2 * (1 - u) * u * c.x + u * u * start.x;
-      const y = (1 - u) ** 2 * p0.y + 2 * (1 - u) * u * c.y + u * u * start.y;
-      return { x, y, z: 0.2, size: L.plane * 0.88 };
+      const q = hermite(p0, { x: 2 * (c.x - p0.x), y: 2 * (c.y - p0.y) }, start, { x: vIn.x * T, y: vIn.y * T }, u);
+      return { x: q.x, y: q.y, z: 0, size: L.plane * 0.84 };
     }
     if (s < LOCK[0]) {
-      const o = s <= ORB[1] ? orbitAt(orbitPhi(s)) : { ...frontEnd };
+      const o = orbitAt(orbitPhi(s));
       return { ...o, size: L.plane * (0.84 + 0.28 * o.z) };
     }
-    // into the lockup: a short rising arc to its place left of the bot
-    const u = inOut(seg(s, LOCK[0], LOCK[1]));
-    const p0 = frontEnd;
-    const p1 = { x: L.lock.planeX, y: L.lock.planeY };
-    const c = { x: lerp(p0.x, p1.x, 0.5) - 60 * k, y: Math.min(p0.y, p1.y) - 70 * k };
-    const x = (1 - u) ** 2 * p0.x + 2 * (1 - u) * u * c.x + u * u * p1.x;
-    const y = (1 - u) ** 2 * p0.y + 2 * (1 - u) * u * c.y + u * u * p1.y;
-    let yy = y;
+    // into the lockup: it carries on out of the orbit, turns, and glides to rest left of the bot
+    const T = LOCK[1] - LOCK[0];
+    const u = seg(s, LOCK[0], LOCK[1]);
+    const q = hermite(frontEnd, { x: vOut.x * T, y: vOut.y * T }, { x: L.lock.planeX, y: L.lock.planeY }, { x: 0, y: 0 }, u);
+    let yy = q.y;
     if (s > INTRO) yy += 3 * k * Math.sin((2 * Math.PI * (s - INTRO)) / IDLE); // idle: a slow bob
-    return { x, y: yy, z: 0.3, size: lerp(L.plane * (0.84 + 0.28 * frontEnd.z), L.lock.planeS, u) };
+    return { x: q.x, y: yy, z: 0.3, size: lerp(frontSize, L.lock.planeS, smooth(u)) };
   };
   // the plane's heading from its path; it banks edge-on where it moves straight up or down, and
   // mirrors when it heads left, the way an orbit seen from the side looks
-  const planePose = (s: number) => {
+  const rawPose = (s: number) => {
     const e = 1 / 60;
     const a = planeAt(Math.max(0, s - e));
     const b = planeAt(Math.min(TOTAL, s + e));
@@ -168,9 +242,14 @@ function build(dark: boolean, narrow: boolean) {
     const land = smooth(seg(s, LOCK[1] - 0.35, LOCK[1]));
     rot = lerp(rot, 0, land);
     flip = lerp(flip, 1, land);
-    if (s > INTRO) rot = 2 * Math.sin((2 * Math.PI * (s - INTRO)) / IDLE + 0.6);
+    if (s > INTRO) rot = 2 * Math.sin((2 * Math.PI * (s - INTRO)) / IDLE);
     return { ...p, rot, flip };
   };
+  // the heading and the mirror, softened: where the plane turns past vertical it rolls through
+  // edge-on instead of snapping round
+  const rotS = softened((s) => rawPose(s).rot, 0.07);
+  const flipS = softened((s) => rawPose(s).flip, 0.05);
+  const planePose = (s: number) => ({ ...planeAt(s), rot: rotS(s), flip: flipS(s) });
 
   // ------------------------------------------------------------------ the bot
   const surprise = (() => {
@@ -192,20 +271,20 @@ function build(dark: boolean, narrow: boolean) {
     // it leans a touch toward the plane while it watches, and stretches when startled
     const pp = planeAt(s);
     const watch = seg(s, ORB[0], ORB[0] + 0.4) * (1 - seg(s, ORB[1], LOCK[0] + 0.2));
-    x += watch * clamp((pp.x - cx) / (L.orbit.A * 2)) * 10 * k;
+    x += watch * clamp((pp.x - cx) / (L.orbit.A * 2), -1, 1) * 10 * k;
     const st = 0.05 * bump(s, surprise + 0.12, 0.3);
     return { x, y, D, sx: 1 - st * 0.6, sy: 1 + st };
   };
 
   // where the eyes look: scripted at first, then they follow the plane (a beat behind it)
-  const look = (s: number) => {
+  const rawLook = (s: number) => {
     const sy = track([[1.4, 0], [1.6, -0.6], [1.9, -0.6], [2.12, 0.5], [2.35, 0.3]], s);
     const sp = track([[1.4, 0], [1.6, 0.04], [1.9, 0.06], [2.12, -0.02], [2.35, 0]], s);
     const p = planeAt(Math.max(0, s - 0.1));
     const b = { x: cx, y: cy };
     // turning the eyes past 0.64 would slide one off the sphere's rim
     const fy = clamp((p.x - b.x) / (L.D * 1.25), -1, 1) * 0.64;
-    const fp = clamp(-(p.y - b.y) / (L.D * 1.1), -1, 1) * 0.6 + (p.z < 0 ? 0.18 : 0);
+    const fp = clamp(-(p.y - b.y) / (L.D * 1.1), -1, 1) * 0.6 + 0.18 * smooth(clamp(0.5 - p.z * 2.5));
     const follow = smooth(seg(s, 2.15, 2.45)) * (1 - smooth(seg(s, LOCK[0], LOCK[0] + 0.3)));
     let Y = lerp(sy, fy, follow);
     let P = lerp(sp, fp, follow);
@@ -220,6 +299,10 @@ function build(dark: boolean, narrow: boolean) {
     }
     return { Y, P };
   };
+  // the gaze trails its target on a spring, so the eyes glide and settle instead of stepping
+  const lookY = sprung((s) => rawLook(s).Y, 15);
+  const lookP = sprung((s) => rawLook(s).P, 15);
+  const look = (s: number) => ({ Y: lookY(s), P: lookP(s) });
 
   // the eyes' shape, in units of the bot's diameter: tall pills; a dash when shut; round when
   // startled; a tilted squint when happy
@@ -275,13 +358,44 @@ function build(dark: boolean, narrow: boolean) {
   const C = dark
     ? { bot: hexA('#EEF2F4'), eye: hexA('#080F14'), dots: hexA('#7D888F'), ink: hexA('#EEF2F4'), ink2: hexA('#A7B1B8') }
     : { bot: hexA('#0E0F12'), eye: hexA('#FAF9F6'), dots: hexA('#8B8D94'), ink: hexA('#101114'), ink2: hexA('#4C4E57') };
-  const TRAIL = ['#1E4BF0', '#FF4A31', '#B48ADB', '#C2D92B'].map((h) => hexA(h));
+  // the trail runs through the mark's own colours, shading from one to the next along the path
+  const stops = [MARK.upper, MARK.lower].flatMap((f) => (typeof f === 'string' ? [f] : [...f])).map((h) => hexA(h));
+  const trailColour = (n: number): Color => {
+    const x = ((n * 0.035) % stops.length + stops.length) % stops.length;
+    const i = Math.floor(x);
+    const a = stops[i];
+    const b = stops[(i + 1) % stops.length];
+    const m = smooth(x - i);
+    return { r: lerp(a.r, b.r, m), g: lerp(a.g, b.g, m), b: lerp(a.b, b.b, m), a: 1 };
+  };
 
   const times: number[] = [];
   for (let i = 0; i * STEP <= TOTAL - S0 + 1e-6; i += 1) times.push(Math.min(TOTAL - S0, i * STEP));
   const v3 = (x: number, y: number, z = 0) => ({ x, y, z });
-  const sampled = <T>(id: string, f: (s: number) => T) =>
-    keyed(id, times.map((s, i) => [t(s), f(s + S0), i === times.length - 1 ? 'hold' : 'linear']) as never) as never;
+  // every frame, then thinned: a key is dropped wherever the straight line between its neighbours
+  // already passes within `tol` of it, so smooth motion stays exact and still stretches cost nothing
+  const nums = (v: unknown): number[] =>
+    typeof v === 'number' ? [v] : Object.values(v as Record<string, number>).filter((x) => typeof x === 'number');
+  const sampled = <T>(id: string, f: (s: number) => T, tol = 0.02) => {
+    const vals = times.map((s) => f(s + S0));
+    const vec = vals.map(nums);
+    const keep = [0];
+    let anchor = 0;
+    for (let j = 2; j < vals.length; j += 1) {
+      let ok = true;
+      for (let m = anchor + 1; m < j && ok; m += 1) {
+        const q = (times[m] - times[anchor]) / (times[j] - times[anchor]);
+        for (let c = 0; c < vec[m].length; c += 1)
+          if (Math.abs(vec[anchor][c] + (vec[j][c] - vec[anchor][c]) * q - vec[m][c]) > tol) ok = false;
+      }
+      if (!ok) {
+        keep.push(j - 1);
+        anchor = j - 1;
+      }
+    }
+    keep.push(vals.length - 1);
+    return keyed(id, keep.map((i, n) => [t(times[i]), vals[i], n === keep.length - 1 ? 'hold' : 'linear']) as never) as never;
+  };
 
   const nodes: Record<string, SceneNode> = {};
   const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
@@ -300,15 +414,16 @@ function build(dark: boolean, narrow: boolean) {
           const visible = s >= 1.35;
           const sc = p.size / 512;
           return v3(visible ? sc * p.flip : 0.0001, visible ? sc : 0.0001, 1);
-        }),
+        }, 0.0001),
         opacity: keyed(
           `${id}.o`,
-          times.map((s0, i) => {
-            const s = s0 + S0;
-            const p = planePose(s);
-            const inFront = s < ORB[0] || s > ORB[1] || p.z >= 0;
-            return [t(s0), (front ? inFront : !inFront) ? 1 : 0, 'hold'];
-          }) as never,
+          times
+            .map((s0) => {
+              const s = s0 + S0;
+              const inFront = s < ORB[0] || s > ORB[1] || planeAt(s).z >= 0;
+              return [t(s0), (front ? inFront : !inFront) ? 1 : 0, 'hold'] as [number, number, string];
+            })
+            .filter((k, i, all) => i === 0 || i === all.length - 1 || k[1] !== all[i - 1][1]) as never,
         ) as never,
       }),
       type: 'image',
@@ -321,7 +436,7 @@ function build(dark: boolean, narrow: boolean) {
   const trailBack: string[] = [];
   const trailFront: string[] = [];
   let n = 0;
-  for (let s = ORB[0] - 0.4; s < ORB[1] - 0.1; s += 0.024, n += 1) {
+  for (let s = ORB[0] - 0.4; s < ORB[1] - 0.1; s += 0.02, n += 1) {
     const p = planePose(s);
     const e = 1 / 60;
     const a = planeAt(s - e);
@@ -345,7 +460,7 @@ function build(dark: boolean, narrow: boolean) {
       ] as never) as never,
       style: {
         fill: {
-          color: constant(TRAIL[n % TRAIL.length]),
+          color: constant(trailColour(n)),
           opacity: keyed(`${id}.o`, [
             [0, 0, 'hold'],
             [t(s - S0) - 4, 0, 'linear'],
@@ -408,7 +523,7 @@ function build(dark: boolean, narrow: boolean) {
       scale: sampled('x.s', (s) => {
         const pop = Math.max(0.0001, backOut(seg(s, 6.95, 7.35)));
         return v3(pop, pop, 1);
-      }),
+      }, 0.002),
       rotation: sampled('x.r', (s) => v3(0, 0, -90 * (1 - out(seg(s, 6.95, 7.45))))),
     }),
     type: 'group',
@@ -421,7 +536,7 @@ function build(dark: boolean, narrow: boolean) {
     ...base('title', {
       outTick: END,
       position: sampled('title.p', (s) => v3(cx - tl.w / 2, tl.y + 18 * k * (1 - out(seg(s, 6.95, 7.7))))),
-      opacity: sampled('title.o', (s) => out(seg(s, 6.95, 7.55))),
+      opacity: sampled('title.o', (s) => out(seg(s, 6.95, 7.55)), 0.003),
     }),
     type: 'text',
     // each run sets its own line: one line on desktop, two on phones
@@ -448,7 +563,7 @@ function build(dark: boolean, narrow: boolean) {
     ...base('sub', {
       outTick: END,
       position: sampled('sub.p', (s) => v3(cx - sb.w / 2, sb.y + 14 * k * (1 - out(seg(s, 7.1, 7.75))))),
-      opacity: sampled('sub.o', (s) => out(seg(s, 7.1, 7.7))),
+      opacity: sampled('sub.o', (s) => out(seg(s, 7.1, 7.7)), 0.003),
     }),
     type: 'text',
     runs: constant(
