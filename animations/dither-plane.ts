@@ -24,6 +24,7 @@ import {
   type SceneNode,
 } from '@clayzo/animation/authoring';
 import { FPS, TPS, t } from './lib/kit';
+import { MARK } from './lib/mark';
 
 const S = 1000;
 const END = t(9);
@@ -76,7 +77,7 @@ function build(dark: boolean) {
       parameters: [
         { id: 'phase', name: 'phase', valueType: 'number', minimum: 0, maximum: 7, value: keyed('dots.phase', [[0, 0, 'linear'], [END, Math.PI * 2]]) },
         { id: 'ink', name: 'ink', valueType: 'color', value: constant(dark ? hex('#E4ECF0') : hex('#101114')) },
-        { id: 'glint', name: 'glint', valueType: 'color', value: constant(dark ? hex('#6CC6EB') : hex('#2F5BEA')) },
+        { id: 'glint', name: 'glint', valueType: 'color', value: constant(hex(dark ? MARK.lit.dark : MARK.lit.light)) },
       ],
     } as SceneNode,
   };

@@ -26,6 +26,7 @@ import {
   type SceneNode,
 } from '@clayzo/animation/authoring';
 import { FPS, INOUT, OUT, TPS, t } from './lib/kit';
+import { MARK } from './lib/mark';
 
 const END = t(9.4);
 const TO_PLANE = 1.2; // the questions start to stream into the plane
@@ -145,7 +146,7 @@ function build(dark: boolean, narrow: boolean) {
   // solid, as the toggle's cells are: dots that share a cell never stack into a darker spot. The grey
   // is the page ink mixed into the ground (light #faf9f6, dark #080f14)
   const ink = dark ? hexA('#7D888F', 1) : hexA('#8B8C92', 1);
-  const lit = dark ? hexA('#6CC6EB', 1) : hexA('#2F5BEA', 1);
+  const lit = hexA(dark ? MARK.lit.dark : MARK.lit.light, 1);
 
   let seed = 11;
   const rand = () => {

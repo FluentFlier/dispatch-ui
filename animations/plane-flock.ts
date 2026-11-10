@@ -30,6 +30,7 @@ import {
   type SceneNode,
 } from '@clayzo/animation/authoring';
 import { FPS, TPS, t } from './lib/kit';
+import { MARK } from './lib/mark';
 
 const W = 390;
 const H = 160;
@@ -103,7 +104,7 @@ function build(dark: boolean) {
   const nodes: Record<string, SceneNode> = {};
   const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
   const roots: string[] = [];
-  const inkOf = (lead?: boolean): Color => (lead ? hex(dark ? '#6CC6EB' : '#2F5BEA') : hex(dark ? '#E4ECF0' : '#101114'));
+  const inkOf = (lead?: boolean): Color => (lead ? hex(dark ? MARK.lit.dark : MARK.lit.light) : hex(dark ? '#E4ECF0' : '#101114'));
 
   FLOCK.forEach((b, n) => {
     const A = arc(b.path);

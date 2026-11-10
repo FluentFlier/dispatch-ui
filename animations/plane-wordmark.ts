@@ -30,6 +30,7 @@ import {
   type SceneNode,
 } from '@clayzo/animation/authoring';
 import { FPS, TPS, t } from './lib/kit';
+import { MARK } from './lib/mark';
 
 const LOOP = 7; // seconds: one wave across the name, then a rest
 const END = t(LOOP);
@@ -166,8 +167,8 @@ const hexC = (h: string, a = 1): Color => {
 };
 
 const PALETTE = {
-  light: { ink: hexC('#101114'), blue: hexC('#015CE6'), red: hexC('#FF4E2E') },
-  dark: { ink: hexC('#EEF2F4', 0.92), blue: hexC('#6CC6EB'), red: hexC('#FF7A5C') },
+  light: { ink: hexC('#101114'), blue: hexC(MARK.wordmark.light[0]), red: hexC(MARK.wordmark.light[1]) },
+  dark: { ink: hexC('#EEF2F4', 0.92), blue: hexC(MARK.wordmark.dark[0]), red: hexC(MARK.wordmark.dark[1]) },
 };
 
 function build(dark: boolean, phone: boolean) {

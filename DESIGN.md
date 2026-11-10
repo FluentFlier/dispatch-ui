@@ -170,6 +170,14 @@ Third-party marks (Claude, Claude Code, Codex, Cursor, Grok Bot, Muse, Dots, Hub
 real logos as 128px PNGs in `public/brand/logos/`; single-colour black marks carry `data-mono` and invert on dark.
 Icon-only buttons carry an `sr-only` name.
 
+### The mark
+
+The ContentOS mark is a two-fold paper plane, `public/brand/mark.svg`, in the Tropical colourway: the upper fold shades
+teal to sky blue (#00E0A8 to #00A3FF), the lower fold yellow to orange (#FFD23F to #FF5A3D), tail to nose, under a
+#16100D outline. One version for both themes. Its colours live in `animations/lib/mark.ts`; change them only with
+`npx tsx animations/apply-mark.ts <colourway>`, which rewrites the SVG, the favicon, the app logo and every plane
+scene. Dithered planes light up in one colour per theme (sky blue on light, sea green on dark).
+
 ## Motion
 
 | Token | Value | Use |
@@ -255,6 +263,7 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
+- 2026-11-10 · The mark is recoloured to Tropical (teal to sky blue over yellow to orange); its colours now live in `animations/lib/mark.ts`, applied everywhere by `animations/apply-mark.ts`.
 - 2026-11-10 · `/pricing` rebuilt in the landing system: the word Pricing, then the $1,000 per account price with an account counter and what every account includes, from the live hosted page; no animation.
 - 2026-11-10 · India is the only backdrop: the `?bg` switch and the painted-sky assets are removed; the Grok Bot page's two panels get paintings of their own (Ladakh, Hampi).
 - 2026-11-10 · `/for/grok-bot`: integration page (hero scene, connect steps with CopyField, key scopes, closing band); experimental.
