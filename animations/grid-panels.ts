@@ -59,7 +59,7 @@ type Surface = ReturnType<typeof surface>;
 type Asset = { id: string; file: string; src: string; w: number; h: number };
 const MARKS: Record<string, Asset> = {
   claude: { id: 'claude', file: 'claude.png', src: 'animations/assets/logos/claude.png', w: 128, h: 128 },
-  plane: { id: 'plane', file: 'plane.webp', src: 'public/brand/plane.webp', w: 96, h: 96 },
+  plane: { id: 'plane', file: 'plane.png', src: 'public/brand/plane.png', w: 192, h: 192 },
   linkedin: { id: 'linkedin', file: 'linkedin.png', src: 'public/images/brands/linkedin.png', w: 64, h: 64 },
   x: { id: 'x', file: 'x.png', src: 'public/images/brands/x.png', w: 64, h: 64 },
   slack: { id: 'slack', file: 'slack.png', src: 'animations/assets/logos/slack.png', w: 128, h: 128 },

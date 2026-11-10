@@ -127,7 +127,7 @@ export function ForGrokBot({ funnel }: { funnel: FunnelState }) {
               <div className="cos-for-panel cos-for-keys-panel">
                 <div className="cos-for-win">
                   <div className="cos-for-win-bar">
-                    <img src="/brand/plane.webp" alt="" width={16} height={16} />
+                    <img src="/brand/mark.svg" alt="" width={16} height={16} />
                     <span className="cos-for-win-name">ContentOS</span>
                     <span className="cos-for-win-sub">API key for Grok Bot</span>
                   </div>

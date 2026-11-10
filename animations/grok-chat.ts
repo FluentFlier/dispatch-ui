@@ -191,7 +191,7 @@ function build(dark: boolean, n: boolean) {
     timing: { ticksPerSecond: TPS, frameRate: { numerator: FPS, denominator: 1 }, durationTicks: END, displayStartTick: 0 },
     assets: {
       ground: { id: 'ground', type: 'image', uri: dark ? 'ground-night.jpg' : 'ground-day.jpg', width: 1200, height: 840, mimeType: 'image/jpeg' },
-      plane: { id: 'plane', type: 'image', uri: 'plane.webp', width: 96, height: 96, mimeType: 'image/webp' },
+      plane: { id: 'plane', type: 'image', uri: 'plane.png', width: 192, height: 192, mimeType: 'image/png' },
     },
     rootCompositionId: 'main',
     components: {},
@@ -221,7 +221,7 @@ for (const n of [false, true])
 for (const [f, src] of [
   ['ground-day.jpg', 'animations/assets/panels/grok-chat-india-day-oil.jpg'],
   ['ground-night.jpg', 'animations/assets/panels/grok-chat-india-night-oil.jpg'],
-  ['plane.webp', 'public/brand/plane.webp'],
+  ['plane.png', 'public/brand/plane.png'],
 ]) {
   copyFileSync(src, `${PUB}/${f}`);
   copyFileSync(src, `${OUTD}/${f}`);

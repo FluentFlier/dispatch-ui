@@ -70,9 +70,9 @@ function track(keys: [number, number][], s: number, ease = inOut) {
 }
 
 // ------------------------------------------------------------------ layout
-// the plane's drawing fills 0.815 of its 512 image across, centred; the bot is its disc. The X sits
+// the plane's drawing fills 0.861 of its 512 image across, centred; the bot is its disc. The X sits
 // at the centre with the same gap to each mark's drawn edge, so the lockup is centred as seen
-const PLANE_INK = 0.815;
+const PLANE_INK = 0.861;
 function lockup(cx: number, y: number, botD: number, planeS: number, gap: number, arm: number, line: number) {
   // the plane's mass sits left of its drawn edge (only a wingtip reaches it), so the X reads centred a
   // little left of the measured middle
@@ -159,7 +159,7 @@ function build(dark: boolean, narrow: boolean) {
     let flip = 1;
     if (sp > 0.05) {
       const alpha = (Math.atan2(vy, Math.abs(vx)) * 180) / Math.PI;
-      const level = clamp(alpha, -70, 70) + 30; // the drawing's nose sits 38° up; keep a little lift
+      const level = clamp(alpha, -70, 70) + 37; // the drawing's nose sits 45° up; keep a little lift
       const side = vx >= 0 ? 1 : -1;
       flip = side * smooth(clamp(Math.abs(vx) / sp / 0.35));
       rot = side > 0 ? level : -level;

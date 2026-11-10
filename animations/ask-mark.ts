@@ -6,7 +6,7 @@
  *             own path and lands as one paper plane, lit; the plane holds, then scatters back into the
  *             questions (the toggle's sun-to-moon move, here questions-to-plane)
  *   geometry  round dots on one square grid; dot size is presence, so the edges of each shape dither
- *             into smaller dots and the plane's far wing and keel read as lighter folds
+ *             into smaller dots and the plane's vermilion fold reads lighter than its blue one
  *   palette   the questions in ink (pale on dark), the plane in cobalt / sea cyan
  *   scale     480 x 400 under the heading on desktop; narrow 390 x 212, the phone strip above the
  *             heading, the same drawing at 0.66
@@ -76,7 +76,7 @@ function askAt(p: P): number {
   return Math.max(stroke, dot);
 }
 
-// the plane, pointing up and right: near wing full, keel lighter, far wing lightest
+// the plane, pointing up and right
 const triDist = (p: P, a: P, b: P, c: P) => {
   const side = (u: P, v: P) => (v[0] - u[0]) * (p[1] - u[1]) - (v[1] - u[1]) * (p[0] - u[0]);
   const s1 = side(a, b);
@@ -86,11 +86,16 @@ const triDist = (p: P, a: P, b: P, c: P) => {
   const e = Math.min(segDist(p, a, b), segDist(p, b, c), segDist(p, c, a));
   return inside ? -e : e;
 };
+// the mark (public/brand/mark.svg, centred and scaled to 0.115): the blue fold full, the vermilion
+// fold lighter, so the crease between them reads in dots
+const NOSE_PT: P = [96.1, -96.7];
+const LEFT_PT: P = [-96.4, -17.7];
+const FOLD_PT: P = [-17, 16.1];
+const TAIL_PT: P = [16.8, 96.5];
 function planeAt(p: P): number {
-  const top = soft(triDist(p, [108, -64], [-104, -18], [-14, 14]), 12);
-  const keel = soft(triDist(p, [108, -64], [-14, 14], [-34, 72]), 12) * 0.8;
-  const far = soft(triDist(p, [108, -64], [-14, 14], [-78, 50]), 12) * 0.55;
-  return Math.max(top, keel, far);
+  const blue = soft(triDist(p, NOSE_PT, LEFT_PT, FOLD_PT), 12);
+  const red = soft(triDist(p, NOSE_PT, FOLD_PT, TAIL_PT), 12) * 0.72;
+  return Math.max(blue, red);
 }
 
 // the shapes placed in the drawing (centred on 0, 0): three questions of different sizes, one plane
@@ -269,10 +274,10 @@ function build(dark: boolean, narrow: boolean) {
   // the wake: dots shed from the two wingtips and left behind in the air, drifting back along the
   // plane's line and fading, so it reads as moving forward while it holds the middle of the frame
   const TIPS = [
-    { x: -104 * PLANE.s + PLANE.x, y: -18 * PLANE.s + PLANE.y },
-    { x: -78 * PLANE.s + PLANE.x, y: 50 * PLANE.s + PLANE.y },
+    { x: LEFT_PT[0] * PLANE.s + PLANE.x, y: LEFT_PT[1] * PLANE.s + PLANE.y },
+    { x: TAIL_PT[0] * PLANE.s + PLANE.x, y: TAIL_PT[1] * PLANE.s + PLANE.y },
   ];
-  const NOSE = (Math.atan2(-64, 108) * 180) / Math.PI; // the nose's angle at rest
+  const NOSE = (Math.atan2(NOSE_PT[1], NOSE_PT[0]) * 180) / Math.PI; // the nose's angle at rest
   const world = (sec: number, p: { x: number; y: number }) => {
     const f = flightAt(sec);
     const r = (f.rot * Math.PI) / 180;

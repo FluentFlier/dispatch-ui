@@ -1,11 +1,12 @@
 /**
- * ContentOS mark: the paper plane from the app (public/images/content-os-logo.png on main),
- * served as a small 96px copy for the nav and the demo.
+ * ContentOS mark: the paper plane, two folds (blue and vermilion) in a dark outline. The vector is
+ * public/brand/mark.svg; the favicon (src/app/icon.png), the app logo and the scenes' copies are
+ * rendered from it.
  */
 export function Mark({ size = 22, className }: { size?: number; className?: string }) {
   return (
     <img
-      src="/brand/plane.webp"
+      src="/brand/mark.svg"
       alt=""
       width={size}
       height={size}

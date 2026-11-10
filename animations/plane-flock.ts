@@ -34,8 +34,8 @@ import { FPS, TPS, t } from './lib/kit';
 const W = 390;
 const H = 160;
 const END = t(10);
-// the mark's nose points 34.5 degrees above the horizontal (measured off plane.png)
-const NOSE = -34.5;
+// the mark's nose points 45 degrees above the horizontal (measured off public/brand/mark.svg)
+const NOSE = -45;
 // how often to key a plane's position along its arc (seconds)
 const STEP = 1 / 15;
 

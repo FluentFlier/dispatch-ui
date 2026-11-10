@@ -10,8 +10,8 @@
  *             planes around it flying out on a curve, and they glide home
  *   geometry  the mark simplified to its three pieces (top wing, lower wing, tail), on a square grid;
  *             a cell on a letter's edge carries a smaller plane, so the letters keep their shape
- *   palette   ink at rest (pale on dark), the top wing full, the lower wing and tail lighter, like a
- *             fold; lit, the mark's blue, red and lilac
+ *   palette   ink at rest (pale on dark), the blue fold full and the vermilion fold lighter, like a
+ *             crease; lit, the mark's blue and vermilion
  *   scale     1440 x 248: the name spans 94 % of the width; phones get 390 x 72 with a finer grid
  *
  *   pnpm tsx animations/plane-wordmark.ts   (writes public/scene/plane-wordmark/{light,dark}[-narrow].json)
@@ -48,7 +48,6 @@ uniform float phase;
 uniform half4 ink;
 uniform half4 blue;
 uniform half4 red;
-uniform half4 lilac;
 uniform float2 renderScale;
 
 float sdTri(float2 p, float2 p0, float2 p1, float2 p2) {
@@ -100,7 +99,7 @@ half4 plane(float2 u, float2 cc, float cov, float2 fc, float CELL, float s) {
   dir = float2(cos(bend) * dir.x - sin(bend) * dir.y, sin(bend) * dir.x + cos(bend) * dir.y);
   float2 pos = cc + dir * fly * CELL * 2.1;
 
-  float rest = -0.588;
+  float rest = -0.788; // the mark's nose, 45 degrees above level
   float dA = atan(dir.y, dir.x) - rest;
   dA = dA - 6.2831853 * floor((dA + 3.14159265) / 6.2831853);
   float th = turn + clamp(max(near, abs(fly) * 1.4), 0.0, 1.0) * dA;
@@ -112,25 +111,21 @@ half4 plane(float2 u, float2 cc, float cov, float2 fc, float CELL, float s) {
   float s0 = sin(th);
   v = float2(c0 * v.x + s0 * v.y, -s0 * v.x + c0 * v.y);
 
-  // the mark: top wing, lower wing, tail
-  float dTop = sdTri(v, float2(0.93, -0.62), float2(-0.95, -0.18), float2(-0.2, 0.18));
-  float dLow = sdTri(v, float2(0.93, -0.62), float2(-0.2, 0.18), float2(-0.05, 0.8));
-  float dTail = sdTri(v, float2(-0.45, 0.1), float2(-0.52, 0.62), float2(-0.2, 0.46));
+  // the mark (public/brand/mark.svg, centred, in a unit box): the blue fold and the vermilion fold
+  float dTop = sdTri(v, float2(0.929, -0.934), float2(-0.931, -0.171), float2(-0.164, 0.156));
+  float dLow = sdTri(v, float2(0.929, -0.934), float2(-0.164, 0.156), float2(0.162, 0.932));
   float px = 1.0 / (s * R);
   float aTop = smoothstep(px, -px, dTop);
   float aLow = smoothstep(px, -px, dLow) * (1.0 - aTop);
-  float aTail = smoothstep(px, -px, dTail) * (1.0 - aTop) * (1.0 - aLow);
 
   float lit = clamp(max(max(glint, near), abs(fly) * 1.5), 0.0, 1.0);
   half3 cTop = mix(ink.rgb, blue.rgb, lit);
   half3 cLow = mix(ink.rgb, red.rgb, lit);
-  half3 cTail = mix(ink.rgb, lilac.rgb, lit);
   float fTop = ink.a;
   float fLow = ink.a * mix(0.66, 1.0, lit);
-  float fTail = ink.a * mix(0.42, 1.0, lit);
 
-  half3 rgb = cTop * aTop * fTop + cLow * aLow * fLow + cTail * aTail * fTail;
-  float a = aTop * fTop + aLow * fLow + aTail * fTail;
+  half3 rgb = cTop * aTop * fTop + cLow * aLow * fLow;
+  float a = aTop * fTop + aLow * fLow;
   return half4(rgb, a);
 }
 
@@ -171,8 +166,8 @@ const hexC = (h: string, a = 1): Color => {
 };
 
 const PALETTE = {
-  light: { ink: hexC('#101114'), blue: hexC('#2F5BEA'), red: hexC('#F0503C'), lilac: hexC('#B49CEB') },
-  dark: { ink: hexC('#EEF2F4', 0.92), blue: hexC('#6CC6EB'), red: hexC('#FF7A5C'), lilac: hexC('#C7B6F2') },
+  light: { ink: hexC('#101114'), blue: hexC('#015CE6'), red: hexC('#FF4E2E') },
+  dark: { ink: hexC('#EEF2F4', 0.92), blue: hexC('#6CC6EB'), red: hexC('#FF7A5C') },
 };
 
 function build(dark: boolean, phone: boolean) {
@@ -209,7 +204,6 @@ function build(dark: boolean, phone: boolean) {
       { id: 'ink', name: 'ink', valueType: 'color', value: constant(P.ink) },
       { id: 'blue', name: 'blue', valueType: 'color', value: constant(P.blue) },
       { id: 'red', name: 'red', valueType: 'color', value: constant(P.red) },
-      { id: 'lilac', name: 'lilac', valueType: 'color', value: constant(P.lilac) },
     ],
   } as SceneNode);
 
