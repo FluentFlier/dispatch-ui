@@ -202,6 +202,7 @@ composition for phones.
 | ProductDemo | `demo/ProductDemo.tsx`, `demo/StepSwitch.tsx` | | | screenshots of the app | ready |
 | Sections | `sections/ActVoice.tsx`, `ActLeads.tsx`, `ActOutreach.tsx`, `ActMore.tsx`, `CtaBand.tsx` | | | | ready |
 | Integration page | `pages/ForGrokBot.tsx` (route `src/app/for/grok-bot`), `.cos-for-*`, scene `animations/grok-hero.ts` | | hero scene plays its intro once then idles (state machine); nav links show from the top (`data-page="sub"`) | a landing section reused as a page hero | experimental |
+| Pricing page | `pages/Pricing.tsx` (route `src/app/pricing`), `.cos-price-*` | | no scene: the word Pricing, then the card; account counter 1 to 50 (hover, active, focus-visible, disabled at the ends; the count is announced); `?trial=expired` and `?checkout=canceled` notices | the old three-plan page | experimental |
 | CopyField | `pages/CopyField.tsx`, `.cos-copy*` | | idle / copied / manual (clipboard refused: text selected, "Press ⌘C"); hover, active, focus-visible; announced in an `aria-live` region | a raw `<code>` with no way to copy | experimental |
 | FAQ | `sections/ActFaq.tsx`, `.cos-faq-*` | | per row: closed / open (several at once), hover, active, focus-visible, reduced motion; closed answers hidden from the tab order | a `<details>` list or a second accordion | experimental |
 | SiteFooter | `SiteFooter.tsx` | | | | ready |
@@ -254,6 +255,7 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
+- 2026-11-10 · `/pricing` rebuilt in the landing system: the word Pricing, then the $1,000 per account price with an account counter and what every account includes, from the live hosted page; no animation.
 - 2026-11-10 · India is the only backdrop: the `?bg` switch and the painted-sky assets are removed; the Grok Bot page's two panels get paintings of their own (Ladakh, Hampi).
 - 2026-11-10 · `/for/grok-bot`: integration page (hero scene, connect steps with CopyField, key scopes, closing band); experimental.
 - 2026-11-09 · FAQ section (`ActFaq`, experimental) before the closing band; answers from the product handover only.
