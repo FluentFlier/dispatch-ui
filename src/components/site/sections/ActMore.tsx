@@ -18,8 +18,8 @@ const ROWS: Box[][] = [
       scene: "panel-agents",
       wide: true,
       title: "Works inside your AI",
-      body: "Draft, schedule and check results from Claude, Codex, Cursor or VS Code. Publishing stays opt-in.",
-      label: "In Claude, with ContentOS connected: asked to schedule the Northwind post for Tuesday morning, ContentOS schedules it for Tuesday at 9:00 AM. Also works in Codex, Cursor and VS Code.",
+      body: "Draft, schedule and check results from Claude, Codex or Cursor. Publishing stays opt-in.",
+      label: "In Claude, with ContentOS connected: asked to schedule the Northwind post for Tuesday morning, ContentOS schedules it for Tuesday at 9:00 AM. Also works in Codex and Cursor.",
     },
     {
       scene: "panel-autopilot",
