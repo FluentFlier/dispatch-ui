@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ClayzoScene } from "./ClayzoScene";
 
@@ -17,17 +16,12 @@ export function CtaBand({
   cta: { href: string; label: string };
   loggedIn: boolean;
 }) {
-  // the painting follows the hero's backdrop (?bg=india, SkyField)
-  const [bg, setBg] = useState("");
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("bg") === "india") setBg("-india");
-  }, []);
 
   return (
     <section className="cos-cta" aria-labelledby="cos-cta-title">
       <div className="cos-cta-field" aria-hidden="true">
         <ClayzoScene
-          name={`cta-field${bg}`}
+          name="cta-field-india"
           width={1440}
           height={640}
           narrow={{ width: 390, height: 640 }}

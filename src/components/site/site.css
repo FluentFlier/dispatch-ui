@@ -1208,36 +1208,28 @@ html[data-hero-wait] .cos-rise {
 .cos-for-hero {
   padding: 96px var(--cos-gutter) clamp(72px, 10vh, 120px);
 }
-/* the scene draws the title; the lede and buttons sit just under it, over the canvas's empty foot */
+/* the scene draws the title and its line; its canvas has an empty foot below them, trimmed here (the
+   orbit's lowest pass ends above the cut) */
 .cos-for-scene {
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto -88px;
+  margin: 0 auto -64px;
 }
-.cos-for-intro {
-  position: relative;
-  max-width: 560px;
-  margin: 0 auto;
-  text-align: center;
-}
-.cos-for-lede {
-  margin: 0;
-  font-size: clamp(17px, 0.95rem + 0.3vw, 19px);
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-  color: var(--cos-ink-2);
-  text-wrap: balance;
-}
-.cos-for-actions {
-  justify-content: center;
-  margin-top: 28px;
+/* the hero alone on the first screen: the next section's heading never peeks in */
+@media (min-width: 720px) {
+  .cos-for-hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100svh;
+  }
 }
 @media (max-width: 719px) {
   .cos-for-hero {
     padding-top: 76px;
   }
-  /* the phone lockup ends about 410 of 560 down, and the orbit's front pass about as low */
   .cos-for-scene {
-    margin-bottom: -128px;
+    margin-bottom: -100px;
   }
 }
 
@@ -1341,179 +1333,159 @@ html[data-hero-wait] .cos-rise {
   color: var(--cos-blue);
 }
 
-/* step 3 as a chat with the bot */
-.cos-for-chat {
-  display: grid;
-  gap: 14px;
-  margin: 0;
-  padding: 20px;
-  border-radius: 20px;
-  background: #ffffff;
-  box-shadow: inset 0 0 0 1px rgba(16, 17, 24, 0.09);
-}
-.cos-for-chat-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 14px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--cos-ink);
-  border-bottom: 1px solid var(--cos-line);
-}
-/* Grok Bot's face, small: a disc and two pill eyes */
-.cos-for-face {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--cos-ink);
-}
-.cos-for-face i {
-  width: 3px;
-  height: 7px;
-  border-radius: 2px;
-  background: var(--cos-ground);
-}
-.cos-for-msg {
-  max-width: 88%;
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--cos-ink);
-}
-.cos-for-msg > p {
-  margin: 0;
-}
-.cos-for-msg[data-me] {
-  justify-self: end;
-  padding: 10px 14px;
-  border-radius: 14px 14px 4px 14px;
-  background: rgba(16, 17, 24, 0.05);
-}
-.cos-for-draft {
-  display: grid;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 14px;
+/* step 3 happening (animations/grok-chat.ts): a painted panel like the landing's feature cards */
+.cos-for-panel {
+  overflow: hidden;
   border-radius: 12px;
-  box-shadow: inset 0 0 0 1px var(--cos-line);
 }
-.cos-for-draft p {
-  margin: 0;
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: var(--cos-ink-2);
-}
-.cos-for-draft-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  font-weight: 550;
-  color: var(--cos-ink);
-}
-.cos-for-draft-state {
-  font-size: 12.5px;
-  color: var(--cos-ink-2);
+@media (max-width: 719px) {
+  .cos-for-panel {
+    max-width: 420px;
+    margin: 0 auto;
+    width: 100%;
+  }
 }
 
-/* the four scopes on a key; on and off said in words, the switch only repeats it */
-.cos-for-split[data-flip] > :first-child {
-  align-self: start;
+/* the four scopes on a key, as a ContentOS window on a painted panel: the same frame, window and type
+   as the chat scene beside it (the landing's feature panels: white window, 1px line, radius 12, a close
+   shadow, 13 px Geist, on switches in ink). On and off are said in words; the switch only repeats it */
+.cos-for-keys-panel {
+  --gk-frag: #ffffff;
+  --gk-line: rgba(16, 17, 24, 0.12);
+  --gk-ink: #16171b;
+  --gk-ink2: #55575f;
+  --gk-track: rgba(16, 17, 24, 0.1);
+  --gk-knob: #ffffff;
+  --gk-shadow: 0 10px 28px rgba(30, 40, 80, 0.2);
+  position: relative;
+  aspect-ratio: 600 / 420;
+  padding: 7.3% 0 0 8%;
+  background: url('/scene/grok-keys/ground-day.jpg') center / cover;
+}
+html[data-cos-theme='dark'] .cos-for-keys-panel {
+  --gk-frag: #1c1d20;
+  --gk-line: rgba(255, 255, 255, 0.1);
+  --gk-ink: #eceef0;
+  --gk-ink2: #a9aeb5;
+  --gk-track: rgba(255, 255, 255, 0.12);
+  --gk-knob: #1c1d20;
+  --gk-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  background-image: url('/scene/grok-keys/ground-night.jpg');
+}
+.cos-for-win {
+  height: 100%;
+  border-radius: 12px 0 0 0;
+  background: var(--gk-frag);
+  box-shadow:
+    inset 0 0 0 1px var(--gk-line),
+    var(--gk-shadow);
+  font-family: var(--cos-geist);
+}
+.cos-for-win-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--gk-line);
+  font-size: 13px;
+}
+.cos-for-win-name {
+  font-weight: 520;
+  color: var(--gk-ink);
+}
+.cos-for-win-sub {
+  color: var(--gk-ink2);
 }
 .cos-for-keys {
   display: grid;
   margin: 0;
-  padding: 6px 20px;
+  padding: 0 22px 0 20px;
   list-style: none;
-  border-radius: 20px;
-  background: #ffffff;
-  box-shadow: inset 0 0 0 1px rgba(16, 17, 24, 0.09);
 }
 .cos-for-key {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  min-height: 74px;
-  padding: 14px 0;
+  gap: 16px;
+  min-height: 58px;
+  padding: 10px 0;
 }
 .cos-for-key + .cos-for-key {
-  border-top: 1px solid var(--cos-line);
+  border-top: 1px solid var(--gk-line);
 }
 .cos-for-key-text {
   display: grid;
-  gap: 3px;
+  gap: 2px;
 }
 .cos-for-key-name {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--cos-ink);
+  font-size: 13px;
+  font-weight: 520;
+  color: var(--gk-ink);
 }
 .cos-for-key-line {
-  font-size: 14.5px;
-  line-height: 1.45;
-  color: var(--cos-ink-2);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--gk-ink2);
 }
 .cos-for-key-state {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: none;
-  min-width: 70px;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--cos-ink-2);
+  min-width: 52px;
+  font-size: 12px;
+  color: var(--gk-ink2);
 }
 .cos-for-key[data-on] .cos-for-key-state {
-  color: var(--cos-ink);
+  color: var(--gk-ink);
 }
 .cos-for-switch {
   position: relative;
-  width: 34px;
-  height: 20px;
+  width: 28px;
+  height: 16px;
   border-radius: 999px;
-  background: rgba(16, 17, 24, 0.12);
+  background: var(--gk-track);
 }
 .cos-for-switch::after {
   content: '';
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--gk-knob);
   box-shadow: 0 1px 2px rgba(16, 17, 24, 0.25);
 }
+html[data-cos-theme='dark'] .cos-for-key:not([data-on]) .cos-for-switch::after {
+  background: #a9aeb5;
+}
 .cos-for-key[data-on] .cos-for-switch {
-  background: var(--cos-blue);
+  background: var(--gk-ink);
 }
 .cos-for-key[data-on] .cos-for-switch::after {
-  left: 16px;
+  left: 14px;
+}
+/* phones: the chat's phone shape, the window held 16 in from each side */
+@media (max-width: 719px) {
+  .cos-for-keys-panel {
+    aspect-ratio: auto;
+    padding: 16px 16px 0;
+  }
+  .cos-for-win {
+    border-radius: 12px 12px 0 0;
+  }
 }
 
-html[data-cos-theme='dark'] .cos-copy,
-html[data-cos-theme='dark'] .cos-for-chat,
-html[data-cos-theme='dark'] .cos-for-keys {
+html[data-cos-theme='dark'] .cos-copy {
   background: #0f171c;
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
-html[data-cos-theme='dark'] .cos-copy-btn,
-html[data-cos-theme='dark'] .cos-for-msg[data-me] {
+html[data-cos-theme='dark'] .cos-copy-btn {
   background: rgba(255, 255, 255, 0.07);
-}
-html[data-cos-theme='dark'] .cos-for-switch {
-  background: rgba(255, 255, 255, 0.14);
-}
-html[data-cos-theme='dark'] .cos-for-key[data-on] .cos-for-switch::after {
-  background: #080f14;
 }
 @media (prefers-reduced-motion: reduce) {
   .cos-copy-btn {

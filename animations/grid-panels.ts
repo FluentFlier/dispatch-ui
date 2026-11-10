@@ -109,27 +109,8 @@ function panel(name: string, Wd: number, END: number, marks: string[], draw: (k:
     assertValidAnimationDocument(doc);
     const diags = validateAnimationDocument(doc).diagnostics;
     if (diags.length) console.warn(name, JSON.stringify(diags).slice(0, 600));
-    const pub = `public/scene/${name}`;
-    const out = `animations/out/${name}`;
-    if (!dark && !n) {
-      rmSync(pub, { recursive: true, force: true });
-      rmSync(out, { recursive: true, force: true });
-    }
-    mkdirSync(pub, { recursive: true });
-    mkdirSync(out, { recursive: true });
     const file = `${dark ? 'dark' : 'light'}${n ? '-narrow' : ''}.json`;
-    writeFileSync(`${pub}/${file}`, JSON.stringify(doc));
-    writeFileSync(`${out}/${file}`, JSON.stringify(doc));
-    const files: [string, string][] = [
-      // the crop with the hero's oil-paint pass baked in (animations/paint-panels.ts)
-      [dark ? 'ground-night.jpg' : 'ground-day.jpg', `animations/assets/panels/${key}-${dark ? 'night' : 'day'}-oil.jpg`],
-      ...marks.map((m) => [MARKS[m].file, MARKS[m].src] as [string, string]),
-    ];
-    for (const [f, s] of files) {
-      copyFileSync(s, `${pub}/${f}`);
-      copyFileSync(s, `${out}/${f}`);
-    }
-    // the same panel over the India backdrop (?bg=india): the same document, the India painting
+    // the panel over the India backdrop, the site's only one
     const ipub = `public/scene/${name}-india`;
     const iout = `animations/out/${name}-india`;
     if (!dark && !n) {

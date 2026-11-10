@@ -64,7 +64,7 @@ and is out of scope here.
 Founders and B2B creators deciding, on a laptop or a phone, whether ContentOS can run their LinkedIn and X for them.
 Calm, painted, quietly technical. Comfortable density: one idea per screen.
 
-The page opens on a painted sky (an oil-painted dusk, or an Indian landscape with `?bg=india`) with one promise and
+The page opens on an oil-painted Indian landscape (an Udaipur-style lake palace under a painted sky) with one promise and
 two metal buttons. Below it, each section shows one part of the product working, drawn live with Clayzo: real
 product windows, halftone and dither fields, paper planes. The paper plane is the brand's recurring object, from the
 nav mark to the footer wordmark.
@@ -208,8 +208,8 @@ composition for phones.
 
 Rules:
 - Menu content lives in `nav/menus.tsx` and feeds both MegaNav and MobileNav; never write menu links in two places.
-- Every picture that follows the backdrop reads `?bg=india` the same way (`ActMore`, `CtaBand`, `MegaNav`) and has
-  `-india` assets beside the default ones.
+- India is the only backdrop. Every painted picture (the hero, the feature panels, the closing band, the nav cards, the
+  integration panels) is an Indian place in the hero's painting style; the retired painted sky is not shipped.
 
 ## Patterns
 
@@ -217,7 +217,7 @@ Rules:
 one Clayzo scene or product window. No two sections share a layout; no template eyebrow labels above headings.
 
 **painted picture**: generated with a style reference, cropped to 2× its CSS size, baked through the hero's oil-paint
-pass (`animations/paint-panels.ts`), in day and night, and in `-india` when it follows the backdrop.
+pass (`animations/paint-panels.ts`), in day and night. Each new picture is a new Indian place, never a repeat.
 
 **menu** (desktop and phone): grouped links under labels in `--cos-ink`; real logos only where a page is about a
 product; a group with logos keeps an empty logo slot for items without one, so the words line up.
@@ -254,6 +254,7 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
+- 2026-11-10 · India is the only backdrop: the `?bg` switch and the painted-sky assets are removed; the Grok Bot page's two panels get paintings of their own (Ladakh, Hampi).
 - 2026-11-10 · `/for/grok-bot`: integration page (hero scene, connect steps with CopyField, key scopes, closing band); experimental.
 - 2026-11-09 · FAQ section (`ActFaq`, experimental) before the closing band; answers from the product handover only.
 - 2026-11-09 · Seam onboarding: DESIGN.md rewritten for the new landing page (Mona Sans, painted sky, deep-ocean

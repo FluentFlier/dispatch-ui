@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { getFunnelCta, type FunnelState } from "@/lib/funnel-cta";
 import { SiteNav } from "../SiteNav";
 import { SiteFooter } from "../SiteFooter";
@@ -13,8 +12,9 @@ import "../demo/demo.css";
 
 /**
  * /for/grok-bot. The hero is the scene (animations/grok-hero.ts): Grok Bot wakes, watches the ContentOS
- * plane fly round it, and the two settle into the page's title, which the scene draws (the h1 is
- * for readers and search). Then how to connect it, what it may do, and the closing band.
+ * plane fly round it, and the two settle into the page's title and its one line, which the scene
+ * draws (the h1 and the line are also in the page for readers and search). No buttons here: the
+ * closing band carries the page's call to action. Then how to connect it, what it may do, and the closing band.
  *
  * Product truth: the MCP URL and the four key scopes come from the product handover (Settings, AI and
  * API keys); custom connectors are xAI's documented way to add an MCP server to Grok.
@@ -44,9 +44,13 @@ export function ForGrokBot({ funnel }: { funnel: FunnelState }) {
         <SiteNav cta={cta} loggedIn={funnel.loggedIn} />
         <main id="main">
           <section className="cos-for-hero" aria-labelledby="for-title">
+            {/* the scene draws the title and the line under it; these carry them for readers and search */}
             <h1 id="for-title" className="sr-only">
               ContentOS for Grok Bot
             </h1>
+            <p className="sr-only">
+              Connect ContentOS to your Grok Bot. It drafts posts in your voice, and nothing publishes until you say so.
+            </p>
             <div className="cos-for-scene">
               <ClayzoScene
                 name="grok-hero"
@@ -55,23 +59,8 @@ export function ForGrokBot({ funnel }: { funnel: FunnelState }) {
                 narrow={{ width: 390, height: 560 }}
                 narrowBelow={719}
                 playWhen="visible"
-                stillTick={1872}
+                stillTick={1680}
               />
-            </div>
-            <div className="cos-for-intro">
-              <p className="cos-for-lede">
-                Connect ContentOS to your Grok Bot. It drafts posts in your voice, and nothing publishes until you say so.
-              </p>
-              <div className="cos-hero-actions cos-for-actions">
-                <Link href={cta.href} className="cos-btn cos-btn-metal">
-                  <span>{cta.label}</span>
-                </Link>
-                {!funnel.loggedIn && (
-                  <Link href="/book-demo" className="cos-btn cos-btn-silver">
-                    <span>Book a call</span>
-                  </Link>
-                )}
-              </div>
             </div>
           </section>
 
@@ -107,30 +96,19 @@ export function ForGrokBot({ funnel }: { funnel: FunnelState }) {
                 </ol>
               </div>
 
-              {/* the exchange in step 3, as it reads in a chat with the bot */}
-              <figure className="cos-for-chat" aria-label="Example: asking Grok Bot for a LinkedIn draft">
-                <div className="cos-for-chat-bar">
-                  <span className="cos-for-face" aria-hidden="true">
-                    <i />
-                    <i />
-                  </span>
-                  Grok Bot
-                </div>
-                <p className="cos-for-msg" data-me="">
-                  Draft a LinkedIn post from this week&apos;s customer calls.
-                </p>
-                <div className="cos-for-msg">
-                  <p>Done. It&apos;s in ContentOS as a draft, in your voice.</p>
-                  <div className="cos-for-draft">
-                    <span className="cos-for-draft-tag">
-                      <img src="/brand/plane.webp" alt="" width={14} height={14} />
-                      ContentOS draft
-                    </span>
-                    <p>Three founders told me the same thing this week: the post that got them a call was the one they almost didn&apos;t send.</p>
-                    <span className="cos-for-draft-state">Waiting for your review</span>
-                  </div>
-                </div>
-              </figure>
+              {/* step 3 happening, on a crop of the painted sky like the landing's feature panels
+                  (animations/grok-chat.ts) */}
+              <div className="cos-for-panel">
+                <ClayzoScene
+                  name="grok-chat"
+                  width={600}
+                  height={420}
+                  narrow={{ width: 340, height: 420 }}
+                  narrowBelow={719}
+                  stillTick={1320}
+                  label="Asked for a LinkedIn post from this week's customer calls, Grok Bot runs the ContentOS step and answers that the draft is in ContentOS, in your voice, waiting for your review."
+                />
+              </div>
             </div>
           </section>
 
@@ -144,20 +122,31 @@ export function ForGrokBot({ funnel }: { funnel: FunnelState }) {
                   Each key gets only the scopes you pick. Publishing and outreach stay off unless you turn them on.
                 </p>
               </div>
-              <ul className="cos-for-keys" aria-label="Scopes on a ContentOS API key">
-                {SCOPES.map((s) => (
-                  <li key={s.name} className="cos-for-key" data-on={s.on || undefined}>
-                    <span className="cos-for-key-text">
-                      <span className="cos-for-key-name">{s.name}</span>
-                      <span className="cos-for-key-line">{s.line}</span>
-                    </span>
-                    <span className="cos-for-key-state">
-                      <span className="cos-for-switch" aria-hidden="true" />
-                      {s.on ? "On" : "Off"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              {/* the key's scopes as a ContentOS window on a painted panel, like the chat above (Hampi,
+                  animations/assets/panels/grok-keys-india-*); still, and real text */}
+              <div className="cos-for-panel cos-for-keys-panel">
+                <div className="cos-for-win">
+                  <div className="cos-for-win-bar">
+                    <img src="/brand/plane.webp" alt="" width={16} height={16} />
+                    <span className="cos-for-win-name">ContentOS</span>
+                    <span className="cos-for-win-sub">API key for Grok Bot</span>
+                  </div>
+                  <ul className="cos-for-keys" aria-label="Scopes on a ContentOS API key">
+                    {SCOPES.map((s) => (
+                      <li key={s.name} className="cos-for-key" data-on={s.on || undefined}>
+                        <span className="cos-for-key-text">
+                          <span className="cos-for-key-name">{s.name}</span>
+                          <span className="cos-for-key-line">{s.line}</span>
+                        </span>
+                        <span className="cos-for-key-state">
+                          <span className="cos-for-switch" aria-hidden="true" />
+                          {s.on ? "On" : "Off"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           </section>
 

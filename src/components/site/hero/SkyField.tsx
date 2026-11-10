@@ -9,20 +9,16 @@ import { useRenderScale } from '../useRenderScale';
 import { heroPartReady } from '../heroReady';
 
 /**
- * The hero backdrop (Clayzo, animations/hero-sky.ts): a painted sky whose
- * clouds drift and lean toward the cursor. Day and night switch instantly;
- * the page-wide wipe (theme.tsx) does the reveal. ?bg=india swaps in an
- * Udaipur-style lake palace (for fun). Both are painted in oil by the shader (a brush filter and a
- * canvas weave).
+ * The hero backdrop (Clayzo, animations/hero-sky.ts with BG=india): an Udaipur-style lake palace
+ * under a painted sky whose clouds drift and lean toward the cursor, painted in oil by the shader (a
+ * brush filter and a canvas weave). Day and night switch instantly; the page-wide wipe (theme.tsx)
+ * does the reveal. India is the site's only backdrop; every painted panel and card follows it.
  */
-const BACKDROPS = {
-  sky: { scene: 'hero-sky', day: 'sky', night: 'sky-night' },
-  india: { scene: 'hero-india', day: 'india', night: 'india-night' },
-} as const;
+const BACKDROP = { scene: 'hero-india', day: 'india', night: 'india-night' } as const;
 
 export function SkyField() {
   const [bundle, setBundle] = useState<LoadedClayzo | null>(null);
-  const [bd, setBd] = useState<(typeof BACKDROPS)[keyof typeof BACKDROPS] | null>(null);
+  const bd = BACKDROP;
   const { theme } = useTheme();
   const playerRef = useRef<PlayerHandle | null>(null);
   const night = theme === 'dark' ? 1 : 0;
@@ -38,12 +34,6 @@ export function SkyField() {
   }, [night]);
 
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get('bg');
-    setBd(q === 'india' ? BACKDROPS.india : BACKDROPS.sky);
-  }, []);
-
-  useEffect(() => {
-    if (!bd) return;
     let alive = true;
     fetch(`/scene/${bd.scene}.clayzo`)
       .then((r) => r.arrayBuffer())
@@ -53,9 +43,7 @@ export function SkyField() {
     return () => {
       alive = false;
     };
-  }, [bd]);
-
-  if (!bd) return <div className="cos-sky" />;
+  }, [bd.scene]);
 
   return (
     <div className="cos-sky" data-bg={bd.scene}>

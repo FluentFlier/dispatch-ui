@@ -96,6 +96,9 @@ const PANELS: [string, number, number][] = [
   ['nav-solutions', 1120, 864],
   ['nav-compare', 1120, 864],
   ['nav-resources', 1120, 864],
+  // the Grok Bot page's two panels (animations/grok-chat.ts, pages/ForGrokBot.tsx): Ladakh and Hampi
+  ['grok-chat', 1200, 840],
+  ['grok-keys', 1200, 800],
 ];
 // `pnpm tsx animations/paint-panels.ts cta` paints only the named crops
 const ONLY = process.argv.slice(2);
@@ -104,8 +107,8 @@ const work = join(tmpdir(), 'contentos-paint-panels');
 rmSync(work, { recursive: true, force: true });
 mkdirSync(work, { recursive: true });
 
-// the default sky, and the India backdrop (?bg=india)
-for (const [name, W, H] of PANELS) for (const bg of ['', '-india']) {
+// the India backdrop, the site's only one
+for (const [name, W, H] of PANELS) for (const bg of ['-india']) {
   if (ONLY.length && !ONLY.includes(name)) continue;
   for (const tone of ['day', 'night']) {
     const src = `animations/assets/panels/${name}${bg}-${tone}.jpg`;

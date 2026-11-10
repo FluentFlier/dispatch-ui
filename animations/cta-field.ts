@@ -254,7 +254,8 @@ const LOOKS: Record<'light' | 'dark', Look> = {
   light: { ground: '#FAF9F6', core: '#FFF6E6', light: '#FFB27A', bright: 0.72, rays: 0.95, disc: 22 },
   dark: { ground: '#080F14', core: '#EEF6F8', light: '#6CC6EB', bright: 0.36, rays: 0.6, disc: 16 },
 };
-for (const bg of ['', '-india']) {
+// India is the site's only backdrop
+for (const bg of ['-india']) {
   const name = `cta-field${bg}`;
   const pub = `public/scene/${name}`;
   const out = `animations/out/${name}`;

@@ -3,15 +3,16 @@
  *
  * Art direction (after xAI's own Grok Bot icon: a black sphere whose pill eyes sit on its surface,
  * sliding and narrowing as it turns, morphing between moods; three loading dots while it thinks)
- *   verb      notice and follow: Grok Bot wakes from its three thinking dots, looks around, then
+ *   verb      notice and follow: Grok Bot pops in and opens its eyes, looks around, then
  *             tracks the ContentOS plane as it flies a tilted orbit around it (behind it and in front,
  *             turning edge-on at the far ends as it banks), round-eyed when it buzzes past, happy when
- *             it comes round. Then both settle into a lockup over "ContentOS for Grok Bot" and stay.
+ *             it comes round. Then both settle into a lockup, plane X bot, over "ContentOS for Grok Bot",
+ *             and stay.
  *   geometry  a sphere with two pill eyes projected on it; the plane is the brand's own illustration;
  *             its trail is dots in the plane's four colours, the way Grok's thinking rings orbit it
  *   palette   the bot ink (pale on dark) with ground-coloured eyes; the plane in its own colours
  *   scale     1200 x 600 on desktop, 390 x 560 on phones (the lockup wraps to two lines)
- *   words     ContentOS for Grok Bot
+ *   words     ContentOS for Grok Bot, and the page's one line under it
  *
  * Playback: the intro plays once, then an idle segment loops (a blink, a glance at the plane), through
  * the document's state machine.
@@ -40,7 +41,10 @@ import { FPS, TPS, t } from './lib/kit';
 const INTRO = 7.8; // the intro ends on the lockup
 const IDLE = 4; // then this loops
 const TOTAL = INTRO + IDLE;
-const END = t(TOTAL);
+// the timeline was authored from three loading dots; the piece now opens on the bot popping in, so
+// it plays from S0 (every function below still reads authored time)
+const S0 = 0.9;
+const END = t(TOTAL - S0);
 const ORB = [2.0, 6.0] as const; // the plane's orbit
 const LOCK = [6.3, 7.35] as const; // into the lockup
 const STEP = 1 / 30;
@@ -66,19 +70,30 @@ function track(keys: [number, number][], s: number, ease = inOut) {
 }
 
 // ------------------------------------------------------------------ layout
+// the plane's drawing fills 0.815 of its 512 image across, centred; the bot is its disc. The X sits
+// at the centre with the same gap to each mark's drawn edge, so the lockup is centred as seen
+const PLANE_INK = 0.815;
+function lockup(cx: number, y: number, botD: number, planeS: number, gap: number, arm: number, line: number) {
+  // the plane's mass sits left of its drawn edge (only a wingtip reaches it), so the X reads centred a
+  // little left of the measured middle
+  const optical = gap * 0.17;
+  return { planeX: cx - gap - (planeS * PLANE_INK) / 2, planeY: y, planeS, botX: cx + gap + botD / 2, botY: y, botD, cx: cx - optical, arm, line };
+}
 function layout(narrow: boolean) {
   return narrow
     ? {
-        W: 390, H: 560, cx: 195, cy: 250, D: 150, dotGap: 26, dotD: 10, midD: 15,
+        W: 390, H: 560, cx: 195, cy: 250, D: 150, midD: 15,
         orbit: { A: 168, B: 54, tilt: -14 }, plane: 72,
-        lock: { botX: 195 + 60, botY: 196, botD: 74, planeX: 195 - 62, planeY: 196, planeS: 86, conn: 17, connD: 5.5 },
-        title: { y: 268, size: 38, w: 340, lh: 42 }, trail: 7,
+        lock: lockup(195, 176, 74, 86, 30, 10, 2.8),
+        title: { y: 248, size: 38, w: 340, lh: 42 }, trail: 7,
+        sub: { y: 344, size: 19, w: 370, lh: 28, lines: ['Connect ContentOS to your Grok Bot.', 'It drafts posts in your voice, and', 'nothing publishes until you say so.'] },
       }
     : {
-        W: 1200, H: 600, cx: 600, cy: 288, D: 236, dotGap: 40, dotD: 15, midD: 23,
+        W: 1200, H: 600, cx: 600, cy: 288, D: 236, midD: 23,
         orbit: { A: 340, B: 96, tilt: -13 }, plane: 118,
-        lock: { botX: 600 + 98, botY: 236, botD: 112, planeX: 600 - 100, planeY: 236, planeS: 132, conn: 26, connD: 8 },
-        title: { y: 352, size: 64, w: 1100, lh: 72 }, trail: 9,
+        lock: lockup(600, 212, 112, 132, 46, 15, 3.6),
+        title: { y: 328, size: 64, w: 1100, lh: 72 }, trail: 9,
+        sub: { y: 418, size: 19, w: 1100, lh: 30, lines: ['Connect ContentOS to your Grok Bot. It drafts posts', 'in your voice, and nothing publishes until you say so.'] },
       };
 }
 
@@ -258,35 +273,18 @@ function build(dark: boolean, narrow: boolean) {
     return { r: ((n >> 16) & 255) / 255, g: ((n >> 8) & 255) / 255, b: (n & 255) / 255, a };
   };
   const C = dark
-    ? { bot: hexA('#EEF2F4'), eye: hexA('#080F14'), dots: hexA('#5E6A72'), ink: hexA('#EEF2F4') }
-    : { bot: hexA('#0E0F12'), eye: hexA('#FAF9F6'), dots: hexA('#A9ABB1'), ink: hexA('#101114') };
+    ? { bot: hexA('#EEF2F4'), eye: hexA('#080F14'), dots: hexA('#7D888F'), ink: hexA('#EEF2F4'), ink2: hexA('#A7B1B8') }
+    : { bot: hexA('#0E0F12'), eye: hexA('#FAF9F6'), dots: hexA('#8B8D94'), ink: hexA('#101114'), ink2: hexA('#4C4E57') };
   const TRAIL = ['#1E4BF0', '#FF4A31', '#B48ADB', '#C2D92B'].map((h) => hexA(h));
 
   const times: number[] = [];
-  for (let i = 0; i * STEP <= TOTAL + 1e-6; i += 1) times.push(Math.min(TOTAL, i * STEP));
+  for (let i = 0; i * STEP <= TOTAL - S0 + 1e-6; i += 1) times.push(Math.min(TOTAL - S0, i * STEP));
   const v3 = (x: number, y: number, z = 0) => ({ x, y, z });
   const sampled = <T>(id: string, f: (s: number) => T) =>
-    keyed(id, times.map((s, i) => [t(s), f(s), i === times.length - 1 ? 'hold' : 'linear']) as never) as never;
+    keyed(id, times.map((s, i) => [t(s), f(s + S0), i === times.length - 1 ? 'hold' : 'linear']) as never) as never;
 
   const nodes: Record<string, SceneNode> = {};
   const add = (n: SceneNode) => ((nodes[n.id] = n), n.id);
-
-  // the loading dots either side, absorbed into the bot as it wakes
-  const sideDots = ([-1, 1] as const).map((side, i) =>
-    add({
-      ...base(`dot${i}`, {
-        outTick: END,
-        position: sampled(`dot${i}.p`, (s) => v3(cx + side * L.dotGap * (1 - inOut(seg(s, 0.88, 1.2))), cy)),
-      }),
-      type: 'ellipse',
-      size: sampled(`dot${i}.s`, (s) => {
-        const pulse = 0.25 * Math.max(0, Math.sin(2 * Math.PI * (s / 0.9) - 0.8 + side * 0.9)) * (1 - seg(s, 0.75, 0.9));
-        const d = L.dotD * (1 + pulse) * (1 - seg(s, 0.95, 1.2));
-        return { width: Math.max(0.01, d), height: Math.max(0.01, d) };
-      }),
-      style: { fill: fill(C.dots) },
-    } as SceneNode),
-  );
 
   const planeNode = (id: string, front: boolean) =>
     add({
@@ -305,10 +303,11 @@ function build(dark: boolean, narrow: boolean) {
         }),
         opacity: keyed(
           `${id}.o`,
-          times.map((s, i) => {
+          times.map((s0, i) => {
+            const s = s0 + S0;
             const p = planePose(s);
             const inFront = s < ORB[0] || s > ORB[1] || p.z >= 0;
-            return [t(s), (front ? inFront : !inFront) ? 1 : 0, i === times.length - 1 ? 'hold' : 'hold'];
+            return [t(s0), (front ? inFront : !inFront) ? 1 : 0, 'hold'];
           }) as never,
         ) as never,
       }),
@@ -340,8 +339,8 @@ function build(dark: boolean, narrow: boolean) {
       type: 'ellipse',
       size: keyed(`${id}.s`, [
         [0, { width: d0, height: d0 }, 'hold'],
-        [t(s), { width: d0, height: d0 }, { x1: 0.3, y1: 0, x2: 0.7, y2: 1 }],
-        [t(s + life), { width: d0 * 0.25, height: d0 * 0.25 }, 'hold'],
+        [t(s - S0), { width: d0, height: d0 }, { x1: 0.3, y1: 0, x2: 0.7, y2: 1 }],
+        [t(s - S0 + life), { width: d0 * 0.25, height: d0 * 0.25 }, 'hold'],
         [END, { width: d0 * 0.25, height: d0 * 0.25 }],
       ] as never) as never,
       style: {
@@ -349,9 +348,9 @@ function build(dark: boolean, narrow: boolean) {
           color: constant(TRAIL[n % TRAIL.length]),
           opacity: keyed(`${id}.o`, [
             [0, 0, 'hold'],
-            [t(s) - 4, 0, 'linear'],
-            [t(s), 0.95, { x1: 0.4, y1: 0, x2: 0.8, y2: 1 }],
-            [t(s + life), 0, 'hold'],
+            [t(s - S0) - 4, 0, 'linear'],
+            [t(s - S0), 0.95, { x1: 0.4, y1: 0, x2: 0.8, y2: 1 }],
+            [t(s - S0 + life), 0, 'hold'],
             [END, 0],
           ] as never),
         },
@@ -391,24 +390,30 @@ function build(dark: boolean, narrow: boolean) {
   );
   const planeFront = planeNode('plane-front', true);
 
-  // the lockup's connector: the bot's three thinking dots again, between the two marks
-  const conn = [-1, 0, 1].map((o, i) =>
+  // the lockup's connector: an X, centred between the two marks, popping in as they settle
+  const xBars = [45, -45].map((deg, i) =>
     add({
-      ...base(`conn${i}`, {
-        outTick: END,
-        x: (L.lock.planeX + L.lock.botX) / 2 + o * L.lock.conn,
-        y: L.lock.botY,
-      }),
-      type: 'ellipse',
-      size: sampled(`conn${i}.s`, (s) => {
-        const pop = backOut(seg(s, 6.95 + i * 0.07, 7.3 + i * 0.07));
-        const idle = s > INTRO ? 0.3 * bump(s - INTRO, 0.45 + i * 0.16, 0.22) : 0;
-        const d = L.lock.connD * Math.max(0.0001, pop) * (1 + idle);
-        return { width: Math.max(0.01, d), height: Math.max(0.01, d) };
-      }),
+      ...base(`x${i}`, { outTick: END, rotation: deg }),
+      type: 'rect',
+      size: constant({ width: L.lock.arm * 2, height: L.lock.line }),
+      cornerRadius: constant(L.lock.line / 2),
       style: { fill: fill(C.dots) },
     } as SceneNode),
   );
+  const cross = add({
+    ...base('x', {
+      outTick: END,
+      x: L.lock.cx,
+      y: L.lock.botY,
+      scale: sampled('x.s', (s) => {
+        const pop = Math.max(0.0001, backOut(seg(s, 6.95, 7.35)));
+        return v3(pop, pop, 1);
+      }),
+      rotation: sampled('x.r', (s) => v3(0, 0, -90 * (1 - out(seg(s, 6.95, 7.45))))),
+    }),
+    type: 'group',
+    children: xBars,
+  } as SceneNode);
 
   // the title, rising into place under the marks
   const tl = L.title;
@@ -437,7 +442,25 @@ function build(dark: boolean, narrow: boolean) {
     verticalAlign: 'top',
   } as SceneNode);
 
-  const roots = [...trailBack, planeBack, ...sideDots, botBody, ...eyes, ...trailFront, planeFront, ...conn, title];
+  // the line under it, a beat later, in the page's secondary ink (each run its own line)
+  const sb = L.sub;
+  const sub = add({
+    ...base('sub', {
+      outTick: END,
+      position: sampled('sub.p', (s) => v3(cx - sb.w / 2, sb.y + 14 * k * (1 - out(seg(s, 7.1, 7.75))))),
+      opacity: sampled('sub.o', (s) => out(seg(s, 7.1, 7.7))),
+    }),
+    type: 'text',
+    runs: constant(
+      sb.lines.map((text) => ({ text, fontFamily: 'Geist', fontSize: sb.size, fontWeight: 400, letterSpacing: -0.01 * sb.size, lineHeight: sb.lh, color: C.ink2 })),
+    ),
+    box: { width: sb.w, height: sb.lh * (sb.lines.length + 1) },
+    wrap: 'none',
+    align: 'center',
+    verticalAlign: 'top',
+  } as SceneNode);
+
+  const roots = [...trailBack, planeBack, botBody, ...eyes, ...trailFront, planeFront, cross, title, sub];
 
   const doc = withComputedRevision({
     version: ANIMATION_DOCUMENT_VERSION,
@@ -449,7 +472,7 @@ function build(dark: boolean, narrow: boolean) {
     rootCompositionId: 'main',
     components: {},
     compositions: { main: { id: 'main', name: 'Main', width: W, height: H, durationTicks: END, nodes, rootNodeIds: roots } },
-    markers: [marker('intro', 0, { durationTicks: t(INTRO) }), marker('idle', t(INTRO), { durationTicks: END - t(INTRO) })],
+    markers: [marker('intro', 0, { durationTicks: t(INTRO - S0) }), marker('idle', t(INTRO - S0), { durationTicks: END - t(INTRO - S0) })],
     design: { tokens: { looping: false } },
     capabilities: { required: [], optional: [], unsupportedPolicy: 'warn' },
   } as never);

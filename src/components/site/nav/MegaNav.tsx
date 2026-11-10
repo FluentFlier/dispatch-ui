@@ -29,11 +29,6 @@ export function MegaNav({ extra }: { extra: { label: string; href: string }[] })
   const panel = useRef<HTMLDivElement>(null);
   const triggers = useRef<Record<string, HTMLButtonElement | null>>({});
   const timer = useRef<number>();
-  // the cards follow the hero's backdrop (?bg=india, SkyField): India gets places of its own
-  const [bg, setBg] = useState("");
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("bg") === "india") setBg("-india");
-  }, []);
 
   const clear = () => window.clearTimeout(timer.current);
   const show = useCallback(
@@ -165,7 +160,7 @@ export function MegaNav({ extra }: { extra: { label: string; href: string }[] })
       >
         {menu && (
           <div ref={content} key={menu.id} className="cos-mega-content" data-dir={dir}>
-            <MenuBody menu={menu} bg={bg} onGo={() => close()} />
+            <MenuBody menu={menu} onGo={() => close()} />
           </div>
         )}
       </div>
@@ -173,7 +168,7 @@ export function MegaNav({ extra }: { extra: { label: string; href: string }[] })
   );
 }
 
-function MenuBody({ menu, bg, onGo }: { menu: NavMenu; bg: string; onGo: () => void }) {
+function MenuBody({ menu, onGo }: { menu: NavMenu; onGo: () => void }) {
   const { theme } = useTheme();
   const c = menu.card;
   return (
@@ -198,7 +193,7 @@ function MenuBody({ menu, bg, onGo }: { menu: NavMenu; bg: string; onGo: () => v
       ))}
       <Link href={c.href} className="cos-mega-card" onClick={onGo}>
         <img
-          src={`/brand/nav/${c.image}${bg}-${theme === "dark" ? "night" : "day"}.jpg`}
+          src={`/brand/nav/${c.image}-india-${theme === "dark" ? "night" : "day"}.jpg`}
           alt=""
           width={560}
           height={432}
