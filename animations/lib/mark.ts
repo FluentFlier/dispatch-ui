@@ -49,6 +49,6 @@ export const COLOURWAYS = {
 
 export type Colourway = keyof typeof COLOURWAYS;
 
-export const CURRENT: Colourway = 'tropical';
+export const CURRENT: Colourway = 'ocean';
 
 export const MARK = COLOURWAYS[CURRENT];
