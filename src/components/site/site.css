@@ -1083,6 +1083,36 @@ html[data-hero-wait] .cos-rise {
     align-items: start;
   }
 }
+/* the halftone question-to-plane mark (animations/ask-mark.ts): under the heading on desktop, a
+   strip above the heading on phones (the narrow build), held to the gutters like Act 3's */
+.cos-faq-mark,
+.cos-faq-strip {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .cos-faq-mark {
+    display: block;
+    width: min(100%, 440px);
+    margin-top: clamp(28px, 4vh, 48px);
+    margin-left: -20px;
+  }
+}
+@media (max-width: 1023px) {
+  .cos-faq {
+    padding-top: calc(min(100vw - 2 * var(--cos-gutter), 420px) * 212 / 390 + 28px);
+  }
+  .cos-faq-strip {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 10px;
+    left: 0;
+    right: 0;
+    width: min(calc(100% - 2 * var(--cos-gutter)), 420px);
+    margin: 0 auto;
+    pointer-events: none;
+  }
+}
 .cos-faq-list {
   margin: 0;
   padding: 0;
