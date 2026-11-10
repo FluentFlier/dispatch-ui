@@ -471,9 +471,9 @@ html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
 .cos-mega-label {
   margin: 0 0 10px;
   font-size: 12.5px;
-  font-weight: 500;
+  font-weight: 550;
   letter-spacing: 0;
-  color: var(--cos-ink-3);
+  color: var(--cos-ink);
 }
 .cos-mega-group ul {
   display: grid;

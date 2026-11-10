@@ -77,17 +77,17 @@ export const MENUS: NavMenu[] = [
           label: "Personal assistants",
           items: [
             { label: "ContentOS for Claude", href: "/for/claude", icon: logo("claude") },
-            { label: "ContentOS for Grok", href: "/for/grok", icon: logo("grok", true) },
-            { label: "ContentOS for Muse", href: "/for/muse" },
+            { label: "ContentOS for Grok Bot", href: "/for/grok-bot", icon: logo("grokbot", true) },
+            { label: "ContentOS for Muse", href: "/for/muse", icon: logo("muse") },
+            { label: "ContentOS for Dots", href: "/for/dots", icon: logo("dots") },
           ],
         },
         {
           label: "Coding agents",
           items: [
-            { label: "ContentOS for Claude Code", href: "/for/claude-code", icon: logo("claude") },
+            { label: "ContentOS for Claude Code", href: "/for/claude-code", icon: logo("claude-code") },
             { label: "ContentOS for Codex", href: "/for/codex", icon: logo("codex", true) },
             { label: "ContentOS for Cursor", href: "/for/cursor", icon: logo("cursor", true) },
-            { label: "ContentOS for VS Code", href: "/for/vscode", icon: logo("vscode") },
           ],
         },
       ],
@@ -120,7 +120,7 @@ export const MENUS: NavMenu[] = [
         },
       ],
     ],
-    card: { title: "Works inside your AI", line: "Draft and schedule from Claude, Grok, Muse or your code editor.", href: "/for/claude", image: "solutions" },
+    card: { title: "Works inside your AI", line: "Draft and schedule from Claude, Grok Bot, Muse or Dots.", href: "/for/claude", image: "solutions" },
   },
   {
     id: "compare",
