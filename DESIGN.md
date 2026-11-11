@@ -263,7 +263,7 @@ Known debt (recorded at detect time; not reviewed per PR):
 
 ## Changelog
 
-- 2026-11-10 · `/for/grok-bot` has its own share card: its hero scene on the page's paper (`animations/og-paper.ts`), `public/og/grok-bot.mp4` and `.jpg` (the settled lockup).
+- 2026-11-10 · `/for/grok-bot` has its own share card: its hero scene without its title and line, at 1.3x on the page's paper (`animations/og-paper.ts`), the settled lockup centred; `public/og/grok-bot.mp4` and `.jpg` (the lockup).
 - 2026-11-10 · Share card, send off (`animations/og-card.ts`, a 6 s seamless loop): the page's paper and grain, the wordmark top left and the promise set as the hero title, beside the closing band's riverside at sunset breaking into halftone; paper planes rise off the river and fan out into the sky. `public/og.mp4` (og:video) and `public/og.jpg` (og:image). Replaces into the sun.
 - 2026-11-10 · Share card, into the sun (`animations/og-card.ts`, 5.6 s): the CTA band's riverside at sunset opens in its own halftone, the camera easing in; the plane sweeps in huge from the foreground and races away into the painting, painting its wake; it hits the sun, which flares into shafts, and a ring of paint blooms across the scene into the band's shape; the plane loops up and lands as the lockup's mark, centred in the frame, and Grow beyond word of mouth rises. `public/og.mp4` (og:video) and `public/og.jpg` (og:image, its last frame).
 - 2026-11-10 · Share card (`animations/og-card.ts`): the ContentOS plane skywrites the name in paper planes across the hero's oil-painted sky, settling on ink Content and coral OS over Grow beyond word of mouth. `public/og.mp4` (og:video) and `public/og.jpg` (og:image, its last frame) replace the old og.png.
