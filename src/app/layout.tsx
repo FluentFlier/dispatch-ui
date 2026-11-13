@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Fraunces, Hanken_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { DM_Sans, Fraunces, Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+import localFont from 'next/font/local';
 import { PRODUCT_NAME, SITE_TITLE } from '@/lib/brand';
 import './globals.css';
 
@@ -26,6 +29,14 @@ const jetbrains = JetBrains_Mono({
   display: 'swap',
 });
 
+const instrument = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-instrument',
+  display: 'swap',
+});
+
 const SITE_DESC =
   'Create in your voice, publish to LinkedIn and X, reply faster, and turn the response into what you do next.';
 
@@ -39,22 +50,35 @@ export const metadata: Metadata = {
     url: '/',
     siteName: PRODUCT_NAME,
     type: 'website',
+    // the share card: the wordmark and the promise beside the closing band's riverside, paper planes
+    // rising off the river into the sky (animations/og-card.ts, a 6 s loop); the image is one frame
     images: [
       {
-        url: '/og.png',
+        url: '/og.jpg',
         width: 1200,
         height: 630,
-        alt: 'Content OS turns content and leads into one connected loop.',
+        alt: 'ContentOS. Grow beyond word of mouth. Beside it, a painted riverside at sunset breaking into halftone dots, with paper planes rising into the sky.',
       },
     ],
+    // Next leaves video URLs as given, and crawlers need them absolute
+    videos: [{ url: new URL('/og.mp4', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'), width: 1200, height: 630, type: 'video/mp4' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: SITE_TITLE,
     description: SITE_DESC,
-    images: ['/og.png'],
+    images: ['/og.jpg'],
   },
 };
+
+// Mona Sans (OFL, GitHub), the marketing site's face; latin, weight 200-900 and width 75-125%
+const mona = localFont({
+  src: './fonts/mona-sans-latin.woff2',
+  variable: '--font-mona',
+  weight: '200 900',
+  display: 'swap',
+  declarations: [{ prop: 'font-stretch', value: '75% 125%' }],
+});
 
 export default function RootLayout({
   children,
@@ -64,7 +88,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`scroll-smooth ${dmSans.variable} ${fraunces.variable} ${hanken.variable} ${jetbrains.variable}`}
+      suppressHydrationWarning
+      className={`scroll-smooth ${dmSans.variable} ${fraunces.variable} ${hanken.variable} ${jetbrains.variable} ${instrument.variable} ${GeistSans.variable} ${GeistMono.variable} ${mona.variable}`}
     >
       <body className={dmSans.className}>{children}</body>
     </html>

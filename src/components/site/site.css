@@ -1,0 +1,2456 @@
+/* ContentOS marketing site. Quiet neutral ground, Geist, metal controls, glyph field. */
+
+.cos {
+  --cos-ground: #faf9f6;
+  --cos-ink: #101114;
+  --cos-ink-2: #4c4e57;
+  --cos-ink-3: #7e808a;
+  /* secondary text that sits on the sky: darker than ink-2 so it holds on blue */
+  --cos-ink-sky: #2c2e36;
+  --cos-line: rgba(16, 17, 20, 0.08);
+  --cos-blue: #2f5bea;
+  --cos-apricot: #f08a4b;
+  --cos-peach: #fbd3b2;
+  --cos-sky: #8fb3e2;
+  --cos-lilac: #b9b3e0;
+
+  /* Mona Sans for the page; the product's own windows stay in Geist (demo.css) */
+  --cos-sans: var(--font-mona), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --cos-geist: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --cos-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --cos-ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --cos-gutter: clamp(20px, 4vw, 48px);
+  --cos-max: 1200px;
+
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--cos-ground);
+  color: var(--cos-ink);
+  font-family: var(--cos-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body:has(.cos) {
+  background: #faf9f6;
+}
+
+:where(.cos) ::selection {
+  background: var(--cos-ink);
+  color: #fff;
+}
+:where(.cos) :focus-visible {
+  outline: 2px solid var(--cos-blue);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+:where(.cos) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cos-skip {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 100;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--cos-ink);
+  color: #fff;
+  font-size: 14px;
+  transform: translateY(-160%);
+  transition: transform 200ms var(--cos-ease-out);
+}
+.cos-skip:focus-visible {
+  transform: none;
+}
+
+/* ----------------------------------------------------------- metal buttons */
+
+.cos-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 26px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  white-space: nowrap;
+  transition:
+    transform 160ms var(--cos-ease-out),
+    box-shadow 220ms ease,
+    filter 220ms ease;
+}
+.cos-btn > span {
+  position: relative;
+  z-index: 2;
+}
+/* the gloss: a hard specular band across the upper half */
+.cos-btn::before {
+  content: '';
+  position: absolute;
+  inset: 1px 1px 50% 1px;
+  z-index: 1;
+  border-radius: 11px 11px 4px 4px;
+  pointer-events: none;
+}
+/* the shine: a light sweep on hover */
+.cos-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  left: 0;
+  width: 60%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.08) 38%,
+    rgba(255, 255, 255, 0.42) 50%,
+    rgba(255, 255, 255, 0.08) 62%,
+    transparent 80%
+  );
+  transform: translateX(-140%) skewX(-12deg);
+}
+.cos-btn:active {
+  transform: scale(0.97);
+}
+
+/* Dark: brushed gunmetal */
+.cos-btn-metal {
+  color: #f7f7f8;
+  background:
+    linear-gradient(180deg, #4a4a50 0%, #26262a 46%, #111113 54%, #1c1c1f 100%);
+  box-shadow:
+    0 0 0 1px #050506,
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 8px 20px -8px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+.cos-btn-metal::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.03));
+}
+
+/* Light: polished silver */
+.cos-btn-silver {
+  color: #17171a;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f4f4f5 46%, #e3e3e6 54%, #f0f0f2 100%);
+  box-shadow:
+    0 0 0 1px rgba(14, 14, 16, 0.14),
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(14, 14, 16, 0.06),
+    0 1px 2px rgba(14, 14, 16, 0.08),
+    0 8px 20px -10px rgba(14, 14, 16, 0.22);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.cos-btn-silver::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.25));
+}
+.cos-btn-silver::after {
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.3) 40%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.3) 60%,
+    transparent 80%
+  );
+}
+
+/* light mode, on the sky: the buttons need more presence than on the plain page */
+html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-metal {
+  box-shadow:
+    0 0 0 1px #050506,
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 10px 24px -8px rgba(10, 14, 40, 0.55),
+    0 18px 44px -12px rgba(47, 91, 234, 0.5);
+}
+html:not([data-cos-theme='dark']) .cos-hero-actions .cos-btn-silver {
+  box-shadow:
+    0 0 0 1px rgba(20, 24, 48, 0.2),
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(14, 14, 16, 0.08),
+    0 1px 2px rgba(20, 24, 48, 0.12),
+    0 12px 28px -10px rgba(30, 40, 90, 0.42);
+}
+
+.cos-btn-sm {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+.cos-btn-sm::before {
+  border-radius: 9px 9px 3px 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cos-btn:hover::after {
+    transform: translateX(240%) skewX(-12deg);
+    transition: transform 900ms var(--cos-ease-out);
+  }
+  .cos-btn-metal:hover {
+    box-shadow:
+      0 0 0 1px #050506,
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.35),
+      0 12px 28px -10px rgba(0, 0, 0, 0.6);
+  }
+  .cos-btn-silver:hover {
+    box-shadow:
+      0 0 0 1px rgba(14, 14, 16, 0.2),
+      inset 0 1px 0 #fff,
+      inset 0 -1px 0 rgba(14, 14, 16, 0.06),
+      0 1px 2px rgba(14, 14, 16, 0.08),
+      0 12px 26px -12px rgba(14, 14, 16, 0.3);
+  }
+}
+
+/* ---------------------------------------------------------------------- nav */
+
+.cos-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--cos-geist);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  color: var(--cos-ink);
+}
+
+.cos-nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 240ms ease,
+    border-color 240ms ease;
+}
+.cos-nav[data-scrolled='true'] {
+  /* solid, no backdrop blur: Chrome's backdrop-filter flickered over the animating hero */
+  background: rgba(250, 249, 246, 0.985);
+  border-bottom-color: var(--cos-line);
+}
+.cos-nav-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+  max-width: calc(var(--cos-max) + 2 * var(--cos-gutter));
+  height: 76px;
+  margin: 0 auto;
+  padding: 0 var(--cos-gutter);
+}
+.cos-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 44px;
+}
+.cos-nav-links {
+  display: flex;
+  gap: 4px;
+  transition:
+    opacity 320ms var(--cos-ease-out),
+    transform 420ms var(--cos-ease-out),
+    visibility 0s linear 0s;
+}
+/* over the sky the hero speaks for itself: the section links arrive once you scroll */
+.cos-nav:not([data-scrolled='true']) .cos-nav-links {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease,
+    visibility 0s linear 200ms;
+}
+.cos-nav-link {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 14.5px;
+  font-weight: 450;
+  letter-spacing: -0.01em;
+  color: var(--cos-ink-sky);
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cos-nav-link:hover {
+    color: var(--cos-ink);
+    background: rgba(14, 14, 16, 0.045);
+  }
+}
+.cos-nav-actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 10px;
+}
+.cos-nav-menu {
+  display: none;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  border-radius: 10px;
+  place-items: center;
+}
+.cos-nav-menu-bars,
+.cos-nav-menu-bars::before {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background: var(--cos-ink);
+  transition: transform 200ms var(--cos-ease-out);
+}
+.cos-nav-menu-bars {
+  position: relative;
+  transform: translateY(-3px);
+}
+.cos-nav-menu-bars::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+}
+/* ------------------------------------------------------- the phone menu */
+/* nav/MobileNav.tsx, after Amplitude: a full-screen ink sheet, the menus as large rows that open in
+   place, the actions held at the bottom. Ink in both themes, so it reads as one surface over the page */
+.cos-msheet {
+  --ms-ink: #f3f5f6;
+  --ms-dim: #8d979e;
+  --ms-line: rgba(255, 255, 255, 0.16);
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #0b1014;
+  color: var(--ms-ink);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 160ms ease,
+    visibility 0s linear 160ms;
+}
+.cos-msheet[data-open] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 220ms var(--cos-ease-out),
+    visibility 0s linear 0s;
+}
+.cos-msheet-top {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  height: 76px;
+  padding: 0 var(--cos-gutter);
+  background: #0b1014;
+}
+.cos-msheet .cos-wordmark {
+  color: var(--ms-ink);
+}
+.cos-msheet-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  border-radius: 10px;
+  color: var(--ms-ink);
+  transition: transform 160ms var(--cos-ease-out);
+}
+.cos-msheet-close:active {
+  transform: scale(0.94);
+}
+.cos-msheet-list {
+  flex: 1 0 auto;
+  padding: 8px var(--cos-gutter) 24px;
+  transform: translateY(8px);
+  transition: transform 160ms ease;
+}
+.cos-msheet[data-open] .cos-msheet-list {
+  transform: none;
+  transition: transform 320ms var(--cos-ease-out);
+}
+.cos-msheet-row + .cos-msheet-row {
+  border-top: 1px solid var(--ms-line);
+}
+.cos-msheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 78px;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-align: left;
+  color: var(--ms-ink);
+}
+.cos-msheet-chev {
+  flex: none;
+  transition: transform 260ms var(--cos-ease-out);
+}
+.cos-msheet-row[data-open] .cos-msheet-chev {
+  transform: rotate(180deg);
+}
+/* the pages open in place: the row grows to what it holds */
+.cos-msheet-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms var(--cos-ease-out);
+}
+.cos-msheet-row[data-open] .cos-msheet-body {
+  grid-template-rows: 1fr;
+}
+.cos-msheet-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+.cos-msheet-row:not([data-open]) .cos-msheet-inner {
+  visibility: hidden;
+  transition: visibility 0s linear 280ms;
+}
+.cos-msheet-group {
+  padding-bottom: 22px;
+}
+.cos-msheet-group:last-child {
+  padding-bottom: 28px;
+}
+.cos-msheet-label {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 450;
+  color: var(--ms-dim);
+}
+.cos-msheet-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  font-size: 17px;
+  font-weight: 450;
+  letter-spacing: -0.015em;
+  color: var(--ms-ink);
+}
+.cos-msheet-link:active {
+  opacity: 0.6;
+}
+.cos-msheet-logo {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.cos-msheet-logo img {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+}
+.cos-msheet-logo img[data-mono] {
+  filter: invert(1);
+}
+.cos-msheet-actions {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 10px;
+  flex: none;
+  padding: 16px var(--cos-gutter) max(16px, env(safe-area-inset-bottom));
+  background: #0b1014;
+  border-top: 1px solid var(--ms-line);
+}
+.cos-msheet-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  color: var(--ms-ink);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  transition: transform 160ms var(--cos-ease-out);
+}
+.cos-msheet-btn[data-primary] {
+  background: var(--ms-ink);
+  color: #0b1014;
+  box-shadow: none;
+}
+.cos-msheet-btn:active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-msheet,
+  .cos-msheet-list,
+  .cos-msheet-body,
+  .cos-msheet-chev {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .cos-nav-inner {
+    grid-template-columns: 1fr auto;
+  }
+  .cos-nav-links,
+  .cos-nav-login {
+    display: none;
+  }
+  .cos-nav-menu {
+    display: grid;
+  }
+  .cos-msheet {
+    display: flex;
+  }
+}
+
+/* ------------------------------------------------------------- nav menus */
+/* one panel for every menu (nav/MegaNav.tsx): it slides under the trigger and eases to the size of
+   what it holds. Inside, the page's own quiet type: link columns under small labels, real logos
+   where a page is about a product, and one card on a crop of the painted sky */
+.cos-mega {
+  position: relative;
+}
+.cos-mega-trigger {
+  gap: 4px;
+}
+.cos-mega-chev {
+  margin-right: -5px;
+  opacity: 0.45;
+  transition: transform 200ms var(--cos-ease-out), opacity 160ms ease;
+}
+.cos-mega-trigger[data-open] {
+  color: var(--cos-ink);
+}
+.cos-mega-trigger[data-open] .cos-mega-chev {
+  transform: rotate(180deg);
+  opacity: 0.75;
+}
+.cos-mega-panel {
+  position: absolute;
+  top: calc(100% + 21px);
+  left: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(16, 17, 24, 0.08),
+    0 24px 60px -24px rgba(16, 17, 24, 0.22),
+    0 2px 6px -2px rgba(16, 17, 24, 0.06);
+  transform-origin: top center;
+  transition:
+    transform 240ms var(--cos-ease-out),
+    width 240ms var(--cos-ease-out),
+    height 240ms var(--cos-ease-out),
+    opacity 180ms ease,
+    translate 200ms var(--cos-ease-out),
+    scale 200ms var(--cos-ease-out),
+    visibility 0s linear 0s;
+}
+.cos-mega-panel[data-state='closed'] {
+  opacity: 0;
+  translate: 0 -6px;
+  scale: 0.985;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 140ms ease,
+    translate 140ms ease,
+    scale 140ms ease,
+    visibility 0s linear 140ms;
+}
+/* opening from closed: appear where it belongs, no slide in from the last place it was */
+.cos-mega-panel[data-fresh] {
+  transition:
+    opacity 180ms ease,
+    translate 200ms var(--cos-ease-out),
+    scale 200ms var(--cos-ease-out),
+    visibility 0s linear 0s;
+}
+.cos-mega-content {
+  width: max-content;
+}
+.cos-mega-content[data-dir='right'] {
+  animation: cos-mega-from-right 240ms var(--cos-ease-out);
+}
+.cos-mega-content[data-dir='left'] {
+  animation: cos-mega-from-left 240ms var(--cos-ease-out);
+}
+@keyframes cos-mega-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+@keyframes cos-mega-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+}
+.cos-mega-body {
+  display: flex;
+  gap: 40px;
+  padding: 10px 10px 10px 30px;
+}
+.cos-mega-col {
+  display: grid;
+  align-content: start;
+  gap: 26px;
+  padding: 20px 0 22px;
+}
+.cos-mega-label {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  font-weight: 550;
+  letter-spacing: 0;
+  color: var(--cos-ink);
+}
+.cos-mega-group ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cos-mega-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 32px;
+  font-size: 14.5px;
+  font-weight: 450;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--cos-ink-2);
+  transition: color 160ms ease;
+}
+.cos-mega-logo {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cos-mega-logo img {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
+/* the underline draws from the left on hover */
+.cos-mega-word {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  padding-bottom: 1px;
+  transition: background-size 220ms var(--cos-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  a.cos-mega-link:hover {
+    color: var(--cos-ink);
+  }
+  a.cos-mega-link:hover .cos-mega-word {
+    background-size: 100% 1px;
+  }
+}
+.cos-mega-link:focus-visible,
+.cos-mega-card:focus-visible,
+.cos-mega-trigger:focus-visible {
+  outline: 2px solid var(--cos-blue);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.cos-mega-link[data-soon] {
+  color: var(--cos-ink-3);
+  cursor: default;
+}
+.cos-mega-link[data-soon] .cos-mega-logo {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+.cos-mega-soon {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--cos-ink-3);
+}
+/* the card: a crop of the painted sky, its words on the sky's calm top */
+.cos-mega-card {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 232px;
+  min-height: 236px;
+  overflow: hidden;
+  border-radius: 12px;
+  isolation: isolate;
+}
+.cos-mega-card-img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 500ms var(--cos-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cos-mega-card:hover .cos-mega-card-img {
+    transform: scale(1.03);
+  }
+}
+.cos-mega-card-text {
+  display: grid;
+  gap: 4px;
+  padding: 16px 16px 0;
+}
+.cos-mega-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: #101114;
+}
+.cos-mega-card-line {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #2c2e36;
+  text-wrap: pretty;
+}
+html[data-cos-theme='dark'] .cos-mega-panel {
+  background: #0f171c;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 28px 64px -20px rgba(0, 0, 0, 0.7);
+}
+html[data-cos-theme='dark'] .cos-mega-logo img[data-mono] {
+  filter: invert(1);
+}
+html[data-cos-theme='dark'] .cos-mega-card-title {
+  color: #eef2f4;
+}
+html[data-cos-theme='dark'] .cos-mega-card-line {
+  color: #c1cbd1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-mega-panel,
+  .cos-mega-content,
+  .cos-mega-word,
+  .cos-mega-card-img {
+    transition: none;
+    animation: none;
+  }
+}
+/* phones and tablets use the sheet (SiteNav): the whole bar of menus leaves the grid, or it takes
+   the middle cell and pushes the buttons onto a second row */
+@media (max-width: 900px) {
+  .cos-mega {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------- hero */
+
+.cos-hero {
+  position: relative;
+  padding-top: clamp(156px, 20vh, 212px);
+  padding-bottom: clamp(48px, 7vh, 88px);
+}
+
+/* the sky lives in a rounded panel inset from the page edge. Under 1200 px it runs past the product
+   window and its step bar, ending as far below the bar (22 px) as the bar sits below the window:
+   the hero's bottom padding, less that gap */
+.cos-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: calc(clamp(48px, 7vh, 88px) - 22px);
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #9dbde6;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+.cos-sky {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+}
+.cos-sky-stage {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: max(100cqw, calc(100cqh * 1.7505));
+  transform: translateX(-50%);
+}
+.cos-sky-stage canvas,
+.cos-sky-stage img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* nav sits over the sky until it scrolls */
+.cos-nav:not([data-scrolled='true']) .cos-nav-inner {
+  margin-top: 10px;
+}
+
+/* the words on the left, the product working on the right (one column under 1024 px) */
+.cos-hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: calc(var(--cos-max) + 2 * var(--cos-gutter));
+  margin: 0 auto;
+  padding: 0 var(--cos-gutter);
+}
+.cos-hero-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  pointer-events: none;
+}
+.cos-hero-copy > * {
+  pointer-events: auto;
+}
+/* a soft shade of the page's own light behind the words, so the line under the headline holds
+   over whatever the backdrop puts there (clouds, a fort, lit windows at night) */
+.cos-hero-copy::before {
+  content: '';
+  position: absolute;
+  inset: -14% -22% -16% -34%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(250, 247, 242, 0.66), rgba(250, 247, 242, 0.32) 55%, rgba(250, 247, 242, 0));
+  pointer-events: none;
+}
+html[data-cos-theme='dark'] .cos-hero-copy::before {
+  background: radial-gradient(closest-side, rgba(5, 20, 31, 0.62), rgba(5, 20, 31, 0.3) 55%, rgba(5, 20, 31, 0));
+}
+
+.cos-hero-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+  font-size: clamp(2.75rem, 1.2rem + 3.4vw, 4rem);
+  font-weight: 500;
+  font-stretch: 104%;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--cos-ink);
+  font-feature-settings: 'ss01', 'ss02';
+}
+.cos-line {
+  display: block;
+  padding-bottom: 0.04em;
+}
+@keyframes cos-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cos-hero-sub {
+  max-width: 38ch;
+  margin: 24px 0 0;
+  font-size: clamp(17px, 0.95rem + 0.3vw, 19px);
+  line-height: 1.65;
+  font-weight: 450;
+  letter-spacing: -0.01em;
+  color: var(--cos-ink-sky);
+  text-wrap: pretty;
+}
+
+/* keep an icon and its punctuation together */
+.cos-nowrap {
+  white-space: nowrap;
+}
+
+/* platforms as app icons on the text line (sizing matches the current site) */
+.cos-app-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  border-radius: 5px;
+  vertical-align: -0.26em;
+}
+.cos-app-icon img {
+  display: block;
+}
+.cos-app-icon {
+  vertical-align: -0.2em;
+}
+/* linkedin.png carries 4px of transparent padding in its 64px canvas (the X image has none);
+   scale it by 64/56 so its visible tile matches the X and Threads tiles exactly */
+.cos img[src$='/brands/linkedin.png'] {
+  transform: scale(1.143);
+}
+/* all three at the same size and corner, so none reads louder */
+.cos-app-icon img,
+.cos-app-icon-tile {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+}
+.cos-app-icon-tile {
+  position: relative;
+  display: block;
+  background: #000;
+  color: #fff;
+}
+/* centred out of flow so the tile's baseline is its bottom edge, like the X image */
+.cos-app-icon-tile svg {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+
+.cos-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.cos-rise {
+  animation: cos-rise 1100ms var(--cos-ease-expo) both;
+  animation-delay: calc(80ms + var(--d) * 90ms);
+}
+
+/* the hero enters once, together: until its Clayzo sky and toggle have drawn (heroReady.ts) the nav
+   and sky hold back and every entrance waits on its first frame, then all of it plays at once */
+.cos-nav-inner,
+.cos-panel {
+  transition: opacity 700ms var(--cos-ease-out);
+}
+html[data-hero-wait] .cos-nav-inner,
+html[data-hero-wait] .cos-panel {
+  opacity: 0;
+}
+html[data-hero-wait] .cos-rise {
+  animation-play-state: paused;
+}
+@keyframes cos-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(8px);
+  }
+}
+
+.cos-hero-demo {
+  position: relative;
+  z-index: 2;
+  margin-top: clamp(56px, 8vh, 84px);
+}
+/* wide screens: one screen, the sky behind all of it, the words on the left and the whole app
+   window on the right, reaching past the content edge to 40 px inside the sky so it is big enough
+   to read and never cropped */
+@media (min-width: 1200px) {
+  .cos-hero {
+    display: flex;
+    align-items: center;
+    min-height: max(760px, min(100svh, 1000px));
+    padding-top: 112px;
+    padding-bottom: 64px;
+  }
+  .cos-hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 720px);
+    column-gap: clamp(40px, 4vw, 56px);
+    align-items: center;
+    width: 100%;
+  }
+  .cos-panel {
+    bottom: 10px;
+  }
+  .cos-hero-demo {
+    width: calc(100% + max(var(--cos-gutter), (100vw - var(--cos-max)) / 2) - 50px);
+    margin-top: 0;
+  }
+
+  /* the headline keeps its two lines */
+  .cos-hero-title .cos-line {
+    white-space: nowrap;
+  }
+}
+
+/* ---------------------------------------------------------------- phones */
+
+@media (max-width: 719px) {
+  .cos-panel {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    border-radius: 22px;
+  }
+  .cos-hero-actions {
+    width: 100%;
+    gap: 10px;
+  }
+  /* a pair splits the row; a lone button (signed in: Open ContentOS) keeps its own width */
+  .cos-hero-actions .cos-btn:not(:only-child) {
+    flex: 1;
+    padding: 0 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cos-rise {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- toggle */
+
+.cos-theme-toggle {
+  display: block;
+  width: 72px;
+  height: 38px;
+  margin-right: 4px;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: transform 160ms var(--cos-ease-out);
+}
+.cos-theme-toggle:active {
+  transform: scale(0.96);
+}
+.cos-theme-toggle canvas,
+.cos-theme-toggle img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.cos-theme-fallback {
+  display: block;
+  width: 72px;
+  height: 38px;
+  border-radius: 13px;
+  background: #e3e1db;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+.cos-theme-fallback[data-dark='true'] {
+  background: #0e0e12;
+}
+
+/* ------------------------------------------------------------------- faq */
+/* sections/ActFaq.tsx: the heading holds the left column, the questions open in place on the right
+   (the phone menu's open-in-place rows). Tokens only, so dark needs no rules of its own */
+.cos-faq-inner {
+  display: grid;
+  gap: clamp(32px, 5vw, 56px);
+}
+@media (min-width: 1024px) {
+  .cos-faq-inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+  }
+}
+/* the halftone question-to-plane mark (animations/ask-mark.ts): under the heading, desktop only */
+.cos-faq-mark {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .cos-faq-mark {
+    display: block;
+    width: min(100%, 440px);
+    margin-top: clamp(28px, 4vh, 48px);
+    margin-left: -20px;
+  }
+}
+.cos-faq-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--cos-line);
+}
+.cos-faq-row {
+  border-top: 1px solid var(--cos-line);
+}
+.cos-faq-q {
+  margin: 0;
+  font: inherit;
+}
+.cos-faq-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  min-height: 72px;
+  padding: 18px 0;
+  /* the card title's step (.cos-more-title) */
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-align: left;
+  color: var(--cos-ink);
+}
+.cos-faq-icon {
+  flex: none;
+  color: var(--cos-ink-2);
+  transition:
+    transform 260ms var(--cos-ease-out),
+    color 160ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cos-faq-btn:hover .cos-faq-icon {
+    color: var(--cos-ink);
+  }
+}
+.cos-faq-btn:active .cos-faq-icon {
+  transform: scale(0.9);
+}
+/* open: the plus turns into a close mark */
+.cos-faq-row[data-open] .cos-faq-icon {
+  transform: rotate(45deg);
+  color: var(--cos-ink);
+}
+/* pressing an open row still gives feedback (the open rule above would otherwise win) */
+.cos-faq-row[data-open] .cos-faq-btn:active .cos-faq-icon {
+  transform: rotate(45deg) scale(0.9);
+}
+.cos-faq-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms var(--cos-ease-out);
+}
+.cos-faq-row[data-open] .cos-faq-body {
+  grid-template-rows: 1fr;
+}
+.cos-faq-inner-a {
+  min-height: 0;
+  overflow: hidden;
+}
+.cos-faq-row:not([data-open]) .cos-faq-inner-a {
+  visibility: hidden;
+  transition: visibility 0s linear 280ms;
+}
+.cos-faq-a {
+  max-width: 56ch;
+  margin: 0;
+  padding: 0 44px 26px 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--cos-ink-2);
+  text-wrap: pretty;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-faq-icon,
+  .cos-faq-body {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------- integration pages (/for/*) */
+/* pages/ForGrokBot.tsx: no sky behind the nav, so its links show from the top */
+.cos[data-page='sub'] .cos-nav:not([data-scrolled='true']) .cos-nav-links {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.cos-for-hero {
+  padding: 96px var(--cos-gutter) clamp(72px, 10vh, 120px);
+}
+/* the scene draws the title and its line; its canvas has an empty foot below them, trimmed here (the
+   orbit's lowest pass ends above the cut) */
+.cos-for-scene {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto -64px;
+}
+/* the hero alone on the first screen: the next section's heading never peeks in */
+@media (min-width: 720px) {
+  .cos-for-hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100svh;
+  }
+}
+@media (max-width: 719px) {
+  .cos-for-hero {
+    padding-top: 76px;
+  }
+  .cos-for-scene {
+    margin-bottom: -100px;
+  }
+}
+
+/* two columns: words and a picture of the thing */
+.cos-for-split {
+  display: grid;
+  gap: clamp(40px, 6vw, 72px);
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .cos-for-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.cos-for-steps {
+  display: grid;
+  gap: 26px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cos-for-steps li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 14px;
+}
+.cos-for-step-n {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  color: var(--cos-ink);
+  box-shadow: inset 0 0 0 1px var(--cos-line);
+}
+.cos-for-step-title {
+  margin: 3px 0 0;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--cos-ink);
+}
+.cos-for-step-line {
+  margin: 6px 0 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--cos-ink-2);
+}
+
+/* the MCP URL with its copy button (pages/CopyField.tsx) */
+.cos-copy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 440px;
+  margin-top: 12px;
+  padding: 6px 6px 6px 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(16, 17, 24, 0.1);
+}
+.cos-copy-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 14px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--cos-ink);
+}
+.cos-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--cos-ink);
+  background: rgba(16, 17, 24, 0.05);
+  transition:
+    background-color 160ms ease,
+    transform 160ms var(--cos-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cos-copy-btn:hover {
+    background: rgba(16, 17, 24, 0.09);
+  }
+}
+.cos-copy-btn:active {
+  transform: scale(0.97);
+}
+.cos-copy-btn[data-state='copied'] {
+  color: var(--cos-blue);
+}
+
+/* step 3 happening (animations/grok-chat.ts): a painted panel like the landing's feature cards */
+.cos-for-panel {
+  overflow: hidden;
+  border-radius: 12px;
+}
+@media (max-width: 719px) {
+  .cos-for-panel {
+    max-width: 420px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+/* the four scopes on a key, as a ContentOS window on a painted panel: the same frame, window and type
+   as the chat scene beside it (the landing's feature panels: white window, 1px line, radius 12, a close
+   shadow, 13 px Geist, on switches in ink). On and off are said in words; the switch only repeats it */
+.cos-for-keys-panel {
+  --gk-frag: #ffffff;
+  --gk-line: rgba(16, 17, 24, 0.12);
+  --gk-ink: #16171b;
+  --gk-ink2: #55575f;
+  --gk-track: rgba(16, 17, 24, 0.1);
+  --gk-knob: #ffffff;
+  --gk-shadow: 0 10px 28px rgba(30, 40, 80, 0.2);
+  position: relative;
+  aspect-ratio: 600 / 420;
+  padding: 7.3% 0 0 8%;
+  background: url('/scene/grok-keys/ground-day.jpg') center / cover;
+}
+html[data-cos-theme='dark'] .cos-for-keys-panel {
+  --gk-frag: #1c1d20;
+  --gk-line: rgba(255, 255, 255, 0.1);
+  --gk-ink: #eceef0;
+  --gk-ink2: #a9aeb5;
+  --gk-track: rgba(255, 255, 255, 0.12);
+  --gk-knob: #1c1d20;
+  --gk-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  background-image: url('/scene/grok-keys/ground-night.jpg');
+}
+.cos-for-win {
+  height: 100%;
+  border-radius: 12px 0 0 0;
+  background: var(--gk-frag);
+  box-shadow:
+    inset 0 0 0 1px var(--gk-line),
+    var(--gk-shadow);
+  font-family: var(--cos-geist);
+}
+.cos-for-win-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--gk-line);
+  font-size: 13px;
+}
+.cos-for-win-name {
+  font-weight: 520;
+  color: var(--gk-ink);
+}
+.cos-for-win-sub {
+  color: var(--gk-ink2);
+}
+.cos-for-keys {
+  display: grid;
+  margin: 0;
+  padding: 0 22px 0 20px;
+  list-style: none;
+}
+.cos-for-key {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 58px;
+  padding: 10px 0;
+}
+.cos-for-key + .cos-for-key {
+  border-top: 1px solid var(--gk-line);
+}
+.cos-for-key-text {
+  display: grid;
+  gap: 2px;
+}
+.cos-for-key-name {
+  font-size: 13px;
+  font-weight: 520;
+  color: var(--gk-ink);
+}
+.cos-for-key-line {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--gk-ink2);
+}
+.cos-for-key-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-width: 52px;
+  font-size: 12px;
+  color: var(--gk-ink2);
+}
+.cos-for-key[data-on] .cos-for-key-state {
+  color: var(--gk-ink);
+}
+.cos-for-switch {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--gk-track);
+}
+.cos-for-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--gk-knob);
+  box-shadow: 0 1px 2px rgba(16, 17, 24, 0.25);
+}
+html[data-cos-theme='dark'] .cos-for-key:not([data-on]) .cos-for-switch::after {
+  background: #a9aeb5;
+}
+.cos-for-key[data-on] .cos-for-switch {
+  background: var(--gk-ink);
+}
+.cos-for-key[data-on] .cos-for-switch::after {
+  left: 14px;
+}
+/* phones: the chat's phone shape, the window held 16 in from each side */
+@media (max-width: 719px) {
+  .cos-for-keys-panel {
+    aspect-ratio: auto;
+    padding: 16px 16px 0;
+  }
+  .cos-for-win {
+    border-radius: 12px 12px 0 0;
+  }
+}
+
+html[data-cos-theme='dark'] .cos-copy {
+  background: #0f171c;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+html[data-cos-theme='dark'] .cos-copy-btn {
+  background: rgba(255, 255, 255, 0.07);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-copy-btn {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------- pricing */
+/* pages/Pricing.tsx: the price leads. The word, then the card */
+.cos-price {
+  position: relative;
+  overflow: hidden;
+  padding: calc(76px + clamp(48px, 7vh, 88px)) var(--cos-gutter) clamp(96px, 12vh, 140px);
+}
+.cos-price-title {
+  position: relative;
+  z-index: 1;
+}
+.cos-price-stage {
+  position: relative;
+  margin-top: clamp(40px, 6vh, 64px);
+}
+.cos-price-stage > .cos-price-card {
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
+}
+.cos-price-notice {
+  max-width: 640px;
+  margin: 28px 0 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  color: var(--cos-ink);
+  box-shadow: inset 0 0 0 1px var(--cos-line);
+}
+/* the price and what it includes, on the landing's card surface */
+.cos-price-card {
+  display: grid;
+  margin-top: clamp(36px, 5vw, 56px);
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(16, 17, 24, 0.09);
+}
+@media (min-width: 900px) {
+  .cos-price-card {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .cos-price-incl {
+    border-left: 1px solid var(--cos-line);
+  }
+}
+.cos-price-calc,
+.cos-price-incl {
+  padding: clamp(24px, 3.4vw, 40px);
+}
+@media (max-width: 899px) {
+  .cos-price-incl {
+    border-top: 1px solid var(--cos-line);
+  }
+}
+.cos-price-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--cos-ink);
+}
+.cos-price-amount {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 0;
+  font-size: clamp(2.75rem, 1.6rem + 2.6vw, 3.75rem);
+  font-weight: 500;
+  font-stretch: 104%;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--cos-ink);
+}
+.cos-price-amount span {
+  font-size: 15px;
+  font-weight: 450;
+  letter-spacing: -0.01em;
+  color: var(--cos-ink-2);
+}
+.cos-price-box {
+  margin-top: 28px;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px var(--cos-line);
+}
+.cos-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+}
+.cos-price-row-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--cos-ink);
+}
+.cos-price-row-line {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--cos-ink-2);
+  text-wrap: balance;
+}
+/* narrow: the counter sits beside "Accounts" and the line runs full width under both */
+@media (max-width: 559px) {
+  .cos-price-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'title step' 'line line';
+    align-items: center;
+    row-gap: 6px;
+  }
+  .cos-price-row > div:first-child {
+    display: contents;
+  }
+  .cos-price-row-title {
+    grid-area: title;
+  }
+  .cos-price-row-line {
+    grid-area: line;
+    margin: 0;
+  }
+  .cos-step {
+    grid-area: step;
+  }
+}
+/* the counter: minus, the count, plus; 44px targets */
+.cos-step {
+  display: inline-flex;
+  align-items: stretch;
+  flex: none;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--cos-line);
+}
+.cos-step-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: var(--cos-ink);
+  transition:
+    background-color 160ms ease,
+    transform 160ms var(--cos-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cos-step-btn:not(:disabled):hover {
+    background: rgba(16, 17, 24, 0.05);
+  }
+}
+.cos-step-btn:not(:disabled):active {
+  transform: scale(0.94);
+}
+.cos-step-btn:disabled {
+  color: var(--cos-ink-2);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.cos-step-n {
+  display: grid;
+  place-items: center;
+  min-width: 52px;
+  font-size: 17px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--cos-ink);
+  border-left: 1px solid var(--cos-line);
+  border-right: 1px solid var(--cos-line);
+}
+.cos-price-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 20px;
+  padding: 18px 0;
+  font-size: 16px;
+  color: var(--cos-ink-2);
+  border-top: 1px solid var(--cos-line);
+}
+.cos-price-total-n {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--cos-ink);
+}
+.cos-price-total-n small {
+  font-size: 15px;
+  font-weight: 450;
+  color: var(--cos-ink-2);
+}
+.cos-price-note {
+  margin: 18px 0 0;
+  font-size: 15px;
+  color: var(--cos-ink-2);
+}
+.cos-price-go {
+  width: 100%;
+  margin-top: 22px;
+}
+.cos-price-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--cos-ink);
+}
+.cos-price-more svg {
+  transition: transform 200ms var(--cos-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cos-price-more:hover svg {
+    transform: translateX(3px);
+  }
+}
+.cos-price-incl-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 550;
+  color: var(--cos-ink);
+}
+.cos-price-incl ul {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cos-price-incl li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--cos-ink);
+}
+.cos-price-incl li svg {
+  margin-top: 3px;
+  color: var(--cos-ink-2);
+}
+html[data-cos-theme='dark'] .cos-price-card {
+  background: #0f171c;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+@media (hover: hover) and (pointer: fine) {
+  html[data-cos-theme='dark'] .cos-step-btn:not(:disabled):hover {
+    background: rgba(255, 255, 255, 0.07);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-step-btn,
+  .cos-price-more svg {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------- dark theme */
+
+html[data-cos-theme='dark'] body:has(.cos) {
+  background: #080f14;
+}
+html[data-cos-theme='dark'] .cos {
+  --cos-ground: #080f14;
+  --cos-ink: #eef2f4;
+  --cos-ink-2: #a7b1b8;
+  --cos-ink-3: #75818a;
+  --cos-ink-sky: #c1cbd1;
+  --cos-line: rgba(255, 255, 255, 0.08);
+  --cos-blue: #6cc6eb;
+  color-scheme: dark;
+}
+html[data-cos-theme='dark'] .cos-panel {
+  background: #0e2a3b;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+html[data-cos-theme='dark'] .cos-nav[data-scrolled='true'] {
+  background: rgba(8, 15, 20, 0.98);
+}
+html[data-cos-theme='dark'] .cos-hero-title {
+  text-shadow: 0 2px 40px rgba(3, 20, 30, 0.5);
+}
+/* the line under it crosses the clouds, so it is brighter and carries a soft shade */
+html[data-cos-theme='dark'] .cos-hero-sub {
+  color: #e2e9ed;
+  text-shadow:
+    0 1px 2px rgba(3, 20, 30, 0.45),
+    0 2px 22px rgba(3, 20, 30, 0.7);
+}
+/* buttons swap: the bright metal leads at night */
+html[data-cos-theme='dark'] .cos-btn-metal {
+  color: #17171a;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f1f3 46%, #dcdce0 54%, #ececef 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 10px 30px -10px rgba(108, 198, 235, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+html[data-cos-theme='dark'] .cos-btn-metal::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.25));
+}
+html[data-cos-theme='dark'] .cos-btn-silver {
+  color: #f2f2f5;
+  background: linear-gradient(180deg, #37404a 0%, #222a31 46%, #141a1f 54%, #1b2228 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 8px 20px -8px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+html[data-cos-theme='dark'] .cos-btn-silver::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+}
+
+/* ------------------------------------------------- ground: grain and glow */
+
+/* light: the grain in ocean navy rather than grey (dark keeps its own grain below) */
+.cos {
+  --cos-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .06 0 0 0 0 .17 0 0 0 0 .28 .55 0 0 0 -.24'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: var(--cos-noise);
+  background-size: 180px;
+}
+html[data-cos-theme='dark'] .cos {
+  --cos-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .42 0 0 0 -.19'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* a slow gradient aura that the product window sits in */
+.cos-hero-demo::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 34%;
+  width: min(1400px, 120%);
+  aspect-ratio: 2.2;
+  translate: -50% 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(40% 55% at 22% 50%, rgba(240, 138, 75, 0.38), transparent 70%),
+    radial-gradient(40% 55% at 78% 46%, rgba(47, 91, 234, 0.3), transparent 70%),
+    radial-gradient(45% 60% at 50% 62%, rgba(185, 179, 224, 0.5), transparent 72%);
+  filter: blur(40px);
+  animation: cos-aura 22s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  pointer-events: none;
+}
+@keyframes cos-aura {
+  from {
+    transform: rotate(-4deg) scale(1);
+  }
+  to {
+    transform: rotate(5deg) scale(1.08);
+  }
+}
+html[data-cos-theme='dark'] .cos-hero-demo::before {
+  background:
+    radial-gradient(40% 55% at 22% 50%, rgba(24, 150, 190, 0.4), transparent 70%),
+    radial-gradient(40% 55% at 78% 46%, rgba(40, 110, 220, 0.34), transparent 70%),
+    radial-gradient(45% 60% at 50% 62%, rgba(70, 215, 185, 0.2), transparent 72%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-hero-demo::before {
+    animation: none;
+  }
+}
+/* phones: the glow's gradients are soft already; a live 40 px blur on an animating layer is
+   recomputed every frame and made scrolling through the hero stutter */
+@media (max-width: 719px) {
+  .cos-hero-demo::before {
+    filter: none;
+    animation: none;
+  }
+}
+
+/* the theme switch: one wipe from the toggle over the whole page (theme.tsx).
+   The toggle rides on its own layer, live above the wipe, so its slide is never clipped. */
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-old(cos-nav),
+::view-transition-new(cos-nav) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root),
+::view-transition-new(cos-nav) {
+  z-index: 1;
+}
+/* the nav is its own layer, wiped by the same circle (it sits at the top-left, so the
+   circle's page coordinates line up with its own) */
+.cos-nav {
+  view-transition-name: cos-nav;
+}
+::view-transition-group(cos-nav) {
+  z-index: 2;
+  animation: none;
+}
+.cos-theme-toggle {
+  view-transition-name: cos-theme-toggle;
+}
+::view-transition-group(cos-theme-toggle) {
+  z-index: 3;
+  animation: none;
+}
+::view-transition-old(cos-theme-toggle) {
+  display: none;
+}
+::view-transition-new(cos-theme-toggle) {
+  animation: none;
+}
+
+
+@media (max-width: 719px) {
+  .cos-nav-actions .cos-btn-metal {
+    display: none;
+  }
+  .cos-theme-toggle {
+    width: 62px;
+    height: 33px;
+  }
+}
+
+/* ------------------------------------------------------------ act 1: the voice check */
+
+.cos-act {
+  --act-gap: clamp(40px, 5.4vh, 64px);
+  position: relative;
+  overflow: hidden;
+  padding: clamp(96px, 13.4vh, 152px) var(--cos-gutter) clamp(88px, 12vh, 140px);
+}
+/* the plane mark in the halftone the rejected draft breaks into, top right, its tail tucked a
+   little behind the window. The artwork fills 18-82% of its box, so the box can ride above the
+   section's top edge without the nose being clipped */
+.cos-act-mark {
+  --mark: min(540px, 40vw);
+  position: absolute;
+  z-index: 0;
+  right: 1vw;
+  top: clamp(-72px, -4vw, -20px);
+  width: var(--mark);
+  aspect-ratio: 1;
+  opacity: 0.2;
+  pointer-events: none;
+}
+.cos-act-mark > div {
+  width: 100%;
+  height: 100%;
+}
+html[data-cos-theme='dark'] .cos-act-mark {
+  opacity: 0.17;
+}
+/* on a phone the big mark would only peek out from under the nav beside the heading; a flock
+   of small ones crosses a band above the heading instead (animations/plane-flock.ts) */
+.cos-act-flock {
+  display: none;
+}
+@media (max-width: 719px) {
+  .cos-act:has(.cos-act-flock) {
+    padding-top: 184px;
+  }
+  .cos-act-mark {
+    display: none;
+  }
+  .cos-act-flock {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 12px;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+  }
+}
+.cos-act-inner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--cos-max);
+  margin: 0 auto;
+}
+/* the heading sits on the content's left edge, the same edge as the window under it */
+.cos-act-title {
+  max-width: 15em;
+  margin: 0;
+  font-size: clamp(2.5rem, 1.2rem + 3vw, 3.75rem);
+  font-weight: 500;
+  font-stretch: 104%;
+  line-height: 1.02;
+  letter-spacing: -0.034em;
+  color: var(--cos-ink);
+  font-feature-settings: 'ss01', 'ss02';
+  text-wrap: balance;
+}
+.cos-act-lede {
+  max-width: 46ch;
+  margin: 24px 0 0;
+  font-size: clamp(17px, 0.95rem + 0.3vw, 19px);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  color: var(--cos-ink-2);
+  text-wrap: pretty;
+}
+.cos-act-scene {
+  margin-top: var(--act-gap);
+  /* the window is drawn edge to edge in the canvas: match its corner (22 of 1200 x 404) so the
+     shadow follows it at any width; the shadow is the hero demo window's */
+  border-radius: 1.833% / 5.446%;
+  box-shadow:
+    0 2px 6px rgba(30, 40, 80, 0.06),
+    0 50px 100px -40px rgba(30, 40, 80, 0.45);
+}
+html[data-cos-theme='dark'] .cos-act-scene {
+  box-shadow: 0 50px 100px -40px rgba(0, 0, 0, 0.7);
+}
+/* Act 2 mirrors Act 1 on desktop: the words take the right-hand column and the audience
+   field (a halftone crowd of people) sits on the left, tucked behind the window like Act 1's plane */
+.cos-act-field {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .cos-act-flip .cos-act-head {
+    width: min(600px, 52%);
+    margin-left: auto;
+  }
+  .cos-act-field {
+    --field: min(640px, 46vw);
+    display: block;
+    position: absolute;
+    z-index: 0;
+    left: calc(max(var(--cos-gutter), (100vw - var(--cos-max)) / 2) - 70px);
+    top: clamp(-40px, -2.5vw, -16px);
+    width: var(--field);
+    aspect-ratio: 10 / 7;
+    pointer-events: none;
+  }
+  .cos-act-field > div {
+    width: 100%;
+    height: 100%;
+  }
+}
+/* under 1024 px: the crowd as a strip above the heading (the narrow people-field build) */
+.cos-act-crowd {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .cos-act:has(.cos-act-crowd) {
+    padding-top: calc(min(100vw, 520px) * 190 / 390 + 28px);
+  }
+  .cos-act-crowd {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 10px;
+    left: 0;
+    right: 0;
+    width: min(100%, 520px);
+    margin: 0 auto;
+    pointer-events: none;
+  }
+}
+/* Act 3 is a split on desktop: the words in the left column, the outreach timeline beside them
+   (drawn on the page, no window), so the third section changes shape again */
+.cos-act-thread {
+  margin-top: var(--act-gap);
+}
+.cos-act-thread canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@media (min-width: 1024px) {
+  .cos-act-split .cos-act-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 600px);
+    column-gap: clamp(48px, 6vw, 104px);
+    align-items: start;
+  }
+  .cos-act-split .cos-act-head {
+    padding-top: 8px;
+  }
+  .cos-act-thread {
+    margin-top: 0;
+  }
+  .cos-act-split .cos-act-talk {
+    display: block;
+    width: min(100%, 440px);
+    margin-top: clamp(44px, 7vh, 80px);
+  }
+}
+/* Act 3's halftone conversation, under the sentence on desktop only */
+.cos-act-talk {
+  display: none;
+}
+/* and under 1024 px, as a strip above the heading (the narrow talk-mark build), held to the
+   gutters rather than bleeding like Act 2's crowd, since it is two objects, not a field */
+.cos-act-chat {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .cos-act:has(.cos-act-chat) {
+    padding-top: calc(min(100vw - 2 * var(--cos-gutter), 420px) * 212 / 390 + 28px);
+  }
+  .cos-act-chat {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 10px;
+    left: 0;
+    right: 0;
+    width: min(calc(100% - 2 * var(--cos-gutter)), 420px);
+    margin: 0 auto;
+    pointer-events: none;
+  }
+}
+/* after the acts: four features in a grid (ActMore, animations/grid-panels.ts), cards in the x.ai
+   manner: the card one step off the page with a hairline, its words on top, then its panel (a lit
+   painting with the product on it) running off the card's bottom edge */
+.cos-more-grid {
+  display: grid;
+  gap: clamp(14px, 1.6vw, 20px);
+  margin-top: var(--act-gap);
+}
+/* wide then narrow, then narrow then wide: the panels are 640 and 440 units wide and 340 tall, so
+   640fr / 440fr gives every panel the same height */
+.cos-more-row {
+  display: grid;
+  grid-template-columns: minmax(0, 640fr) minmax(0, 440fr);
+  gap: inherit;
+}
+.cos-more-row[data-flip] {
+  grid-template-columns: minmax(0, 440fr) minmax(0, 640fr);
+}
+.cos-more-box {
+  --pad: 32px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--pad) var(--pad) 0;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(16, 17, 24, 0.09);
+}
+html[data-cos-theme='dark'] .cos-more-box {
+  background: #0f171c;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.cos-more-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  color: var(--cos-ink);
+}
+.cos-more-body {
+  max-width: 46ch;
+  min-height: 48px;
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: color-mix(in srgb, var(--cos-ink) 84%, transparent);
+  text-wrap: pretty;
+}
+/* the panel: the box's full width inside its padding, rounded on top, cut by the card's bottom edge */
+.cos-more-panel {
+  position: relative;
+  margin-top: 32px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+}
+/* in a row, the wide card's panel sets the height; the narrow card's panel fills the same height
+   and its picture keeps its shape, centred, so a centred window stays centred */
+@media (min-width: 861px) {
+  .cos-more-box[data-narrow] .cos-more-panel {
+    flex: 1 1 auto;
+  }
+  .cos-more-box[data-narrow] .cos-more-panel > .cos-clayzo {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: auto;
+  }
+}
+.cos-more-panel canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@media (max-width: 1023px) {
+  .cos-more-box {
+    --pad: 28px;
+  }
+}
+@media (max-width: 860px) {
+  .cos-more-row,
+  .cos-more-row[data-flip] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* the panels keep their desktop shape until the grid stacks, then take their phone composition
+   (320 x 300, the window centred and cut only by the bottom), so stacked cards are all one height */
+@media (min-width: 861px) and (max-width: 1023px) {
+  .cos-more-panel .cos-clayzo[data-narrow] {
+    aspect-ratio: var(--scene-ar);
+    max-width: none;
+  }
+}
+@media (max-width: 860px) {
+  .cos-more-panel .cos-clayzo[data-narrow] {
+    aspect-ratio: var(--scene-ar-narrow);
+    width: 100%;
+    max-width: none;
+  }
+  /* stacked, every card's sentence holds three lines, so the cards are one height */
+  .cos-more-body {
+    min-height: 72px;
+  }
+}
+@media (max-width: 639px) {
+  .cos-more-box {
+    --pad: 24px;
+    border-radius: 18px;
+  }
+}
+
+/* ------------------------------------------------------------ closing band */
+/* full bleed, in the scene's own shape (1440 x 640), never shorter than the words need: then the
+   scene keeps its height and its faded sides run off the screen. Phones get the 390 x 640 build */
+.cos-cta {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1440 / 640;
+  min-height: 560px;
+  max-height: 800px;
+  margin-top: clamp(56px, 7vw, 112px);
+  overflow: hidden;
+}
+.cos-cta-field {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  aspect-ratio: 1440 / 640;
+}
+.cos-cta-field > .cos-clayzo {
+  width: 100%;
+  height: 100%;
+}
+.cos-cta-field canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* the words let the cursor through to the sky; only the buttons take it */
+.cos-cta-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 760px;
+  padding: 0 var(--cos-gutter);
+  text-align: center;
+  pointer-events: none;
+}
+.cos-cta-title {
+  margin: 0;
+  font-size: clamp(2.5rem, 1.2rem + 3.4vw, 4.25rem);
+  font-weight: 500;
+  font-stretch: 104%;
+  line-height: 1.02;
+  letter-spacing: -0.036em;
+  color: var(--cos-ink);
+  text-wrap: balance;
+  /* a halo of the page's own ground lifts the words off the dots */
+  text-shadow: 0 0 28px var(--cos-ground), 0 0 10px var(--cos-ground);
+}
+.cos-cta-sub {
+  max-width: 40ch;
+  margin: 20px 0 0;
+  font-size: clamp(17px, 0.95rem + 0.3vw, 19px);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--cos-ink-sky);
+  text-wrap: balance;
+  text-shadow: 0 0 18px var(--cos-ground), 0 0 6px var(--cos-ground);
+}
+.cos-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+  pointer-events: auto;
+}
+@media (max-width: 719px) {
+  .cos-cta {
+    aspect-ratio: 390 / 640;
+    min-height: 0;
+    max-height: none;
+  }
+  .cos-cta-field {
+    left: 0;
+    right: 0;
+    transform: none;
+    aspect-ratio: auto;
+  }
+  .cos-cta-field > .cos-clayzo {
+    aspect-ratio: auto;
+    max-width: none;
+  }
+}
+
+/* ------------------------------------------------------------------ footer */
+/* the promise and the way around the site, then the name across the full width in paper planes */
+.cos-foot {
+  /* the closing band above already fades out into the page */
+  margin-top: 0;
+}
+.cos-foot-inner {
+  max-width: calc(var(--cos-max) + 2 * var(--cos-gutter));
+  margin: 0 auto;
+  padding: clamp(48px, 6vw, 80px) var(--cos-gutter) 0;
+}
+.cos-foot-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr);
+  gap: 48px;
+}
+.cos-foot-promise {
+  margin: 0;
+  font-size: clamp(1.5rem, 1rem + 1.2vw, 2rem);
+  font-weight: 500;
+  font-stretch: 104%;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--cos-ink);
+}
+.cos-foot-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+.cos-foot-title {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--cos-ink-3);
+}
+.cos-foot-col ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cos-foot-link {
+  font-size: 15px;
+  color: var(--cos-ink-2);
+  transition: color 160ms ease;
+}
+@media (hover: hover) {
+  .cos-foot-link:hover {
+    color: var(--cos-ink);
+  }
+}
+.cos-foot-base {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: clamp(48px, 6vw, 72px);
+  font-size: 13px;
+  color: var(--cos-ink-3);
+}
+/* the name runs edge to edge; its scene keeps its own shape (the narrow build only on phones) */
+.cos-foot-word {
+  margin-top: clamp(20px, 3vw, 36px);
+}
+.cos-foot-word .cos-clayzo,
+.cos-foot-word .cos-clayzo[data-narrow] {
+  width: 100%;
+  max-width: none;
+  aspect-ratio: var(--scene-ar);
+}
+.cos-foot-word canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@media (max-width: 860px) {
+  .cos-foot-top {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+}
+@media (max-width: 719px) {
+  .cos-foot-word .cos-clayzo[data-narrow] {
+    aspect-ratio: var(--scene-ar-narrow);
+  }
+}
+/* phones: the promise at a size that holds the screen, Product and Explore side by side, Company
+   as one row of links across both, and the name on two lines (the narrow build), big enough that
+   every plane reads as one */
+@media (max-width: 520px) {
+  .cos-foot-promise {
+    font-size: 2.125rem;
+    line-height: 1.06;
+  }
+  .cos-foot-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 36px;
+  }
+  .cos-foot-col:last-child {
+    grid-column: 1 / -1;
+  }
+  .cos-foot-col:last-child ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+  }
+}
+/* under 720 px the name is the two-line build: held to the text column's edge (its ink starts 3 % in),
+   with the year in the empty corner beside OS, on its baseline */
+@media (max-width: 719px) {
+  .cos-foot {
+    position: relative;
+  }
+  .cos-foot-word {
+    margin-top: 48px;
+    padding: 0 calc(var(--cos-gutter) - 3vw) 10px;
+  }
+  .cos-foot-base {
+    position: absolute;
+    right: var(--cos-gutter);
+    bottom: calc(10px + (100vw - 2 * (var(--cos-gutter) - 3vw)) * 10 / 390);
+    margin: 0;
+  }
+}
+
+/* the lead sort's window: 22 of 1200 x 440 */
+.cos-act-scene-leads {
+  border-radius: 1.833% / 5%;
+}
+.cos-clayzo {
+  aspect-ratio: var(--scene-ar);
+}
+/* below 1024 px the wide window's type gets too small; scenes switch to their stacked
+   composition (ClayzoScene NARROW), held to a readable column */
+@media (max-width: 1023px) {
+  .cos-clayzo[data-narrow] {
+    aspect-ratio: var(--scene-ar-narrow);
+    max-width: 440px;
+  }
+  .cos-act-scene {
+    border-radius: 5.747% / 3.546%;
+  }
+  .cos-act-scene-leads {
+    border-radius: 5.747% / 2.865%;
+  }
+}
+.cos-act-scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
