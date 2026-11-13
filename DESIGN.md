@@ -42,8 +42,7 @@ components:
   button-primary: { backgroundColor: "{colors.ink}", textColor: "{colors.ground}", rounded: "{rounded.control}", height: 52px }
   button-secondary: { backgroundColor: "#ffffff", textColor: "{colors.ink}", rounded: "{rounded.control}", height: 52px }
 
-seam:
-  index: .seam/design-index.json
+scope:
   sources: [src/components/site/site.css, src/app/layout.tsx]
   maturity: partial
   surfaces:
@@ -110,7 +109,7 @@ transition. Dark redefines the same `--cos-*` tokens (deep-ocean ground, cool in
 hard-code a second colour for dark; they read the token or add one `html[data-cos-theme='dark']` rule next to the
 light rule.
 
-Contrast (measured with Seam `contrast.mjs`, WCAG 2.2):
+Contrast (WCAG 2.2):
 
 | Pair | Light | Dark |
 |---|---|---|
@@ -273,5 +272,5 @@ Known debt (recorded at detect time; not reviewed per PR):
 - 2026-11-10 · India is the only backdrop: the `?bg` switch and the painted-sky assets are removed; the Grok Bot page's two panels get paintings of their own (Ladakh, Hampi).
 - 2026-11-10 · `/for/grok-bot`: integration page (hero scene, connect steps with CopyField, key scopes, closing band); experimental.
 - 2026-11-09 · FAQ section (`ActFaq`, experimental) before the closing band; answers from the product handover only.
-- 2026-11-09 · Seam onboarding: DESIGN.md rewritten for the new landing page (Mona Sans, painted sky, deep-ocean
+- 2026-11-09 · Design system: DESIGN.md rewritten for the new landing page (Mona Sans, painted sky, deep-ocean
   dark, Clayzo scenes); the earlier "Content Relay" direction is retired.
